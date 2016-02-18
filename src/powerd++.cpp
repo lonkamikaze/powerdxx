@@ -14,6 +14,9 @@
 #include <sys/sysctl.h>    /* sysctl() */
 #include <sys/resource.h>  /* CPUSTATES */
 
+#include <signal.h>  /* signal() */
+#include <libutil.h> /* pidfile_*() */
+
 namespace {
 
 using namespace powerdxx;
@@ -46,7 +49,7 @@ typedef unsigned long cptime_t;
 /**
  * Type for CPU frequencies in MHz.
  */
-typedef unsigned int freq_t;
+typedef unsigned int mhz_t;
 
 /**
  * The MIB for hw.ncpu.
@@ -85,7 +88,7 @@ char const FREQ[] = "dev.cpu.%d.freq";
  */
 enum class Exit : int {
 	OK, ESYSCTL, ENOFREQ, EFORBIDDEN, EMODE, ECLARG, EFREQ,
-	EIVAL, ESAMPLES
+	EIVAL, ESAMPLES, EDAEMON, ECONFLICT, EPID
 }; 
 
 /**
@@ -93,7 +96,7 @@ enum class Exit : int {
  */
 const char * const ExitStr[]{
 	"OK", "ESYSCTL", "ENOFREQ", "EFORBIDDEN", "EMODE", "ECLARG", "EFREQ",
-	"EIVAL", "ESAMPLES"
+	"EIVAL", "ESAMPLES", "EDAEMON", "ECONFLICT", "EPID"
 };
 
 /**
@@ -113,37 +116,141 @@ typedef std::tuple<Exit, std::string> Exception;
 template <typename T, size_t Count>
 constexpr size_t countof(T (&)[Count]) { return Count; }
 
+/**
+ * Contains the management information for a single CPU core.
+ */
 struct Core {
+	/**
+	 * The MIB to kern.cpu.N.freq, if present.
+	 */
 	mib_t freq_mib[4] = {0};
+
+	/**
+	 * The core that controls the frequency for this core.
+	 */
 	coreid_t controller = -1;
+
+	/**
+	 * The idle time during the last frame, a value in the range [0, 1024].
+	 */
 	cptime_t idle = 0;
 };
 
+/**
+ * The idle target for adaptive load, equals 50% load.
+ */
 cptime_t const ADP{512};
+
+/**
+ * The idle target for hiadaptive load, equals 25% load.
+ */
 cptime_t const HADP{768};
 
-/* wrap all the mutable globals in a struct for clearer semantics */
+/**
+ * A collection of all the gloabl, mutable states.
+ *
+ * This is mostly for semantic clarity.
+ */
 struct {
-	size_t samples_max = 5;
-	size_t sample = 0;
-	cptime_t target = ADP;
-	freq_t target_freq{0};
-	coreid_t ncpu;
+	/**
+	 * The last signal received, used for terminating.
+	 */
+	int signal{0};
+
+	/**
+	 * The number of cp_time samples to take.
+	 *
+	 * At least 2 are required.
+	 */
+	size_t samples{5};
+
+	/**
+	 * The polling interval.
+	 */
 	ms interval{500};
-	freq_t freq_min{0};
-	freq_t freq_max{1000000};
 
+	/**
+	 * The current sample.
+	 */
+	size_t sample{0};
+
+	/**
+	 * The number of CPU cores or threads.
+	 */
+	coreid_t ncpu{0};
+
+	/**
+	 * Lowest frequency to set in MHz.
+	 */
+	mhz_t freq_min{0};
+
+	/**
+	 * Highest frequency to set in MHz.
+	 */
+	mhz_t freq_max{1000000};
+
+	/**
+	 * Target idle times [0, 1024].
+	 *
+	 * The value 0 indicates the corresponding fixed frequency setting
+	 * from target_freqs should be used.
+	 */
 	cptime_t targets[3]{ADP, HADP, HADP};
-	freq_t target_freqs[3]{0, 0, 0};
 
+	/**
+	 * Fixed clock frequencies to use if the target load is set to 0.
+	 */
+	mhz_t target_freqs[3]{0, 0, 0};
+
+	/**
+	 * The target load for the current AC line state.
+	 */
+	cptime_t target = HADP;
+
+	/**
+	 * The target clock for the current AC line state if the target loat
+	 * is set to 0.
+	 */
+	mhz_t target_freq{0};
+
+	/**
+	 * The MIB for the AC line.
+	 */
 	mib_t acline_mib[3];
-	AcLineState acline = AcLineState::UNKNOWN;
 
-	bool verbose = false;
+	/**
+	 * The current power source.
+	 */
+	AcLineState acline{AcLineState::UNKNOWN};
 
+	/**
+	 * Verbose/foreground mode.
+	 */
+	bool verbose{false};
+
+	/**
+	 * Name of an alternative pidfile.
+	 *
+	 * If not given pidfile_open() uses a default name.
+	 */
+	char const * pidfilename{nullptr};
+
+	/**
+	 * The MIB for kern.cp_times.
+	 */
 	mib_t cp_times_mib[2];
+
+	/**
+	 * This is a ring buffer to be allocated with ncpu × samples
+	 * instances of cptime_t[CPUSTATES] instances.
+	 */
 	std::unique_ptr<cptime_t[][CPUSTATES]> cp_times;
 
+	/**
+	 * This buffer is to be allocated with ncpu instances of the
+	 * Core struct to store the management information of every
+	 * core.
+	 */
 	std::unique_ptr<Core[]> cores;
 } g;
 
@@ -153,10 +260,19 @@ static_assert(countof(g.targets) == countof(AcLineStateStr),
 static_assert(countof(g.target_freqs) == countof(AcLineStateStr),
               "there must be a target frequency for each state");
 
+/**
+ * Command line argument units.
+ *
+ * These units are supported for command line arguments, for SCALAR
+ * arguments the behaviour of powerd is to be imitated.
+ */
 enum class Unit : size_t {
 	SCALAR, PERCENT, SECOND, MILLISECOND, HZ, KHZ, MHZ, GHZ, THZ, UNKNOWN
 };
 
+/**
+ * The unit strings on the command line, for the respective Unit instances.
+ */
 char const * const UnitStr[]{
 	"", "%", "s", "ms", "hz", "khz", "mhz", "ghz", "thz"
 };
@@ -195,11 +311,19 @@ std::string operator "" _s(char const op[], size_t const size) {
  *	available space
  */
 template <size_t Size, typename... Args>
-inline int sprintf(char (&dst)[Size], const char * format,
+inline int sprintf(char (&dst)[Size], const char format[],
                    Args const... args) {
 	return std::snprintf(dst, Size, format, args...);
 }
 
+/**
+ * Determine the unit of a string encoded value.
+ *
+ * @param str
+ *	The string to determine the unit of
+ * @return
+ *	A unit
+ */
 Unit unit(std::string const & str) {
 	size_t pos = 0;
 	for (; pos < str.length() && ((str[pos] >= '0' && str[pos] <= '9') ||
@@ -213,6 +337,9 @@ Unit unit(std::string const & str) {
 	return Unit::UNKNOWN;
 }
 
+/**
+ *
+ */
 inline void verbose(std::string const & msg) {
 	if (g.verbose) {
 		std::cerr << "powerd++: " << msg << '\n';
@@ -341,7 +468,7 @@ void init() {
 	sysctlnametomib(CP_TIMES, g.cp_times_mib);
 	/* create buffer for system load times */
 	g.cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
-	    new cptime_t[g.samples_max * g.ncpu][CPUSTATES]{{0}});
+	    new cptime_t[g.samples * g.ncpu][CPUSTATES]{{0}});
 }
 
 /*
@@ -353,7 +480,7 @@ void update_cp_times() {
 
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
 		auto const & cp_times = g.cp_times[g.sample * g.ncpu + core];
-		auto const & cp_times_old = g.cp_times[((g.sample + 1) % g.samples_max) * g.ncpu + core];
+		auto const & cp_times_old = g.cp_times[((g.sample + 1) % g.samples) * g.ncpu + core];
 		uint64_t all = 0;
 		for (auto const time : cp_times) { all += time; }
 		for (auto const time : cp_times_old) { all -= time; }
@@ -361,7 +488,7 @@ void update_cp_times() {
 		cptime_t idle = cp_times[CP_IDLE] - cp_times_old[CP_IDLE];
 		g.cores[core].idle = all ? cptime_t((uint64_t{idle} << 10) / all) : 1024;
 	}
-	g.sample = (g.sample + 1) % g.samples_max;
+	g.sample = (g.sample + 1) % g.samples;
 }
 
 void update_idle_times() {
@@ -400,7 +527,7 @@ void update_freq() {
 		if (core.controller != corei) { continue; }
 
 		/* determine target frequency */
-		freq_t freq = 0;
+		mhz_t freq = 0;
 		if (g.target) {
 			/* adaptive frequency mode */
 			sysctl_get(core.freq_mib, freq);
@@ -432,13 +559,14 @@ void update_freq() {
 			sysctl_get(core.freq_mib, freq);
 			std::cout << "power: " << AcLineStateStr[static_cast<int>(g.acline)]
 			          << " load: " << ((1024 - core.idle) * 100 / 1024)
-			          << "% cpu" << corei << ".freq: " << freq << '\n';
+			          << "% cpu" << corei << ".freq: " << freq << " MHz\n";
 		}
 	}
+	std::cout << std::flush;
 }
 
 void reset_cp_times() {
-	for (size_t i = 1; i < g.samples_max; ++i) {
+	for (size_t i = 1; i < g.samples; ++i) {
 		update_cp_times();
 	}
 }
@@ -471,14 +599,14 @@ void set_mode(AcLineState const line, char const str[]) {
 	switch (unit(mode)) {
 	case Unit::SCALAR:
 		if (value > 1. || value < 0) {
-			return fail(Exit::EMODE, "Load targets must be in the range [0.0, 1.0]");
+			return fail(Exit::EMODE, "load targets must be in the range [0.0, 1.0]");
 		}
 		value = 1024 * (1. - value); /* convert load to idle value */
 		g.targets[linei] = value < 1 ? 1 : value;
 		return;
 	case Unit::PERCENT:
 		if (value > 100. || value < 0) {
-			return fail(Exit::EMODE, "Load targets must be in the range [0%, 100%]");
+			return fail(Exit::EMODE, "load targets must be in the range [0%, 100%]");
 		}
 		value = 1024 * (1. - (value / 100.)); /* convert load to idle value */
 		g.targets[linei] = value < 1 ? 1 : value;
@@ -492,10 +620,10 @@ void set_mode(AcLineState const line, char const str[]) {
 	case Unit::MHZ:
 	unit__mhz:
 		if (value > 1000000. || value < 0) {
-			return fail(Exit::EMODE, "Target frequency must be in the range [0Hz, 1THz]");
+			return fail(Exit::EMODE, "target frequency must be in the range [0Hz, 1THz]");
 		}
 		g.targets[linei] = 0;
-		g.target_freqs[linei] = freq_t(value);
+		g.target_freqs[linei] = mhz_t(value);
 		return;
 	case Unit::GHZ:
 		value *= 1000.;
@@ -506,10 +634,10 @@ void set_mode(AcLineState const line, char const str[]) {
 	default:
 		break;
 	}
-	fail(Exit::EMODE, "Mode '"_s + mode + "' not recognised");
+	fail(Exit::EMODE, "mode '"_s + mode + "' not recognised");
 }
 
-freq_t freq(char const str[]) {
+mhz_t freq(char const str[]) {
 	std::string freqstr{str};
 	for (char & ch : freqstr) { ch = std::tolower(ch); }
 
@@ -525,10 +653,10 @@ freq_t freq(char const str[]) {
 	case Unit::MHZ:
 	unit__mhz:
 		if (value > 1000000. || value < 0) {
-			fail(Exit::EFREQ, "Target frequency must be in the range [0Hz, 1THz]");
+			fail(Exit::EFREQ, "target frequency must be in the range [0Hz, 1THz]");
 			return 0;
 		}
-		return freq_t(value);
+		return mhz_t(value);
 	case Unit::GHZ:
 		value *= 1000.;
 		goto unit__mhz;
@@ -538,7 +666,7 @@ freq_t freq(char const str[]) {
 	default:
 		break;
 	}
-	fail(Exit::EFREQ, "Frequency value not recognised: "_s + str);
+	fail(Exit::EFREQ, "frequency value not recognised: "_s + str);
 	return 0;
 };
 
@@ -548,7 +676,7 @@ ms ival(char const * const str) {
 
 	auto value = std::atof(str);
 	if (value < 0) {
-		fail(Exit::EIVAL, "Polling interval must be positive: "_s + str);
+		fail(Exit::EIVAL, "polling interval must be positive: "_s + str);
 		return ms{0};
 	}
 	switch (unit(interval)) {
@@ -560,21 +688,21 @@ ms ival(char const * const str) {
 	default:
 		break;
 	}
-	fail(Exit::EIVAL, "Polling interval not recognised: "_s + str);
+	fail(Exit::EIVAL, "polling interval not recognised: "_s + str);
 	return ms{0};
 }
 
 size_t samples(char const str[]) {
 	if (unit(str) != Unit::SCALAR) {
-		fail(Exit::ESAMPLES, "Sample count must be a number: "_s + str);
+		fail(Exit::ESAMPLES, "sample count must be a number: "_s + str);
 	}
 	auto const cnt = std::atoi(str);
 	auto const cntf = std::atof(str);
 	if (cntf != cnt) {
-		fail(Exit::ESAMPLES, "Sample count must be an integer: "_s + str);
+		fail(Exit::ESAMPLES, "sample count must be an integer: "_s + str);
 	}
 	if (cnt < 2 || cnt > 1001) {
-		fail(Exit::ESAMPLES, "Sample count must be in the range [2; 1001]: "_s + str);
+		fail(Exit::ESAMPLES, "sample count must be in the range [2; 1001]: "_s + str);
 	}
 	return size_t(cnt);
 }
@@ -586,7 +714,7 @@ enum class OE {
 	/* obligatory: */ OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH, OPT_DONE
 };
 
-char const USAGE[] = "[-hv] [-abn mode] [-mM freq] [-p ival] [-s cnt] [-P pid]";
+char const USAGE[] = "[-hv] [-abn mode] [-mM freq] [-p ival] [-s cnt] [-P file]";
 
 Option<OE> const OPTIONS[]{
 	{OE::USAGE,        'h', "help",    "",     "Show usage and exit"},
@@ -632,10 +760,10 @@ void read_args(int const argc, char const * const argv[]) {
 		g.interval = ival(getopt[1]);
 		break;
 	case OE::CNT_SAMPLES:
-		g.samples_max = samples(getopt[1]);
+		g.samples = samples(getopt[1]);
 		break;
 	case OE::FILE_PID:
-		//TODO
+		g.pidfilename = getopt[1];
 		break;
 	case OE::LOAD_IDLE:
 	case OE::LOAD_RUN:
@@ -645,7 +773,7 @@ void read_args(int const argc, char const * const argv[]) {
 	case OE::OPT_NOOPT:
 	case OE::OPT_DASH:
 	case OE::OPT_LDASH:
-		fail(Exit::ECLARG, "Unexpected command line argument: "_s +
+		fail(Exit::ECLARG, "unexpected command line argument: "_s +
 		                   getopt[0] + "\n\n" + getopt.usage());
 		return;
 	case OE::OPT_DONE:
@@ -653,19 +781,117 @@ void read_args(int const argc, char const * const argv[]) {
 	}
 }
 
+void show_settings() {
+	if (!g.verbose) {
+		return;
+	}
+	std::cerr << "Load Sampling\n"
+	          << "\tcp_time samples:       " << g.samples << '\n'
+	          << "\tpolling interval:      " << g.interval.count() << " ms\n"
+	          << "\tload average over:     " << ((g.samples - 1) *
+	                                             g.interval.count()) << " ms\n"
+	          << "CPU Cores\n"
+	          << "\tCPU cores:             " << g.ncpu << '\n'
+	          << "\tfrequency limits:      [" << g.freq_min << " MHz, "
+	                                      << g.freq_max << " MHz]\n"
+	          << "Core Groups\n";
+	for (coreid_t i = 0; i < g.ncpu; ++i) {
+		if (i == g.cores[i].controller) {
+			if (i > 0) {
+				std::cerr << (i - 1) << "]\n";
+			}
+			std::cerr << '\t' << i << ": [" << i << ", ";
+		}
+	}
+	std::cerr << (g.ncpu - 1) << "]\n"
+	          << "Load Targets\n";
+	for (size_t i = 0; i < countof(g.targets); ++i) {
+		std::cerr << '\t' << std::left << std::setw(23)
+		          << (""_s + AcLineStateStr[i] + " power target:")
+		          << (g.targets[i] ?
+		              ((1024 - g.targets[i]) * 100 / 1024) :
+		              g.target_freqs[i])
+		          << (g.targets[i] ? "% load\n" : " MHz\n");
+	}
+}
+
+class Pidfile final {
+	private:
+	pid_t otherpid;
+	pidfh * pfh;
+	int err;
+	public:
+	Pidfile(char const pfname[], mode_t const mode) :
+	    otherpid{0}, pfh{::pidfile_open(pfname, mode, &this->otherpid)},
+	    err{this->pfh == nullptr ? errno : 0} {}
+	~Pidfile() {
+		::pidfile_remove(this->pfh);
+	}
+	int error() { return this->err; }
+	pid_t other() { return this->otherpid; }
+	void write() {
+		if (::pidfile_write(this->pfh)) { this->err = errno; }
+	}
+};
+
+void run_daemon() {
+	/* open pidfile */
+	Pidfile pidfile{g.pidfilename, 0600};
+	switch (pidfile.error()) {
+	case 0:
+		break;
+	case EEXIST:
+		fail(Exit::ECONFLICT, "already running under PID: "_s +
+		                      std::to_string(pidfile.other()));
+		return;
+	default:
+		fail(Exit::EPID, "cannot create pidfile "_s +
+		                 (g.pidfilename ? g.pidfilename : ""));
+		return;
+	}
+
+	/* one chance to fail before forking */
+	update_freq();
+
+	/* daemonise */
+	if (!g.verbose && -1 == ::daemon(0, 1)) {
+		fail(Exit::EDAEMON, "detaching the process failed");
+	}
+
+	/* write pid */
+	pidfile.write();
+	if (pidfile.error()){
+		fail(Exit::EPID, "cannot write to pidfile "_s +
+		                 (g.pidfilename ? g.pidfilename : ""));
+	}
+
+	while (g.signal == 0) {
+		std::this_thread::sleep_for(g.interval);
+		update_freq();
+	}
+
+	verbose("signal "_s + std::to_string(g.signal) + " received, exiting ...");
+}
+
+void signal(int const signal) {
+	g.signal = signal;
+}
+
 } /* namespace */
 
 int main(int const argc, char const * const argv[]) {
 	try {
+		signal(SIGINT, signal);
+		signal(SIGTERM, signal);
 		read_args(argc, argv);
 		init();
+		show_settings();
 		reset_cp_times();
-		while (true) {
-			std::this_thread::sleep_for(g.interval);
-			update_freq();
-		}
+		run_daemon();
 	} catch (Exception & e) {
-		std::cerr << std::get<1>(e) << '\n';
+		if (std::get<1>(e) != "") {
+			std::cerr << std::get<1>(e) << '\n';
+		}
 		return static_cast<int>(std::get<0>(e));
 	}
 	return 0;
