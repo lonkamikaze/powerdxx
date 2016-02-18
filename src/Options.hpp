@@ -3,10 +3,10 @@
  *
  * The `getopt(3)` interface takes the command line arguments as `char * const`
  * instead of `char const *`. I.e. it reserves the right to mutate the
- * provided arguments, which is arguably broken.
+ * provided arguments, which it actually does.
  *
  * The powerdxx::Options<> functor is not a drop in substitute, but
- * tries to be easily adoptable and a little safer to use.
+ * tries to be easily adoptable and does not change the data given to it.
  *
  * To use the options an enum or enum class is required, e.g.:
  *
@@ -113,9 +113,8 @@
 #include <iomanip>     /* std::left, std::setw */
 #include <sstream>     /* std::ostringstream, std::string */
 #include <type_traits> /* std::true_type */
-#include <cassert>     /* assert */
+#include <cassert>     /* assert() */
 
-#include <iostream>
 namespace powerdxx {
 
 /**
@@ -381,8 +380,8 @@ class Options {
 	 */
 	Options(int const argc, char const * const argv[],
 	        char const usage[], Option<Enum> const (& defs)[DefCount]) :
-	    argc{argc}, argv{argv}, usageStr{usage}, defs{defs}, argi{1},
-	    argp{nullptr}, current{nullptr} {}
+	    argc{argc}, argv{argv}, usageStr{usage}, defs{defs},
+	    argi{1}, argp{nullptr}, current{nullptr} {}
 
 	/**
 	 * Returns the next option from the command line arguments.
@@ -484,7 +483,7 @@ class Options {
 	std::string usage() {
 		std::ostringstream result;
 		result << "usage: " << removePath(this->argv[0]) << ' '
-		       << this->usageStr << '\n' << std::left;
+		       << this->usageStr << "\n\n" << std::left;
 
 		/* collect options and arguments in arrays because formatting
 		 * is only possible after all of them have been read */
@@ -518,9 +517,9 @@ class Options {
 		 * column widths */
 		for (size_t i = 0; i < DefCount; ++i) {
 			result << '\t' << std::setw(options_max) << options[i]
-			       << "    " << std::setw(arguments_max)
+			       << "  " << std::setw(arguments_max)
 			                 << arguments[i]
-			       << "    " << this->defs[i].usage << '\n';
+			       << "  " << this->defs[i].usage << '\n';
 		}
 		return result.str();
 	}
