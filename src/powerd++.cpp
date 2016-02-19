@@ -22,7 +22,8 @@
 
 namespace {
 
-using namespace powerdxx;
+using nih::Option;
+using nih::make_Options;
 
 /**
  * Millisecond type for polling intervals.
@@ -93,7 +94,7 @@ enum class Exit : int {
 	OK, ECLARG, EOUTOFRANGE, ELOAD, EFREQ, EMODE, EIVAL,
 	ESAMPLES, ESYSCTL, ENOFREQ, ECONFLICT, EPID, EFORBIDDEN,
 	EDAEMON
-}; 
+};
 
 /**
  * Printable strings for exit codes.
@@ -646,7 +647,7 @@ void update_freq() {
 		          << ", load: " << std::setw(3)
 		          << ((core.load * 100 + 512) / 1024)
 		          << "%, cpu" << corei << ".freq: "
-		          << std::setw(4) << oldfreq 
+		          << std::setw(4) << oldfreq
 		          << " -> " << std::setw(4) << freq << " MHz\n";
 	}
 	std::cout << std::flush;
@@ -788,7 +789,7 @@ mhz_t freq(char const str[]) {
 void set_mode(AcLineState const line, char const str[]) {
 	std::string mode{str};
 	for (char & ch : mode) { ch = std::tolower(ch); }
-	
+
 	auto const linei = static_cast<unsigned int>(line);
 	g.targets[linei] = 0;
 	g.target_freqs[linei] = 0;

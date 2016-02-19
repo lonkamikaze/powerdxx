@@ -1,11 +1,11 @@
 /** \file
- * This file provides powerdxx::Options<>, a substitute for `getopt(3)`.
+ * This file provides nih::Options<>, a substitute for `getopt(3)`.
  *
  * The `getopt(3)` interface takes the command line arguments as `char * const`
  * instead of `char const *`. I.e. it reserves the right to mutate the
  * provided arguments, which it actually does.
  *
- * The powerdxx::Options<> functor is not a drop in substitute, but
+ * The nih::Options<> functor is not a drop in substitute, but
  * tries to be easily adoptable and does not change the data given to it.
  *
  * To use the options an enum or enum class is required, e.g.:
@@ -18,7 +18,7 @@
  * ~~~~
  *
  * The options prefixed with `OPT_` are obligatory. Their meaning is
- * documented in powerdxx::enum_has_members<>. Their presence is validated
+ * documented in nih::enum_has_members<>. Their presence is validated
  * at compile time.
  *
  * The enum values are returned whe selecting the next option, in order
@@ -27,7 +27,7 @@
  * ~~~~{.cpp}
  * static char const USAGE[] = "[-hv] [-i file] [-o file] [command ...]";
  *
- * static powerdxx::Option<MyOptions> const OPTIONS[]{
+ * static nih::Option<MyOptions> const OPTIONS[]{
  * 	{MyOptions::USAGE,        'h', "help",    "",     "Show this help"},
  * 	{MyOptions::USAGE,        0,   "usage",   "",     ""},
  * 	{MyOptions::FILE_IN,      'i', "in",      "file", "Input file"},
@@ -39,7 +39,7 @@
  * Every array entry defines an option consisting of the enum value that
  * represents it, a short and a long version (either of which are optional)
  * and a comma seperated list of arguments. The final string appears in the
- * usage() output. The details are documented by powerdxx::Option<>.
+ * usage() output. The details are documented by nih::Option<>.
  *
  * Aliases are created by adding a definition that returns the same enum
  * value.
@@ -49,7 +49,7 @@
  * arguments may be directly followed by another short option, e.g. `-vofile`
  * is equivalent to `-v -o file`.
  *
- * The option definitions should be passed to powerdxx::make_Options() to
+ * The option definitions should be passed to nih::make_Options() to
  * create the functor:
  *
  * ~~~~{.cpp}
@@ -61,7 +61,7 @@
  * 	char const * outfile = "-";
  * 	bool verbose = false;
  * 
- * 	auto getopt = powerdxx::make_Options(argc, argv, USAGE, OPTIONS);
+ * 	auto getopt = nih::make_Options(argc, argv, USAGE, OPTIONS);
  * 	while (true) switch (getopt()) { // get new option/argument
  * 	case MyOptions::USAGE:
  * 		std::cerr << getopt.usage(); // show usage
@@ -106,8 +106,8 @@
  * return `file` regardless of argument chaining.
  */
 
-#ifndef _POWERDXX_OPTIONS_HPP_
-#define _POWERDXX_OPTIONS_HPP_
+#ifndef _NIH_OPTIONS_HPP_
+#define _NIH_OPTIONS_HPP_
 
 #include <cstddef>     /* size_t */
 #include <iomanip>     /* std::left, std::setw */
@@ -115,7 +115,11 @@
 #include <type_traits> /* std::true_type */
 #include <cassert>     /* assert() */
 
-namespace powerdxx {
+/**
+ * Not invented here namespace, for code that substitutes already commonly
+ * available functionality.
+ */
+namespace nih {
 
 /**
  * See std::void_t in C++17 <type_traits>.
@@ -129,13 +133,13 @@ using void_t = void;
  * The Options<> template expects the provided enum to provide the
  * following members:
  *
- * | Member      | Description
- * |-------------|--------------------------------------------------------
- * | OPT_UNKNOWN | An undefined option (long or short) was encountered
- * | OPT_NOOPT   | The encountered command line argument is not an option
- * | OPT_DASH    | A single dash "-" was encountered
- * | OPT_LDASH   | Double dashes "--" were encountered
- * | OPT_DONE    | All command line arguments have been processed
+ * | Member      | Description                                            |
+ * |-------------|--------------------------------------------------------|
+ * | OPT_UNKNOWN | An undefined option (long or short) was encountered    |
+ * | OPT_NOOPT   | The encountered command line argument is not an option |
+ * | OPT_DASH    | A single dash "-" was encountered                      |
+ * | OPT_LDASH   | Double dashes "--" were encountered                    |
+ * | OPT_DONE    | All command line arguments have been processed         |
  *
  * @tparam Enum
  *	An enum or enum class representing the available options
@@ -160,7 +164,7 @@ struct enum_has_members<Enum, void_t<decltype(Enum::OPT_UNKNOWN),
  * The lopt, args and usage members have to be 0 terminated, using string
  * literals is safe.
  *
- * @tparm Enum
+ * @tparam Enum
  *	An enum or enum class representing the available options
  */
 template <class Enum>
@@ -200,7 +204,7 @@ struct Option {
 /**
  * Retrieves the count of arguments in an option definition.
  *
- * @tparm Enum
+ * @tparam Enum
  *	An enum or enum class representing the available options
  * @param def
  *	The option definition
@@ -217,6 +221,21 @@ size_t argCount(Option<Enum> const & def) {
 	return argc;
 }
 
+/**
+ * An instance of this class offers operators to retrieve command line
+ * options and arguments.
+ *
+ * Instantiate with make_Options() to infer template parameters
+ * automatically.
+ *
+ * Check the `operator ()` and `operator []` for use.
+ *
+ * @tparam Enum
+ *	An enum or enum class matching the requirements set by
+ *	enum_has_members
+ * @tparam DefCount
+ *	The number of option definitions
+ */
 template <class Enum, size_t DefCount>
 class Options {
 	static_assert(enum_has_members<Enum>::value,
@@ -529,9 +548,9 @@ class Options {
  * Wrapper around the Options<> constructor, that uses function template
  * matching to deduce template arguments.
  *
- * @tparm Enum
+ * @tparam Enum
  *	An enum for all the available options
- * @tparm DefCount
+ * @tparam DefCount
  *	The number of option definitions
  * @param argc,argv
  *	The command line arguments
@@ -547,6 +566,6 @@ make_Options(int const argc, char const * const argv[],
 	return Options<Enum, DefCount>{argc, argv, usage, defs};
 }
 
-} /* namespace powerdxx */
+} /* namespace nih */
 
-#endif /* _POWERDXX_OPTIONS_HPP_ */
+#endif /* _NIH_OPTIONS_HPP_ */
