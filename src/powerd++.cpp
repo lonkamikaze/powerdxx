@@ -1,14 +1,17 @@
+/** \file
+ * Implements powerd++ a drop in replacement for FreeBSD's powerd.
+ */
 
 #include "Options.hpp"
 
-#include <iostream>
-#include <locale>  /* std::tolower() */
-#include <cstdlib> /* atof() */
-#include <memory>  /* std::unique_ptr */
-#include <cstdint> /* uint64_t */
-#include <chrono>  /* std::chrono::milliseconds */
-#include <thread>  /* std::this_thread::sleep_for() */
-#include <limits>  /* std::numeric_limits */
+#include <iostream>  /* std::cout, std::cerr */
+#include <locale>    /* std::tolower() */
+#include <cstdlib>   /* atof() */
+#include <memory>    /* std::unique_ptr */
+#include <cstdint>   /* uint64_t */
+#include <chrono>    /* std::chrono::milliseconds */
+#include <thread>    /* std::this_thread::sleep_for() */
+#include <algorithm> /* std::min(), std::max() */
 
 #include <sys/types.h>     /* sysctl() */
 #include <sys/sysctl.h>    /* sysctl() */
@@ -87,16 +90,18 @@ char const FREQ[] = "dev.cpu.%d.freq";
  * Exit codes.
  */
 enum class Exit : int {
-	OK, ESYSCTL, ENOFREQ, EFORBIDDEN, EMODE, ECLARG, EFREQ,
-	EIVAL, ESAMPLES, EDAEMON, ECONFLICT, EPID
+	OK, ECLARG, EOUTOFRANGE, ELOAD, EFREQ, EMODE, EIVAL,
+	ESAMPLES, ESYSCTL, ENOFREQ, ECONFLICT, EPID, EFORBIDDEN,
+	EDAEMON
 }; 
 
 /**
  * Printable strings for exit codes.
  */
 const char * const ExitStr[]{
-	"OK", "ESYSCTL", "ENOFREQ", "EFORBIDDEN", "EMODE", "ECLARG", "EFREQ",
-	"EIVAL", "ESAMPLES", "EDAEMON", "ECONFLICT", "EPID"
+	"OK", "ECLARG", "EOUTOFRANGE", "ELOAD", "EFREQ", "EMODE", "EIVAL",
+	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
+	"EDAEMON"
 };
 
 /**
@@ -131,9 +136,9 @@ struct Core {
 	coreid_t controller = -1;
 
 	/**
-	 * The idle time during the last frame, a value in the range [0, 1024].
+	 * The load during the last frame, a value in the range [0, 1024].
 	 */
-	cptime_t idle = 0;
+	cptime_t load = 0;
 };
 
 /**
@@ -142,9 +147,9 @@ struct Core {
 cptime_t const ADP{512};
 
 /**
- * The idle target for hiadaptive load, equals 25% load.
+ * The idle target for hiadaptive load, equals 37.5% load.
  */
-cptime_t const HADP{768};
+cptime_t const HADP{384};
 
 /**
  * A collection of all the gloabl, mutable states.
@@ -190,7 +195,7 @@ struct {
 	mhz_t freq_max{1000000};
 
 	/**
-	 * Target idle times [0, 1024].
+	 * Target load times [0, 1024].
 	 *
 	 * The value 0 indicates the corresponding fixed frequency setting
 	 * from target_freqs should be used.
@@ -255,7 +260,7 @@ struct {
 } g;
 
 static_assert(countof(g.targets) == countof(AcLineStateStr),
-              "there must be a target idle load for each state");
+              "there must be a target load for each state");
 
 static_assert(countof(g.target_freqs) == countof(AcLineStateStr),
               "there must be a target frequency for each state");
@@ -338,7 +343,10 @@ Unit unit(std::string const & str) {
 }
 
 /**
+ * Outputs the given message on stderr if g.verbose is set.
  *
+ * @param msg
+ *	The message to output
  */
 inline void verbose(std::string const & msg) {
 	if (g.verbose) {
@@ -346,13 +354,29 @@ inline void verbose(std::string const & msg) {
 	}
 }
 
+/**
+ * Throws an Exception instance with the given message.
+ *
+ * @param exitcode
+ *	The exit code to return on termination
+ * @param msg
+ *	The message to show
+ */
 inline void fail(Exit const exitcode, std::string const & msg) {
 	assert(static_cast<int>(exitcode) < countof(ExitStr) &&
 	       "Enum member must have a corresponding string");
 	throw Exception{exitcode, "powerd++: ("_s + ExitStr[static_cast<int>(exitcode)] + ") " + msg};
 }
 
-void sysctl_fail(int err) {
+/**
+ * Treat sysctl errors.
+ *
+ * Fails appropriately for the given error.
+ *
+ * @param err
+ *	The error number to treat
+ */
+void sysctl_fail(int const err) {
 	switch(err) {
 	case 0:
 		break;
@@ -382,8 +406,18 @@ void sysctl_fail(int err) {
 	};
 }
 
+/**
+ * Returns the requested sysctl data into the location given by oldp.
+ *
+ * @tparam Namelen
+ *	The length of MIB array
+ * @param name
+ *	The MIB of the sysctl to return
+ * @param oldp,oldplen
+ *	Pointer and size to/of the data structure to return the data to
+ */
 template <u_int Namelen>
-void sysctl_get(int const (&name)[Namelen], void * oldp, size_t const oldplen) {
+void sysctl_get(int const (& name)[Namelen], void * oldp, size_t const oldplen) {
 	auto len = oldplen;
 	int err = ::sysctl(name, Namelen, oldp, &len, nullptr, 0);
 	sysctl_fail(err & errno);
@@ -391,29 +425,62 @@ void sysctl_get(int const (&name)[Namelen], void * oldp, size_t const oldplen) {
 	assert(err == 0 && "untreated error");
 }
 
+/**
+ * Returns the requested sysctl data into oldv.
+ *
+ * @tparam Namelen
+ *	The length of MIB array
+ * @param name
+ *	The MIB of the sysctl to return
+ * @param oldv
+ *	The data to update with the given sysctl
+ */
 template <u_int Namelen, typename T>
-inline void sysctl_get(int const (&name)[Namelen], T & oldv) {
+inline void sysctl_get(int const (& name)[Namelen], T & oldv) {
 	return sysctl_get(name, &oldv, sizeof(oldv));
 }
 
+/**
+ * Sets the requested sysctl to the data given by newp.
+ *
+ * @tparam Namelen
+ *	The length of MIB array
+ * @param name
+ *	The MIB of the sysctl to return
+ * @param newp,newplen
+ *	Pointer and size to/of the data structure to update the sysctl with
+ */
 template <u_int Namelen>
-void sysctl_set(int const (&name)[Namelen], void const * newp, size_t const newplen) {
+void sysctl_set(int const (& name)[Namelen], void const * newp, size_t const newplen) {
 	int err = ::sysctl(name, Namelen, nullptr, nullptr, newp, newplen);
 	sysctl_fail(err & errno);
 	assert(err == 0);
 }
 
+/**
+ * Sets the requested sysctl to newv.
+ *
+ * @tparam Namelen
+ *	The length of MIB array
+ * @param name
+ *	The MIB of the sysctl to return
+ * @param newv
+ *	The data to update the given sysctl with
+ */
 template <u_int Namelen, typename T>
-inline void sysctl_set(int const (&name)[Namelen], T const & newv) {
+inline void sysctl_set(int const (& name)[Namelen], T const & newv) {
 	return sysctl_set(name, &newv, sizeof(newv));
 }
 
-/*
- * Wrapper around sysctlnametomib() that fails hard.
+/**
+ * Sets a MIB array to the correct MIB for the given sysctl name.
  *
- * Fails if:
- * - The length of the MIB structure does not match the returned length
- * - sysctlnametomib() returns a non-0 value
+ * @tparam MibLen
+ *	The lenght of the MIB array
+ * @param name
+ *	The name of the sysctl
+ * @param mibp
+ *	A pointer to the MIB array
  */
 template <size_t MibLen>
 void sysctlnametomib(const char name[], mib_t (&mibp)[MibLen]) {
@@ -424,6 +491,13 @@ void sysctlnametomib(const char name[], mib_t (&mibp)[MibLen]) {
 	       "The MIB array length should match the returned MIB length");
 }
 
+/**
+ * Perform initial tasks.
+ *
+ * - Get number of CPU cores/threads
+ * - Determine the clock controlling core for each core
+ * - Set the MIBs of hw.acpi.acline and kern.cp_times
+ */
 void init() {
 	/* number of cores */
 	sysctl_get(NCPU_MIB, g.ncpu);
@@ -471,8 +545,8 @@ void init() {
 	    new cptime_t[g.samples * g.ncpu][CPUSTATES]{{0}});
 }
 
-/*
- * Updates the cp_times ring buffer and the idle times for each core.
+/**
+ * Updates the cp_times ring buffer and the load times for each core.
  */
 void update_cp_times() {
 	sysctl_get(g.cp_times_mib, g.cp_times[g.sample * g.ncpu],
@@ -486,24 +560,30 @@ void update_cp_times() {
 		for (auto const time : cp_times_old) { all -= time; }
 
 		cptime_t idle = cp_times[CP_IDLE] - cp_times_old[CP_IDLE];
-		g.cores[core].idle = all ? cptime_t((uint64_t{idle} << 10) / all) : 1024;
+		g.cores[core].load = all ? 1024 - cptime_t((uint64_t{idle} << 10) / all) : 0;
 	}
 	g.sample = (g.sample + 1) % g.samples;
 }
 
-void update_idle_times() {
+/**
+ * Sets the load time of each clock controlling core to the maximum load
+ * in the group.
+ */
+void update_load_times() {
 	update_cp_times();
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto const & core = g.cores[corei];
 		if (core.controller == corei) { continue; }
 		auto & controller = g.cores[core.controller];
-		if (controller.idle > core.idle) {
-			controller.idle = core.idle;
-		}
+		controller.load = std::max(controller.load, core.load);
 	}
 }
 
+/**
+ * Update AC line status and fetch the corresponding target load and
+ * frequency.
+ */
 void update_acline() {
 	try {
 		sysctl_get(g.acline_mib, g.acline);
@@ -515,35 +595,38 @@ void update_acline() {
 	g.target_freq = g.target_freqs[modei];
 }
 
+/**
+ * Update the CPU clocks depending on the AC line state and targets.
+ */
 void update_freq() {
-	update_idle_times();
+	update_load_times();
 	update_acline();
 
 	assert(g.target <= 1024 &&
-	       "idle target must be in the range (0, 1024]");
+	       "load target must be in the range (0, 1024]");
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto const & core = g.cores[corei];
 		if (core.controller != corei) { continue; }
 
+		/* get old clock */
+		mhz_t oldfreq = 0;
+		if (g.target || g.verbose) {
+			sysctl_get(core.freq_mib, oldfreq);
+		}
 		/* determine target frequency */
 		mhz_t freq = 0;
 		if (g.target) {
 			/* adaptive frequency mode */
-			sysctl_get(core.freq_mib, freq);
-			assert(freq == (((freq << 10) & ~0x3ff) >> 10) &&
-			       "CPU frequency exceeds values that are safe to compute");
-			freq = freq * g.target / (core.idle ? core.idle : 1);
+			assert(oldfreq == (((oldfreq << 10) & ~0x3ff) >> 10) &&
+			       "CPU clock frequency exceeds values that are safe to compute");
+			freq = oldfreq * core.load / g.target;
 		} else {
 			/* fixed frequency mode */
 			freq = g.target_freq;
 		}
 		/* apply limits */
-		if (freq < g.freq_min) {
-			freq = g.freq_min;
-		} else if (freq > g.freq_max) {
-			freq = g.freq_max;
-		}
+		freq = std::min(std::max(freq, g.freq_min), g.freq_max);
 		/* update CPU frequency */
 		try {
 			sysctl_set(core.freq_mib, freq);
@@ -555,88 +638,90 @@ void update_freq() {
 				throw;
 			}
 		}
-		if (g.verbose) {
-			sysctl_get(core.freq_mib, freq);
-			std::cout << "power: " << AcLineStateStr[static_cast<int>(g.acline)]
-			          << " load: " << ((1024 - core.idle) * 100 / 1024)
-			          << "% cpu" << corei << ".freq: " << freq << " MHz\n";
-		}
+		/* verbose output */
+		if (!g.verbose) { continue; }
+		std::cout << std::right
+		          << "power: " << std::setw(7)
+		          << AcLineStateStr[static_cast<int>(g.acline)]
+		          << ", load: " << std::setw(3)
+		          << ((core.load * 100 + 512) / 1024)
+		          << "%, cpu" << corei << ".freq: "
+		          << std::setw(4) << oldfreq 
+		          << " -> " << std::setw(4) << freq << " MHz\n";
 	}
 	std::cout << std::flush;
 }
 
+/**
+ * Fill the cp_times buffer with n - 1 samples.
+ */
 void reset_cp_times() {
 	for (size_t i = 1; i < g.samples; ++i) {
 		update_cp_times();
 	}
 }
 
-void set_mode(AcLineState const line, char const str[]) {
-	std::string mode{str};
-	for (char & ch : mode) { ch = std::tolower(ch); }
-	
-	auto const linei = static_cast<unsigned int>(line);
+/**
+ * Convert string to load in the range [0, 1024].
+ *
+ * The given string must have the following format:
+ *
+ * \verbatim
+ * load = <float>, [ "%" ];
+ * \endverbatim
+ *
+ * The input value must be in the range [0.0, 1.0] or [0%, 100%].
+ *
+ * @param str
+ *	A string encoded load
+ * @return
+ *	The load given by str
+ */
+cptime_t load(char const str[]) {
+	std::string load{str};
+	for (char & ch : load) { ch = std::tolower(ch); }
 
-	if (mode == "maximum" || mode == "max") {
-		g.targets[linei] = 0;
-		g.target_freqs[linei] = 1000000;
-		return;
-	}
-	if (mode == "minimum" || mode == "min") {
-		g.targets[linei] = 0;
-		g.target_freqs[linei] = 0;
-		return;
-	}
-	if (mode == "adaptive" || mode == "adp") {
-		g.targets[linei] = ADP;
-		return;
-	}
-	if (mode == "hiadaptive" || mode == "hadp") {
-		g.targets[linei] = HADP;
-		return;
-	}
 	auto value = std::atof(str);
-	switch (unit(mode)) {
+	switch (unit(load)) {
 	case Unit::SCALAR:
 		if (value > 1. || value < 0) {
-			return fail(Exit::EMODE, "load targets must be in the range [0.0, 1.0]");
+			fail(Exit::EOUTOFRANGE, "load targets must be in the range [0.0, 1.0]: "_s + str);
 		}
-		value = 1024 * (1. - value); /* convert load to idle value */
-		g.targets[linei] = value < 1 ? 1 : value;
-		return;
+		/* convert load to [0, 1024] range */
+		value = 1024 * value;
+		return value < 1 ? 1 : value;
 	case Unit::PERCENT:
 		if (value > 100. || value < 0) {
-			return fail(Exit::EMODE, "load targets must be in the range [0%, 100%]");
+			fail(Exit::EOUTOFRANGE, "load targets must be in the range [0%, 100%]: "_s + str);
 		}
-		value = 1024 * (1. - (value / 100.)); /* convert load to idle value */
-		g.targets[linei] = value < 1 ? 1 : value;
-		return;
-	case Unit::HZ:
-		value /= 1000000.;
-		goto unit__mhz;
-	case Unit::KHZ:
-		value /= 1000.;
-		goto unit__mhz;
-	case Unit::MHZ:
-	unit__mhz:
-		if (value > 1000000. || value < 0) {
-			return fail(Exit::EMODE, "target frequency must be in the range [0Hz, 1THz]");
-		}
-		g.targets[linei] = 0;
-		g.target_freqs[linei] = mhz_t(value);
-		return;
-	case Unit::GHZ:
-		value *= 1000.;
-		goto unit__mhz;
-	case Unit::THZ:
-		value *= 1000000.;
-		goto unit__mhz;
+		/* convert load to [0, 1024] range */
+		value = 1024 * (value / 100.);
+		return value < 1 ? 1 : value;
 	default:
 		break;
 	}
-	fail(Exit::EMODE, "mode '"_s + mode + "' not recognised");
+	fail(Exit::ELOAD, "load target not recognised: "_s + str);
+	return 0;
 }
 
+/**
+ * Convert string to frequency in MHz.
+ *
+ * The given string must have the following format:
+ *
+ * \verbatim
+ * freq = <float>, [ "hz" | "khz" | "mhz" | "ghz" | "thz" ];
+ * \endverbatim
+ *
+ * For compatibility with powerd MHz are assumed, if no unit string is given.
+ *
+ * The resulting frequency must be in the range [0Hz, 1THz].
+ *
+ * @param str
+ *	A string encoded frequency
+ * @return
+ *	The frequency given by str
+ */
 mhz_t freq(char const str[]) {
 	std::string freqstr{str};
 	for (char & ch : freqstr) { ch = std::tolower(ch); }
@@ -653,8 +738,7 @@ mhz_t freq(char const str[]) {
 	case Unit::MHZ:
 	unit__mhz:
 		if (value > 1000000. || value < 0) {
-			fail(Exit::EFREQ, "target frequency must be in the range [0Hz, 1THz]");
-			return 0;
+			fail(Exit::EOUTOFRANGE, "target frequency must be in the range [0Hz, 1THz]: "_s + str);
 		}
 		return mhz_t(value);
 	case Unit::GHZ:
@@ -670,13 +754,105 @@ mhz_t freq(char const str[]) {
 	return 0;
 };
 
-ms ival(char const * const str) {
+/**
+ * Sets a load target or fixed frequency for the given AC line state.
+ *
+ * The string must be in the following format:
+ *
+ * \verbatim
+ * mode_predefined = "minimum" | "min" | "maximum" | "max" |
+ *                   "adaptive" | "adp" | "hiadptive" | "hadp";
+ * mode =            mode_predefined | load | freq;
+ * \endverbatim
+ *
+ * Scalar values are treated as loads.
+ *
+ * The predefined values have the following meaning:
+ *
+ * | Symbol     | Meaning                                      |
+ * |------------|----------------------------------------------|
+ * | minimum    | The minimum clock rate (default 0 MHz)       |
+ * | min        |                                              |
+ * | maximum    | The maximum clock rate (default 1000000 MHz) |
+ * | max        |                                              |
+ * | adaptive   | A target load of 50%                         |
+ * | adp        |                                              |
+ * | hiadptive  | A target load of 25%                         |
+ * | hadp       |                                              |
+ *
+ * @param line
+ *	The power line state to set the mode for
+ * @param str
+ *	A mode string
+ */
+void set_mode(AcLineState const line, char const str[]) {
+	std::string mode{str};
+	for (char & ch : mode) { ch = std::tolower(ch); }
+	
+	auto const linei = static_cast<unsigned int>(line);
+	g.targets[linei] = 0;
+	g.target_freqs[linei] = 0;
+
+	if (mode == "minimum" || mode == "min") {
+		g.target_freqs[linei] = 0;
+		return;
+	}
+	if (mode == "maximum" || mode == "max") {
+		g.target_freqs[linei] = 1000000; return;
+	}
+	if (mode == "adaptive" || mode == "adp") {
+		g.targets[linei] = ADP;
+		return;
+	}
+	if (mode == "hiadaptive" || mode == "hadp") {
+		g.targets[linei] = HADP;
+		return;
+	}
+
+	/* try to set load,
+	 * do that first so it gets the scalar values */
+	try {
+		g.targets[linei] = load(str);
+		return;
+	} catch (Exception & e) {
+		if (std::get<0>(e) == Exit::EOUTOFRANGE) { throw; }
+	}
+
+	/* try to set clock frequency */
+	try {
+		g.target_freqs[linei] = freq(str);
+		return;
+	} catch (Exception & e) {
+		if (std::get<0>(e) == Exit::EOUTOFRANGE) { throw; }
+	}
+
+	fail(Exit::EMODE, "mode not recognised: "_s + str);
+}
+
+/**
+ * Convert string to time interval in milliseconds.
+ *
+ * The given string must have the following format:
+ *
+ * \verbatim
+ * ival = <float>, [ "s" | "ms" ];
+ * \endverbatim
+ *
+ * For compatibility with powerd scalar values are assumed to represent
+ * milliseconds.
+ *
+ * @param str
+ *	A string encoded time interval
+ * @return
+ *	The interval in milliseconds
+ */
+ms ival(char const str[]) {
 	std::string interval{str};
 	for (char & ch : interval) { ch = std::tolower(ch); }
 
 	auto value = std::atof(str);
 	if (value < 0) {
-		fail(Exit::EIVAL, "polling interval must be positive: "_s + str);
+		fail(Exit::EOUTOFRANGE, "polling interval must be positive: "_s + str);
 		return ms{0};
 	}
 	switch (unit(interval)) {
@@ -692,21 +868,34 @@ ms ival(char const * const str) {
 	return ms{0};
 }
 
+/**
+ * A string encoded number of samples.
+ *
+ * The string is expected to contain a scalar integer.
+ *
+ * @param str
+ *	The string containing the number of samples
+ * @return
+ *	The number of samples
+ */
 size_t samples(char const str[]) {
 	if (unit(str) != Unit::SCALAR) {
-		fail(Exit::ESAMPLES, "sample count must be a number: "_s + str);
+		fail(Exit::ESAMPLES, "sample count must be a scalar integer: "_s + str);
 	}
 	auto const cnt = std::atoi(str);
 	auto const cntf = std::atof(str);
 	if (cntf != cnt) {
-		fail(Exit::ESAMPLES, "sample count must be an integer: "_s + str);
+		fail(Exit::EOUTOFRANGE, "sample count must be an integer: "_s + str);
 	}
 	if (cnt < 2 || cnt > 1001) {
-		fail(Exit::ESAMPLES, "sample count must be in the range [2; 1001]: "_s + str);
+		fail(Exit::EOUTOFRANGE, "sample count must be in the range [2; 1001]: "_s + str);
 	}
 	return size_t(cnt);
 }
 
+/**
+ * An enum for command line parsing.
+ */
 enum class OE {
 	USAGE, MODE_AC, MODE_BATT, LOAD_IDLE, FREQ_MIN, FREQ_MAX,
 	MODE_UNKNOWN, IVAL_POLL, FILE_PID, LOAD_RUN, FLAG_VERBOSE,
@@ -714,8 +903,14 @@ enum class OE {
 	/* obligatory: */ OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH, OPT_DONE
 };
 
+/**
+ * The short usage string.
+ */
 char const USAGE[] = "[-hv] [-abn mode] [-mM freq] [-p ival] [-s cnt] [-P file]";
 
+/**
+ * Definitions of command line options.
+ */
 Option<OE> const OPTIONS[]{
 	{OE::USAGE,        'h', "help",    "",     "Show usage and exit"},
 	{OE::FLAG_VERBOSE, 'v', "verbose", "",     "Be verbose, stay in foreground"},
@@ -731,6 +926,12 @@ Option<OE> const OPTIONS[]{
 	{OE::LOAD_RUN,     'r', "run",     "load", "Ignored"}
 };
 
+/**
+ * Parse command line arguments.
+ *
+ * @param argc,argv
+ *	The command line arguments
+ */
 void read_args(int const argc, char const * const argv[]) {
 	auto getopt = make_Options(argc, argv, USAGE, OPTIONS);
 
@@ -781,6 +982,9 @@ void read_args(int const argc, char const * const argv[]) {
 	}
 }
 
+/**
+ * Prints the configuration on stderr in verbose mode.
+ */
 void show_settings() {
 	if (!g.verbose) {
 		return;
@@ -809,31 +1013,80 @@ void show_settings() {
 		std::cerr << '\t' << std::left << std::setw(23)
 		          << (""_s + AcLineStateStr[i] + " power target:")
 		          << (g.targets[i] ?
-		              ((1024 - g.targets[i]) * 100 / 1024) :
-		              g.target_freqs[i])
+		              ((g.targets[i] * 100 + 512) / 1024) : g.target_freqs[i])
 		          << (g.targets[i] ? "% load\n" : " MHz\n");
 	}
 }
 
+/**
+ * A wrapper around the pidfile_* family of commands implementing the
+ * RAII pattern.
+ */
 class Pidfile final {
 	private:
+	/**
+	 * In case of failure to acquire the lock, the PID of the other
+	 * process holding it is stored here.
+	 */
 	pid_t otherpid;
+
+	/**
+	 * Pointer to the pidfile state data structure.
+	 *
+	 * Thus is allocated by pidfile_open() and assumedly freed by
+	 * pidfile_remove().
+	 */
 	pidfh * pfh;
+
+	/**
+	 * The errno value of the last call to a pidfile_*() function.
+	 */
 	int err;
+
 	public:
+	/**
+	 * Attempts to open the pidfile.
+	 *
+	 * @param pfname,mode
+	 *	Arguments to pidfile_open()
+	 */
 	Pidfile(char const pfname[], mode_t const mode) :
 	    otherpid{0}, pfh{::pidfile_open(pfname, mode, &this->otherpid)},
 	    err{this->pfh == nullptr ? errno : 0} {}
+
+	/**
+	 * Removes the pidfile.
+	 */
 	~Pidfile() {
 		::pidfile_remove(this->pfh);
 	}
+
+	/**
+	 * Returns the last error.
+	 *
+	 * @return
+	 *	Returns the errno of the last pidfile_*() command if an
+	 *	error occured
+	 */
 	int error() { return this->err; }
+
+	/**
+	 * Returns the PID of the other process holding the lock.
+	 */
 	pid_t other() { return this->otherpid; }
+
+	/**
+	 * Write PID to the file, should be called after daemon().
+	 */
 	void write() {
-		if (::pidfile_write(this->pfh)) { this->err = errno; }
+		this->err = ::pidfile_write(this->pfh);
+		this->err &= errno;
 	}
 };
 
+/**
+ * Daemonise and run the main loop.
+ */
 void run_daemon() {
 	/* open pidfile */
 	Pidfile pidfile{g.pidfilename, 0600};
@@ -865,6 +1118,7 @@ void run_daemon() {
 		                 (g.pidfilename ? g.pidfilename : ""));
 	}
 
+	/* the main loop */
 	while (g.signal == 0) {
 		std::this_thread::sleep_for(g.interval);
 		update_freq();
@@ -873,16 +1127,28 @@ void run_daemon() {
 	verbose("signal "_s + std::to_string(g.signal) + " received, exiting ...");
 }
 
-void signal(int const signal) {
+/**
+ * Sets g.signal, terminating the main loop.
+ */
+void signal_recv(int const signal) {
 	g.signal = signal;
 }
 
 } /* namespace */
 
+/**
+ * Main routine, setup and execute daemon, print errors.
+ *
+ * @param argc,argv
+ *	The command line arguments
+ * @return
+ *	An exit code
+ * @see Exit
+ */
 int main(int const argc, char const * const argv[]) {
 	try {
-		signal(SIGINT, signal);
-		signal(SIGTERM, signal);
+		signal(SIGINT, signal_recv);
+		signal(SIGTERM, signal_recv);
 		read_args(argc, argv);
 		init();
 		show_settings();
