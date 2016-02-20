@@ -88,6 +88,11 @@ const char * const AcLineStateStr[]{"battery", "online", "unknown"};
 char const FREQ[] = "dev.cpu.%d.freq";
 
 /**
+ * The MIB name for CPU frequency levels.
+ */
+char const FREQ_LEVELS[] = "dev.cpu.%d.freq_levels";
+
+/**
  * Exit codes.
  */
 enum class Exit : int {
@@ -129,17 +134,27 @@ struct Core {
 	/**
 	 * The MIB to kern.cpu.N.freq, if present.
 	 */
-	mib_t freq_mib[4] = {0};
+	mib_t freq_mib[4]{0};
 
 	/**
 	 * The core that controls the frequency for this core.
 	 */
-	coreid_t controller = -1;
+	coreid_t controller{-1};
 
 	/**
 	 * The load during the last frame, a value in the range [0, 1024].
 	 */
-	cptime_t load = 0;
+	cptime_t load{0};
+
+	/**
+	 * The minimum core clock rate.
+	 */
+	mhz_t min{0};
+
+	/*+
+	 * The maximum core clock rate.
+	 */
+	mhz_t max{100000};
 };
 
 /**
@@ -410,17 +425,17 @@ void sysctl_fail(int const err) {
 /**
  * Returns the requested sysctl data into the location given by oldp.
  *
- * @tparam Namelen
+ * @tparam NameLen
  *	The length of MIB array
  * @param name
  *	The MIB of the sysctl to return
  * @param oldp,oldplen
  *	Pointer and size to/of the data structure to return the data to
  */
-template <u_int Namelen>
-void sysctl_get(int const (& name)[Namelen], void * oldp, size_t const oldplen) {
+template <u_int NameLen>
+void sysctl_get(mib_t const (& name)[NameLen], void * oldp, size_t const oldplen) {
 	auto len = oldplen;
-	int err = ::sysctl(name, Namelen, oldp, &len, nullptr, 0);
+	int err = ::sysctl(name, NameLen, oldp, &len, nullptr, 0);
 	sysctl_fail(err & errno);
 	assert(len == oldplen && "buffer size must match the data returned");
 	assert(err == 0 && "untreated error");
@@ -429,16 +444,39 @@ void sysctl_get(int const (& name)[Namelen], void * oldp, size_t const oldplen) 
 /**
  * Returns the requested sysctl data into oldv.
  *
- * @tparam Namelen
+ * @tparam NameLen
  *	The length of MIB array
  * @param name
  *	The MIB of the sysctl to return
  * @param oldv
  *	The data to update with the given sysctl
  */
-template <u_int Namelen, typename T>
-inline void sysctl_get(int const (& name)[Namelen], T & oldv) {
+template <u_int NameLen, typename T>
+inline void sysctl_get(mib_t const (& name)[NameLen], T & oldv) {
 	return sysctl_get(name, &oldv, sizeof(oldv));
+}
+
+/**
+ * Returns a unique pointer to an array of T.
+ *
+ * Use if the required buffer size is not known.
+ *
+ * @tparam T
+ *	The type of data to return
+ * @tparam NameLen
+ *	The length of the MIB array
+ * @param name
+ *	The MIB array to identify the sysctl
+ */
+template <typename T, u_int NameLen>
+std::unique_ptr<T[]> sysctl_get(mib_t const (& name)[NameLen]) {
+	size_t len;
+	int err = ::sysctl(name, NameLen, nullptr, &len, nullptr, 0);
+	sysctl_fail(err & errno);
+	assert(err == 0 && "untreated error");
+	auto result = std::unique_ptr<T[]>(new T[len / sizeof(T)]);
+	sysctl_get(name, result.get(), len);
+	return result;
 }
 
 /**
@@ -515,9 +553,9 @@ void init() {
 	 * Basically acts as if the kernel supported local frequency changes.
 	 */
 	g.cores = std::unique_ptr<Core[]>(new Core[g.ncpu]);
-	char name[40];
 	coreid_t controller = -1;
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
+		char name[40];
 		sprintf(name, FREQ, core);
 		try {
 			sysctlnametomib(name, g.cores[core].freq_mib);
@@ -526,7 +564,7 @@ void init() {
 			if (std::get<0>(e) != Exit::ESYSCTL) { throw; }
 
 			if (errno == ENOENT) {
-				verbose("cannot access "_s + name);
+				verbose("cannot access sysctl: "_s + name);
 				if (0 > controller) {
 					fail(Exit::ENOFREQ, "at least the "
 					     "first CPU core must support "
@@ -537,6 +575,39 @@ void init() {
 			}
 		}
 		g.cores[core].controller = controller;
+	}
+
+	/* set per core min/max frequency boundaries */
+	for (coreid_t i = 0; i < g.ncpu; ++i) {
+		auto & core = g.cores[i];
+		if (core.controller != i) { continue; }
+		char name[40];
+		sprintf(name, FREQ_LEVELS, i);
+		try {
+			mib_t mib[4];
+			sysctlnametomib(name, mib);
+			auto levels = sysctl_get<char>(mib);
+			/* the maximum should at least be the minimum
+			 * and vice versa */
+			core.max = g.freq_min;
+			core.min = g.freq_max;
+			for (auto pch = levels.get(); *pch; ++pch) {
+				mhz_t freq = strtol(pch, &pch, 10);
+				if (pch[0] != '/') { break; }
+				core.max = std::max(core.max, freq);
+				core.min = std::min(core.min, freq);
+				strtol(++pch, &pch, 10);
+				/* no idea what that value means */
+				if (pch[0] != ' ') { break; }
+			}
+			/* apply global limits */
+			core.max = std::min(core.max, g.freq_max);
+			core.min = std::max(core.min, g.freq_min);
+			assert(core.min < core.max &&
+			       "minimum must be less than maximum");
+		} catch (Exception &) {
+			verbose("cannot access sysctl: "_s + name);
+		}
 	}
 
 	/* MIB for kern.cp_times */
@@ -612,9 +683,7 @@ void update_freq() {
 
 		/* get old clock */
 		mhz_t oldfreq = 0;
-		if (g.target || g.verbose) {
-			sysctl_get(core.freq_mib, oldfreq);
-		}
+		sysctl_get(core.freq_mib, oldfreq);
 		/* determine target frequency */
 		mhz_t freq = 0;
 		if (g.target) {
@@ -627,9 +696,9 @@ void update_freq() {
 			freq = g.target_freq;
 		}
 		/* apply limits */
-		freq = std::min(std::max(freq, g.freq_min), g.freq_max);
+		freq = std::min(std::max(freq, core.min), core.max);
 		/* update CPU frequency */
-		try {
+		if (oldfreq != freq) try {
 			sysctl_set(core.freq_mib, freq);
 		} catch (Exception & e) {
 			if (errno == EPERM) {
@@ -647,8 +716,11 @@ void update_freq() {
 		          << ", load: " << std::setw(3)
 		          << ((core.load * 100 + 512) / 1024)
 		          << "%, cpu" << corei << ".freq: "
-		          << std::setw(4) << oldfreq
-		          << " -> " << std::setw(4) << freq << " MHz\n";
+		          << std::setw(4) << oldfreq;
+		if (oldfreq != freq) {
+			std::cout << " -> " << std::setw(4) << freq << " MHz";
+		}
+		std::cout << '\n';
 	}
 	std::cout << std::flush;
 }
@@ -997,7 +1069,7 @@ void show_settings() {
 	                                             g.interval.count()) << " ms\n"
 	          << "CPU Cores\n"
 	          << "\tCPU cores:             " << g.ncpu << '\n'
-	          << "\tfrequency limits:      [" << g.freq_min << " MHz, "
+	          << "\tuser frequency limits: [" << g.freq_min << " MHz, "
 	                                      << g.freq_max << " MHz]\n"
 	          << "Core Groups\n";
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
@@ -1009,7 +1081,13 @@ void show_settings() {
 		}
 	}
 	std::cerr << (g.ncpu - 1) << "]\n"
-	          << "Load Targets\n";
+	          << "Core Frequency Limits\n";
+	for (coreid_t i = 0; i < g.ncpu; ++i) {
+		if (i != g.cores[i].controller) { continue; }
+		std::cerr << '\t' << i << ": [" << g.cores[i].min << ", "
+		          << g.cores[i].max << "]\n";
+	}
+	std::cerr << "Load Targets\n";
 	for (size_t i = 0; i < countof(g.targets); ++i) {
 		std::cerr << '\t' << std::left << std::setw(23)
 		          << (""_s + AcLineStateStr[i] + " power target:")
