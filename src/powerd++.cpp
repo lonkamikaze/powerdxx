@@ -158,12 +158,12 @@ struct Core {
 };
 
 /**
- * The idle target for adaptive load, equals 50% load.
+ * The load target for adaptive mode, equals 62.5% load.
  */
-cptime_t const ADP{512};
+cptime_t const ADP{640};
 
 /**
- * The idle target for hiadaptive load, equals 37.5% load.
+ * The load target for hiadaptive mode, equals 37.5% load.
  */
 cptime_t const HADP{384};
 
