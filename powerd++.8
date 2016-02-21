@@ -1,0 +1,222 @@
+.Dd Feruary 30, 2016
+.Dt powerd++ 8
+.Os
+.Sh NAME
+.Nm powerd++
+.Nd CPU clock speed daemon
+.Sh SYNOPSIS
+.Nm
+.Op Fl hv
+.Op Fl a Ar mode
+.Op Fl b Ar mode
+.Op Fl n Ar mode
+.Op Fl m Ar freq
+.Op Fl M Ar freq
+.Op Fl p Ar ival
+.Op Fl s Ar cnt
+.Op Fl P Ar file
+.Sh DESCRIPTION
+The
+.Nm
+daemon monitors the system load and adjusts the CPU clock speed accordingly.
+It is a drop-in replacement for
+.Xr powerd 8
+and supports two modes of operation, a load feedback control loop or fixed
+frequency operation.
+.Sh ARGUMENTS
+The following argument types can be given:
+.Bl -tag -width indent
+.It Ar mode
+The mode is either a
+.Ar load
+target or a fixed
+.Ar freq .
+The
+.Xr powerd 8
+modes are interpreted as follows:
+.Bl -tag -nested -width indent -compact
+.It Li maximum , Li max
+Use the highest clock frequency.
+.It Li minimum , Li min
+Use the lowest clock frequency.
+.It Li adaptive , Li adp
+A target load of 0.5 (62.5%).
+.It Li hiadaptive , Li hadp
+A target load of 0.375 (37.5%).
+.El
+.Pp
+If a scalar number is given, it is interpreted as a load.
+.It Ar load
+A load is either a fraction in the range [0.0, 1.0] or a percentage in the
+range [0%, 100%].
+.It Ar freq
+A clock frequency consists of a number and a frequency unit.
+.D1 Li Hz , Li KHz , Li MHz , Li GHz , Li THz
+The unit is not case sensitive, if omitted
+.Li MHz
+are assumed for compatibility with
+.Xr powerd 8 .
+.It Ar ival
+A time interval can be given in seconds or milliseconds.
+.D1 Li s , Li ms
+An interval without a unit is treated as milliseconds.
+.It Ar cnt
+A positive integer.
+.It Ar file
+A file name.
+.El
+.Sh OPTIONS
+The following options are supported:
+.Bl -tag -width indent
+.It Fl h , -help
+Show usage and exit
+.It Fl v , -verbose
+Be verbose, stay in foreground. Produces initial diagnostics on
+.Pa stderr
+and an event log on
+.Pa stdout .
+.It Fl a , -ac Ar mode
+Mode to use while the AC power line is connected (default
+.Li hadp ) .
+.It Fl b , -batt Ar mode
+Mode to use while battery powered (default
+.Li adp ) .
+.It Fl n , -unknown Ar mode
+Mode to use while the power line state is unknown (default
+.Li hadp ) .
+.It Fl m , -min Ar freq
+The lowest CPU clock frequency to use (default 0Hz).
+.It Fl M , -max Ar freq
+The highest CPU clock frequency to use (default 1THz).
+.It Fl p , -poll Ar ival
+The polling interval that is used to take load samples and update the
+CPU clock (default 0.5s).
+.It Fl s , -samples Ar cnt
+The number of samples to use to calculate the current load. The minimum is 2,
+the default 5.
+.It Fl P , -pid Ar file
+Use an alternative pidfile, the default is
+.Pa /var/run/powerd.pid .
+The default ensures that
+.Xr powerd 8
+and
+.Nm
+are not run simultaneously.
+.It Fl i , r Ar load
+Legacy arguments from
+.Xr powerd 8
+not applicable to
+.Nm
+and thus ignored.
+.El
+.Sh IMPLEMENTATION NOTES
+This section describes the operation of
+.Nm .
+.Pp
+Both
+.Xr powerd 8
+and
+.Nm
+have in common, that they work by polling
+.Li kern.cp_times
+via
+.Xr sysctl 3 ,
+which is an array of the accumulated loads of every core. By subtracting the
+last
+.Li cp_times
+sample the loads over the polling interval can be determined. This information
+is used to set a new CPU clock frequency by updating
+.Li dev.cpu.0.freq .
+.Ss Initialisation
+After parsing command line arguments
+.Nm
+assigns a clock frequency controller to every core. I.e. cores are
+grouped by a common
+.Li dev.cpu.%d.freq
+handle that controls the clock for all of them. Due to limitations of
+.Xr cpufreq 4
+.Li dev.cpu.0.freq
+is the controlling handle for all cores, even across multiple CPUs. However
+.Nm
+is not built with that assumption and per CPU, core or thread controls will
+work as soon as the hardware and kernel support them.
+.Pp
+In the next initialisation stage the available frequencies for every core
+group are determined to set appropriate lower and upper boundaries. This
+is a purely cosmetic measure and used to avoid unnecessary frequency
+updates. The controlling algorithm does not require this information, so
+failure to do so will only be reported (non-fatally) in verbose mode.
+.Ss Detaching From the Terminal
+After the initialisation phase
+.Nm
+prepares to detach from the terminal. The first step is to acquire a lock
+on the pidfile. Afterwards all the frequencies are read and written as
+a last opportunity to fail. After detaching from the terminal the pidfile
+is written and the daemon goes into frequency controlling operation until
+killed by a signal.
+.Ss Load Control Loop
+The original
+.Xr powerd 8
+uses a hysteresis to control the CPU frequency. I.e. it determines the load
+over all cores since taking the last sample (the summary load during the last
+polling interval) and uses a lower and an upper load boundary to decide
+whether it should update the frequency or not.
+.Pp
+.Nm
+has some core differences. It can take more than two samples (five by
+default), this makes it more robust against small spikes in load, while
+retaining much of its ability to quickly react to sudden surges in load.
+Changing the number of samples does not change the runtime cost of running
+.Nm .
+.Pp
+Instead of taking the sum of all loads, the highest load within the core
+group is used to decide the next frequency target. Like with
+.Xr powerd 8
+this means, that high load on a single core will cause an increase in the
+clock frequency. Unlike
+.Xr powerd 8
+it also means that moderate load over all cores allows a decrease of the
+clock frequency.
+.Pp
+The
+.Nm
+daemon steers the clock frequency to match a load target, e.g. if there was
+a 25% load on 2 GHz and the load target was 50%, the frequency would be set
+to 1 GHz.
+.Sh FILES
+.Bl -tag -width indent
+.Pa /var/run/powerd.pid
+Common pidfile with
+.Xr powerd 8 .
+.El
+.Sh EXAMPLES
+Run in foreground, minimum clock frequency 800 MHz:
+.Dl powerd++ -vm800
+.Pp
+Target 75% load on battery power and run at 2.4 GHz on AC power:
+.Dl powerd++ -b .75 -a 2.4ghz
+.Pp
+Target 25% load on AC power:
+.Dl powerd++ -a 25%
+.Pp
+Use the same load sampling
+.Xr powerd 8
+does:
+.Dl powerd++ -s2 -p.25s
+.Sh DIAGNOSTICS
+The
+.Nm
+daemon exits 0 on receiving an
+.Li INT
+or
+.Li TERM
+signal, and >0 if an error occurs.
+.Sh COMPATIBILITY
+So far
+.Nm
+requires ACPI to detect the current power line state.
+.Sh SEE ALSO
+.Xr cpufreq 4 , Xr powerd 8
+.Sh AUTHORS
+Implementation and manual by
+.An Dominic Fandrey Aq kami@freebsd.org
