@@ -20,14 +20,15 @@ exhibited some unhealthy behaviours on multi-core machines.
 In order to make sure that single core loads do not suffer from the
 use of `powerd` it was designed to use the sum load of all cores
 as the current load rating. A side effect of this is that it causes
-`powerd` never to clock down on systems with a moderate number of
-cores. E.g. on a quad-core system with hyper threading a background
+`powerd` to never clock down on systems with even moderate numbers
+of cores. E.g. on a quad-core system with hyper threading a background
 load of 12.5% per core suffices to score a 100% load rating.
 
 The more cores are added, the worse it gets. Even on a dual core
 machine (with HT) having a browser and an e-mail client open, suffices
 to keep the load rating above 100% for most of the time, even without
-user activity. Thus `powerd` never did its job of saving energy.
+user activity. Thus `powerd` never does its job of saving energy,
+by reducing the clock frequency.
 
 Advantages of powerd++
 ----------------------
@@ -75,15 +76,15 @@ The manual page can be read with the following command:
 FAQ
 ---
 
-- **Why `C++`?** The `powerd++` code is not object oriented, but it uses
-  some `C++` and `C++11` features to avoid some of the common pitfalls of
-  writing `C` code. E.g. there is a small RAII wrapper around the
+- **Why C++?** The `powerd++` code is not object oriented, but it uses
+  some *C++* and *C++11* features to avoid some of the common pitfalls of
+  writing *C* code. E.g. there is a small *RAII* wrapper around the
   pidfile facilities (`pidfile_open()`, `pidfile_write()`,
   `pidfile_remove()`), turning the use of pidfiles into a fire and forget
   affair. Templated wrappers around calls like `sysctl()` use array
   references to infer buffer sizes at compile time, taking the burden of
   safely passing these buffer sizes on to the command away from the
-  programmer. The std::unique_ptr<> template obsoletes memory cleanup code,
-  providing the liberty of using exceptions without worrying about memory
-  leaks.
+  programmer. The `std::unique_ptr<>` template obsoletes memory cleanup
+  code, providing the liberty of using exceptions without worrying
+  about memory leaks.
 
