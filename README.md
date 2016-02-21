@@ -27,7 +27,7 @@ load of 12.5% per core suffices to score a 100% load rating.
 The more cores are added, the worse it gets. Even on a dual core
 machine (with HT) having a browser and an e-mail client open, suffices
 to keep the load rating above 100% for most of the time, even without
-user activity. Thus `powerd` never does its job of saving energy,
+user activity. Thus `powerd` never does its job of saving energy
 by reducing the clock frequency.
 
 Advantages of powerd++
