@@ -254,7 +254,7 @@ struct {
 	 *
 	 * If not given pidfile_open() uses a default name.
 	 */
-	char const * pidfilename{nullptr};
+	char const * pidfilename{"/var/run/powerd.pid"};
 
 	/**
 	 * The MIB for kern.cp_times.
@@ -970,9 +970,8 @@ size_t samples(char const str[]) {
  * An enum for command line parsing.
  */
 enum class OE {
-	USAGE, MODE_AC, MODE_BATT, LOAD_IDLE, FREQ_MIN, FREQ_MAX,
-	MODE_UNKNOWN, IVAL_POLL, FILE_PID, LOAD_RUN, FLAG_VERBOSE,
-	CNT_SAMPLES,
+	USAGE, MODE_AC, MODE_BATT, FREQ_MIN, FREQ_MAX, MODE_UNKNOWN, IVAL_POLL,
+	FILE_PID, FLAG_VERBOSE, CNT_SAMPLES, IGNORE,
 	/* obligatory: */ OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH, OPT_DONE
 };
 
@@ -995,8 +994,8 @@ Option<OE> const OPTIONS[]{
 	{OE::IVAL_POLL,    'p', "poll",    "ival", "The polling interval"},
 	{OE::CNT_SAMPLES,  's', "samples", "cnt",  "The number of samples to use"},
 	{OE::FILE_PID,     'P', "pid",     "file", "Alternative PID file"},
-	{OE::LOAD_IDLE,    'i', "idle",    "load", "Ignored"},
-	{OE::LOAD_RUN,     'r', "run",     "load", "Ignored"}
+	{OE::IGNORE,       'i', "",        "load", "Ignored"},
+	{OE::IGNORE,       'r', "",        "load", "Ignored"}
 };
 
 /**
@@ -1039,8 +1038,7 @@ void read_args(int const argc, char const * const argv[]) {
 	case OE::FILE_PID:
 		g.pidfilename = getopt[1];
 		break;
-	case OE::LOAD_IDLE:
-	case OE::LOAD_RUN:
+	case OE::IGNORE:
 		/* for compatibility with powerd, ignore */
 		break;
 	case OE::OPT_UNKNOWN:
@@ -1173,7 +1171,7 @@ void run_daemon() {
 	case 0:
 		break;
 	case EEXIST:
-		fail(Exit::ECONFLICT, "already running under PID: "_s +
+		fail(Exit::ECONFLICT, "a power daemon is already running under PID: "_s +
 		                      std::to_string(pidfile.other()));
 		return;
 	default:
@@ -1182,10 +1180,16 @@ void run_daemon() {
 		return;
 	}
 
-	/* one chance to fail before forking */
-	update_freq();
+	/* try to set frequencies once, before detaching from the terminal */
+	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
+		auto const & core = g.cores[corei];
+		if (core.controller != corei) { continue; }
+		mhz_t freq;
+		sysctl_get(core.freq_mib, freq);
+		sysctl_set(core.freq_mib, freq);
+	}
 
-	/* daemonise */
+	/* detach from the terminal */
 	if (!g.verbose && -1 == ::daemon(0, 1)) {
 		fail(Exit::EDAEMON, "detaching the process failed");
 	}
