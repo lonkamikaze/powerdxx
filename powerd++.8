@@ -183,6 +183,15 @@ The
 daemon steers the clock frequency to match a load target, e.g. if there was
 a 25% load on 2 GHz and the load target was 50%, the frequency would be set
 to 1 GHz.
+.Ss Termination and Signals
+The signals
+.Li HUP
+and
+.Li TERM
+cause an orderly shutdown of
+.Nm .
+An orderly shutdown means the pidfile is removed and the clock frequencies
+are set to their maximums.
 .Sh FILES
 .Bl -tag -width indent
 .Pa /var/run/powerd.pid
