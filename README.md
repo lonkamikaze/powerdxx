@@ -77,14 +77,22 @@ FAQ
 ---
 
 - **Why C++?** The `powerd++` code is not object oriented, but it uses
-  some *C++* and *C++11* features to avoid some of the common pitfalls of
-  writing *C* code. E.g. there is a small *RAII* wrapper around the
-  pidfile facilities (`pidfile_open()`, `pidfile_write()`,
-  `pidfile_remove()`), turning the use of pidfiles into a fire and forget
-  affair. Templated wrappers around calls like `sysctl()` use array
-  references to infer buffer sizes at compile time, taking the burden of
-  safely passing these buffer sizes on to the command away from the
-  programmer. The `std::unique_ptr<>` template obsoletes memory cleanup
-  code, providing the liberty of using exceptions without worrying
-  about memory leaks.
+  some *C++* and *C++11* features to avoid common pitfalls of writing
+  *C* code. E.g. there is a small *RAII* wrapper around the pidfile
+  facilities (`pidfile_open()`, `pidfile_write()`, `pidfile_remove()`),
+  turning the use of pidfiles into a fire and forget affair. Templated
+  wrappers around calls like `sysctl()` use array references to infer
+  buffer sizes at compile time, taking the burden of safely passing
+  these buffer sizes on to the command away from the programmer.
+  The `std::unique_ptr<>` template obsoletes memory cleanup code,
+  providing the liberty of using exceptions without worrying about
+  memory leaks.
+- **Why does powerd++ show a high load when top shows a high idle time?**
+  By default `top` shows the load percentage over all cores/threads,
+  `powerd++` uses the load of a single core/thread (the one with the
+  highest load). This keeps `powerd++` from starving single threaded
+  processes, because they only have a small impact on overall load.
+  An effect that increases with the number of cores/threads. E.g. 80%
+  load on a quad core CPU with hyper threading only has an overall
+  load impact of 10%. Use `top -P` to monitor idle times per core/thread.
 
