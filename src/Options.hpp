@@ -25,7 +25,7 @@
  * to do that a usage string and a list of definitions are needed:
  *
  * ~~~~{.cpp}
- * static char const USAGE[] = "[-hv] [-i file] [-o file] [command ...]";
+ * static char const * const USAGE = "[-hv] [-i file] [-o file] [command ...]";
  *
  * static nih::Option<MyOptions> const OPTIONS[]{
  * 	{MyOptions::USAGE,        'h', "help",    "",     "Show this help"},
@@ -294,7 +294,7 @@ class Options {
 	 * @return
 	 *	A pointer to the file name portion of the path
 	 */
-	static char const * removePath(char const file[]) {
+	static char const * removePath(char const * const file) {
 		auto result = file;
 		for (auto ptr = file; *ptr; ++ptr) {
 			if (*ptr == '/' || *ptr == '\\') {
@@ -314,7 +314,7 @@ class Options {
 	 * @retval false
 	 *	The strings do not match
 	 */
-	static bool match(char const lstr[], char const rstr[]) {
+	static bool match(char const * const lstr, char const * const rstr) {
 		size_t i = 0;
 		for (; lstr[i] && rstr[i]; ++i) {
 			if (lstr[i] != rstr[i]) { return false; }
@@ -333,7 +333,7 @@ class Options {
 	 * @retval false
 	 *	The strings do not match
 	 */
-	static bool bmatch(char const lstr[], char const rstr[]) {
+	static bool bmatch(char const * const lstr, char const * const rstr) {
 		for (size_t i = 0; lstr[i] && rstr[i]; ++i) {
 			if (lstr[i] != rstr[i]) { return false; }
 		}
@@ -371,7 +371,7 @@ class Options {
 	 * @return
 	 *	The option or OPT_UNKNOWN
 	 */
-	Enum get(char const str[]) {
+	Enum get(char const * const str) {
 		if (!str[0]) {
 			this->current = &this->expose;
 			return Enum::OPT_LDASH;
@@ -398,7 +398,8 @@ class Options {
 	 *	An array of option definitions
 	 */
 	Options(int const argc, char const * const argv[],
-	        char const usage[], Option<Enum> const (& defs)[DefCount]) :
+	        char const * const usage,
+	        Option<Enum> const (& defs)[DefCount]) :
 	    argc{argc}, argv{argv}, usageStr{usage}, defs{defs},
 	    argi{1}, argp{nullptr}, current{nullptr} {}
 
@@ -562,7 +563,7 @@ class Options {
 template <class Enum, size_t DefCount>
 constexpr Options<Enum, DefCount>
 make_Options(int const argc, char const * const argv[],
-             char const usage[], Option<Enum> const (&defs)[DefCount]) {
+             char const * const usage, Option<Enum> const (&defs)[DefCount]) {
 	return Options<Enum, DefCount>{argc, argv, usage, defs};
 }
 

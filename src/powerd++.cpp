@@ -6,12 +6,14 @@
 
 #include <iostream>  /* std::cout, std::cerr */
 #include <locale>    /* std::tolower() */
-#include <cstdlib>   /* atof() */
 #include <memory>    /* std::unique_ptr */
-#include <cstdint>   /* uint64_t */
 #include <chrono>    /* std::chrono::milliseconds */
 #include <thread>    /* std::this_thread::sleep_for() */
 #include <algorithm> /* std::min(), std::max() */
+
+#include <cstdlib>   /* std::atof() */
+#include <cstdio>    /* std::snprintf() */
+#include <cstdint>   /* uint64_t */
 
 #include <sys/types.h>     /* sysctl() */
 #include <sys/sysctl.h>    /* sysctl() */
@@ -63,12 +65,12 @@ mib_t const NCPU_MIB[]{CTL_HW, HW_NCPU};
 /**
  * The MIB name for  per-CPU time statistics.
  */
-char const CP_TIMES[] = "kern.cp_times";
+char const * const CP_TIMES = "kern.cp_times";
 
 /**
  * The MIB name for the AC line state.
  */
-char const ACLINE[] = "hw.acpi.acline";
+char const * const ACLINE = "hw.acpi.acline";
 
 /**
  * The available AC line states.
@@ -85,12 +87,12 @@ const char * const AcLineStateStr[]{"battery", "online", "unknown"};
 /**
  * The MIB name for CPU frequencies.
  */
-char const FREQ[] = "dev.cpu.%d.freq";
+char const * const FREQ = "dev.cpu.%d.freq";
 
 /**
  * The MIB name for CPU frequency levels.
  */
-char const FREQ_LEVELS[] = "dev.cpu.%d.freq_levels";
+char const * const FREQ_LEVELS = "dev.cpu.%d.freq_levels";
 
 /**
  * Exit codes.
@@ -111,9 +113,24 @@ const char * const ExitStr[]{
 };
 
 /**
- * Exceptions are an exit code, string message pair.
+ * Exceptions bundle an exit code, errno value and message.
  */
-typedef std::tuple<Exit, std::string> Exception;
+struct Exception {
+	/**
+	 * The code to exit with.
+	 */
+	Exit exitcode;
+
+	/**
+	 * The errno value at the time of creation.
+	 */
+	int err;
+
+	/**
+	 * An error message.
+	 */
+	std::string msg;
+};
 
 /**
  * Like sizeof(), but it returns the number of elements an array consists
@@ -309,7 +326,7 @@ char const * const UnitStr[]{
  * @return
  *	An std::string instance
  */
-std::string operator "" _s(char const op[], size_t const size) {
+std::string operator "" _s(char const * const op, size_t const size) {
 	return {op, size};
 }
 
@@ -332,7 +349,7 @@ std::string operator "" _s(char const op[], size_t const size) {
  *	available space
  */
 template <size_t Size, typename... Args>
-inline int sprintf(char (&dst)[Size], const char format[],
+inline int sprintf(char (&dst)[Size], const char * const format,
                    Args const... args) {
 	return std::snprintf(dst, Size, format, args...);
 }
@@ -375,13 +392,17 @@ inline void verbose(std::string const & msg) {
  *
  * @param exitcode
  *	The exit code to return on termination
+ * @param err
+ *	The errno value at the time the exception was created
  * @param msg
  *	The message to show
  */
-inline void fail(Exit const exitcode, std::string const & msg) {
-	assert(static_cast<int>(exitcode) < countof(ExitStr) &&
+[[noreturn]] inline void
+fail(Exit const exitcode, int const err, std::string const & msg) {
+	assert(size_t(static_cast<int>(exitcode)) < countof(ExitStr) &&
 	       "Enum member must have a corresponding string");
-	throw Exception{exitcode, "powerd++: ("_s + ExitStr[static_cast<int>(exitcode)] + ") " + msg};
+	throw Exception{exitcode, err,
+	                "powerd++: ("_s + ExitStr[static_cast<int>(exitcode)] + ") " + msg};
 }
 
 /**
@@ -389,36 +410,39 @@ inline void fail(Exit const exitcode, std::string const & msg) {
  *
  * Fails appropriately for the given error.
  *
+ * @param sysret
+ *	The value returned by sysctl
  * @param err
- *	The error number to treat
+ *	The errno value after calling sysctl
  */
-void sysctl_fail(int const err) {
+void sysctl_fail(int const sysret, int const err) {
+	if (sysret != -1) { return; }
 	switch(err) {
 	case 0:
 		break;
 	case EFAULT:
-		fail(Exit::ESYSCTL, "sysctl failed with EFAULT");
+		fail(Exit::ESYSCTL, err, "sysctl failed with EFAULT");
 		break;
 	case EINVAL:
-		fail(Exit::ESYSCTL, "sysctl failed with EINVAL");
+		fail(Exit::ESYSCTL, err, "sysctl failed with EINVAL");
 		break;
 	case ENOMEM:
-		fail(Exit::ESYSCTL, "sysctl failed with ENOMEM");
+		fail(Exit::ESYSCTL, err, "sysctl failed with ENOMEM");
 		break;
 	case ENOTDIR:
-		fail(Exit::ESYSCTL, "sysctl failed with ENOTDIR");
+		fail(Exit::ESYSCTL, err, "sysctl failed with ENOTDIR");
 		break;
 	case EISDIR:
-		fail(Exit::ESYSCTL, "sysctl failed with EISDIR");
+		fail(Exit::ESYSCTL, err, "sysctl failed with EISDIR");
 		break;
 	case ENOENT:
-		fail(Exit::ESYSCTL, "sysctl failed with ENOENT");
+		fail(Exit::ESYSCTL, err, "sysctl failed with ENOENT");
 		break;
 	case EPERM:
-		fail(Exit::ESYSCTL, "sysctl failed with EPERM");
+		fail(Exit::ESYSCTL, err, "sysctl failed with EPERM");
 		break;
 	default:
-		fail(Exit::ESYSCTL, "sysctl failed with unknown error");
+		fail(Exit::ESYSCTL, err, "sysctl failed with an unknown error");
 	};
 }
 
@@ -435,10 +459,10 @@ void sysctl_fail(int const err) {
 template <u_int NameLen>
 void sysctl_get(mib_t const (& name)[NameLen], void * oldp, size_t const oldplen) {
 	auto len = oldplen;
-	int err = ::sysctl(name, NameLen, oldp, &len, nullptr, 0);
-	sysctl_fail(err & errno);
+	auto err = ::sysctl(name, NameLen, oldp, &len, nullptr, 0);
+	sysctl_fail(err, errno);
 	assert(len == oldplen && "buffer size must match the data returned");
-	assert(err == 0 && "untreated error");
+	assert(err != -1 && "untreated error");
 }
 
 /**
@@ -471,9 +495,9 @@ inline void sysctl_get(mib_t const (& name)[NameLen], T & oldv) {
 template <typename T, u_int NameLen>
 std::unique_ptr<T[]> sysctl_get(mib_t const (& name)[NameLen]) {
 	size_t len;
-	int err = ::sysctl(name, NameLen, nullptr, &len, nullptr, 0);
-	sysctl_fail(err & errno);
-	assert(err == 0 && "untreated error");
+	auto err = ::sysctl(name, NameLen, nullptr, &len, nullptr, 0);
+	sysctl_fail(err, errno);
+	assert(err != -1 && "untreated error");
 	auto result = std::unique_ptr<T[]>(new T[len / sizeof(T)]);
 	sysctl_get(name, result.get(), len);
 	return result;
@@ -491,8 +515,8 @@ std::unique_ptr<T[]> sysctl_get(mib_t const (& name)[NameLen]) {
  */
 template <u_int Namelen>
 void sysctl_set(int const (& name)[Namelen], void const * newp, size_t const newplen) {
-	int err = ::sysctl(name, Namelen, nullptr, nullptr, newp, newplen);
-	sysctl_fail(err & errno);
+	auto err = ::sysctl(name, Namelen, nullptr, nullptr, newp, newplen);
+	sysctl_fail(err, errno);
 	assert(err == 0);
 }
 
@@ -522,10 +546,10 @@ inline void sysctl_set(int const (& name)[Namelen], T const & newv) {
  *	A pointer to the MIB array
  */
 template <size_t MibLen>
-void sysctlnametomib(const char name[], mib_t (&mibp)[MibLen]) {
+void sysctlnametomib(const char * const name, mib_t (& mibp)[MibLen]) {
 	size_t length = MibLen;
 	auto err = ::sysctlnametomib(name, mibp, &length);
-	sysctl_fail(err & errno);
+	sysctl_fail(err, errno);
 	assert(MibLen == length &&
 	       "The MIB array length should match the returned MIB length");
 }
@@ -561,14 +585,11 @@ void init() {
 			sysctlnametomib(name, g.cores[core].freq_mib);
 			controller = core;
 		} catch (Exception & e) {
-			if (std::get<0>(e) != Exit::ESYSCTL) { throw; }
-
-			if (errno == ENOENT) {
+			if (e.exitcode == Exit::ESYSCTL &&
+			    e.err == ENOENT) {
 				verbose("cannot access sysctl: "_s + name);
 				if (0 > controller) {
-					fail(Exit::ENOFREQ, "at least the "
-					     "first CPU core must support "
-					     "frequency updates");
+					fail(Exit::ENOFREQ, e.err, "at least the first CPU core must support frequency updates");
 				}
 			} else {
 				throw;
@@ -679,7 +700,7 @@ void update_freq() {
 	update_acline();
 
 	assert(g.target <= 1024 &&
-	       "load target must be in the range (0, 1024]");
+	       "load target must be in the range [0, 1024]");
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto const & core = g.cores[corei];
@@ -692,7 +713,7 @@ void update_freq() {
 		mhz_t freq = 0;
 		if (g.target) {
 			/* adaptive frequency mode */
-			assert(oldfreq == (((oldfreq << 10) & ~0x3ff) >> 10) &&
+			assert(oldfreq == ((oldfreq << 10) >> 10) &&
 			       "CPU clock frequency exceeds values that are safe to compute");
 			freq = oldfreq * core.load / g.target;
 		} else {
@@ -705,9 +726,9 @@ void update_freq() {
 		if (oldfreq != freq) try {
 			sysctl_set(core.freq_mib, freq);
 		} catch (Exception & e) {
-			if (errno == EPERM) {
-				fail(Exit::EFORBIDDEN, "insufficient "
-				     "privileges to change core frequency");
+			if (e.exitcode == Exit::ESYSCTL && e.err == EPERM) {
+				fail(Exit::EFORBIDDEN, e.err,
+				     "insufficient privileges to change core frequency");
 			} else {
 				throw;
 			}
@@ -754,7 +775,7 @@ void reset_cp_times() {
  * @return
  *	The load given by str
  */
-cptime_t load(char const str[]) {
+cptime_t load(char const * const str) {
 	std::string load{str};
 	for (char & ch : load) { ch = std::tolower(ch); }
 
@@ -762,14 +783,14 @@ cptime_t load(char const str[]) {
 	switch (unit(load)) {
 	case Unit::SCALAR:
 		if (value > 1. || value < 0) {
-			fail(Exit::EOUTOFRANGE, "load targets must be in the range [0.0, 1.0]: "_s + str);
+			fail(Exit::EOUTOFRANGE, 0, "load targets must be in the range [0.0, 1.0]: "_s + str);
 		}
 		/* convert load to [0, 1024] range */
 		value = 1024 * value;
 		return value < 1 ? 1 : value;
 	case Unit::PERCENT:
 		if (value > 100. || value < 0) {
-			fail(Exit::EOUTOFRANGE, "load targets must be in the range [0%, 100%]: "_s + str);
+			fail(Exit::EOUTOFRANGE, 0, "load targets must be in the range [0%, 100%]: "_s + str);
 		}
 		/* convert load to [0, 1024] range */
 		value = 1024 * (value / 100.);
@@ -777,8 +798,7 @@ cptime_t load(char const str[]) {
 	default:
 		break;
 	}
-	fail(Exit::ELOAD, "load target not recognised: "_s + str);
-	return 0;
+	fail(Exit::ELOAD, 0, "load target not recognised: "_s + str);
 }
 
 /**
@@ -799,7 +819,7 @@ cptime_t load(char const str[]) {
  * @return
  *	The frequency given by str
  */
-mhz_t freq(char const str[]) {
+mhz_t freq(char const * const str) {
 	std::string freqstr{str};
 	for (char & ch : freqstr) { ch = std::tolower(ch); }
 
@@ -815,7 +835,8 @@ mhz_t freq(char const str[]) {
 	case Unit::MHZ:
 	unit__mhz:
 		if (value > 1000000. || value < 0) {
-			fail(Exit::EOUTOFRANGE, "target frequency must be in the range [0Hz, 1THz]: "_s + str);
+			fail(Exit::EOUTOFRANGE, 0,
+			     "target frequency must be in the range [0Hz, 1THz]: "_s + str);
 		}
 		return mhz_t(value);
 	case Unit::GHZ:
@@ -827,7 +848,7 @@ mhz_t freq(char const str[]) {
 	default:
 		break;
 	}
-	fail(Exit::EFREQ, "frequency value not recognised: "_s + str);
+	fail(Exit::EFREQ, 0, "frequency value not recognised: "_s + str);
 	return 0;
 };
 
@@ -862,7 +883,7 @@ mhz_t freq(char const str[]) {
  * @param str
  *	A mode string
  */
-void set_mode(AcLineState const line, char const str[]) {
+void set_mode(AcLineState const line, char const * const str) {
 	std::string mode{str};
 	for (char & ch : mode) { ch = std::tolower(ch); }
 
@@ -875,7 +896,8 @@ void set_mode(AcLineState const line, char const str[]) {
 		return;
 	}
 	if (mode == "maximum" || mode == "max") {
-		g.target_freqs[linei] = 1000000; return;
+		g.target_freqs[linei] = 1000000;
+		return;
 	}
 	if (mode == "adaptive" || mode == "adp") {
 		g.targets[linei] = ADP;
@@ -892,7 +914,7 @@ void set_mode(AcLineState const line, char const str[]) {
 		g.targets[linei] = load(str);
 		return;
 	} catch (Exception & e) {
-		if (std::get<0>(e) == Exit::EOUTOFRANGE) { throw; }
+		if (e.exitcode == Exit::EOUTOFRANGE) { throw; }
 	}
 
 	/* try to set clock frequency */
@@ -900,10 +922,10 @@ void set_mode(AcLineState const line, char const str[]) {
 		g.target_freqs[linei] = freq(str);
 		return;
 	} catch (Exception & e) {
-		if (std::get<0>(e) == Exit::EOUTOFRANGE) { throw; }
+		if (e.exitcode == Exit::EOUTOFRANGE) { throw; }
 	}
 
-	fail(Exit::EMODE, "mode not recognised: "_s + str);
+	fail(Exit::EMODE, 0, "mode not recognised: "_s + str);
 }
 
 /**
@@ -923,14 +945,14 @@ void set_mode(AcLineState const line, char const str[]) {
  * @return
  *	The interval in milliseconds
  */
-ms ival(char const str[]) {
+ms ival(char const * const str) {
 	std::string interval{str};
 	for (char & ch : interval) { ch = std::tolower(ch); }
 
 	auto value = std::atof(str);
 	if (value < 0) {
-		fail(Exit::EOUTOFRANGE, "polling interval must be positive: "_s + str);
-		return ms{0};
+		fail(Exit::EOUTOFRANGE, 0,
+		     "polling interval must be positive: "_s + str);
 	}
 	switch (unit(interval)) {
 	case Unit::SECOND:
@@ -941,8 +963,7 @@ ms ival(char const str[]) {
 	default:
 		break;
 	}
-	fail(Exit::EIVAL, "polling interval not recognised: "_s + str);
-	return ms{0};
+	fail(Exit::EIVAL, 0, "polling interval not recognised: "_s + str);
 }
 
 /**
@@ -955,17 +976,17 @@ ms ival(char const str[]) {
  * @return
  *	The number of samples
  */
-size_t samples(char const str[]) {
+size_t samples(char const * const str) {
 	if (unit(str) != Unit::SCALAR) {
-		fail(Exit::ESAMPLES, "sample count must be a scalar integer: "_s + str);
+		fail(Exit::ESAMPLES, 0, "sample count must be a scalar integer: "_s + str);
 	}
 	auto const cnt = std::atoi(str);
 	auto const cntf = std::atof(str);
 	if (cntf != cnt) {
-		fail(Exit::EOUTOFRANGE, "sample count must be an integer: "_s + str);
+		fail(Exit::EOUTOFRANGE, 0, "sample count must be an integer: "_s + str);
 	}
 	if (cnt < 2 || cnt > 1001) {
-		fail(Exit::EOUTOFRANGE, "sample count must be in the range [2; 1001]: "_s + str);
+		fail(Exit::EOUTOFRANGE, 0, "sample count must be in the range [2, 1001]: "_s + str);
 	}
 	return size_t(cnt);
 }
@@ -982,7 +1003,7 @@ enum class OE {
 /**
  * The short usage string.
  */
-char const USAGE[] = "[-hv] [-abn mode] [-mM freq] [-p ival] [-s cnt] [-P file]";
+char const * const USAGE = "[-hv] [-abn mode] [-mM freq] [-p ival] [-s cnt] [-P file]";
 
 /**
  * Definitions of command line options.
@@ -1013,8 +1034,7 @@ void read_args(int const argc, char const * const argv[]) {
 
 	while (true) switch (getopt()) {
 	case OE::USAGE:
-		throw Exception{Exit::OK, getopt.usage()};
-		break;
+		throw Exception{Exit::OK, 0, getopt.usage()};
 	case OE::FLAG_VERBOSE:
 		g.verbose = true;
 		break;
@@ -1049,9 +1069,8 @@ void read_args(int const argc, char const * const argv[]) {
 	case OE::OPT_NOOPT:
 	case OE::OPT_DASH:
 	case OE::OPT_LDASH:
-		fail(Exit::ECLARG, "unexpected command line argument: "_s +
-		                   getopt[0] + "\n\n" + getopt.usage());
-		return;
+		fail(Exit::ECLARG, 0, "unexpected command line argument: "_s +
+		                      getopt[0] + "\n\n" + getopt.usage());
 	case OE::OPT_DONE:
 		return;
 	}
@@ -1131,7 +1150,7 @@ class Pidfile final {
 	 * @param pfname,mode
 	 *	Arguments to pidfile_open()
 	 */
-	Pidfile(char const pfname[], mode_t const mode) :
+	Pidfile(char const * const pfname, mode_t const mode) :
 	    otherpid{0}, pfh{::pidfile_open(pfname, mode, &this->otherpid)},
 	    err{this->pfh == nullptr ? errno : 0} {}
 
@@ -1160,8 +1179,7 @@ class Pidfile final {
 	 * Write PID to the file, should be called after daemon().
 	 */
 	void write() {
-		this->err = ::pidfile_write(this->pfh);
-		this->err &= errno;
+		this->err = ::pidfile_write(this->pfh) == -1 ? errno : 0;
 	}
 };
 
@@ -1175,13 +1193,12 @@ void run_daemon() {
 	case 0:
 		break;
 	case EEXIST:
-		fail(Exit::ECONFLICT, "a power daemon is already running under PID: "_s +
-		                      std::to_string(pidfile.other()));
-		return;
+		fail(Exit::ECONFLICT, pidfile.error(),
+		     "a power daemon is already running under PID: "_s +
+		     std::to_string(pidfile.other()));
 	default:
-		fail(Exit::EPID, "cannot create pidfile "_s +
-		                 (g.pidfilename ? g.pidfilename : ""));
-		return;
+		fail(Exit::EPID, pidfile.error(),
+		     "cannot create pidfile "_s + g.pidfilename);
 	}
 
 	/* try to set frequencies once, before detaching from the terminal */
@@ -1195,14 +1212,14 @@ void run_daemon() {
 
 	/* detach from the terminal */
 	if (!g.verbose && -1 == ::daemon(0, 1)) {
-		fail(Exit::EDAEMON, "detaching the process failed");
+		fail(Exit::EDAEMON, errno, "detaching the process failed");
 	}
 
 	/* write pid */
 	pidfile.write();
 	if (pidfile.error()){
-		fail(Exit::EPID, "cannot write to pidfile "_s +
-		                 (g.pidfilename ? g.pidfilename : ""));
+		fail(Exit::EPID, pidfile.error(),
+		     "cannot write to pidfile: "_s + g.pidfilename);
 	}
 
 	/* the main loop */
@@ -1232,7 +1249,7 @@ void signal_recv(int const signal) {
  *	An exit code
  * @see Exit
  */
-int main(int const argc, char const * const argv[]) {
+int main(int argc, char * argv[]) {
 	try {
 		signal(SIGINT, signal_recv);
 		signal(SIGTERM, signal_recv);
@@ -1242,10 +1259,10 @@ int main(int const argc, char const * const argv[]) {
 		reset_cp_times();
 		run_daemon();
 	} catch (Exception & e) {
-		if (std::get<1>(e) != "") {
-			std::cerr << std::get<1>(e) << '\n';
+		if (e.msg != "") {
+			std::cerr << e.msg << '\n';
 		}
-		return static_cast<int>(std::get<0>(e));
+		return static_cast<int>(e.exitcode);
 	}
 	return 0;
 }
