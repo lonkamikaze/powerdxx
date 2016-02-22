@@ -517,7 +517,7 @@ template <u_int Namelen>
 void sysctl_set(int const (& name)[Namelen], void const * newp, size_t const newplen) {
 	auto err = ::sysctl(name, Namelen, nullptr, nullptr, newp, newplen);
 	sysctl_fail(err, errno);
-	assert(err == 0);
+	assert(err != -1);
 }
 
 /**
@@ -585,8 +585,7 @@ void init() {
 			sysctlnametomib(name, g.cores[core].freq_mib);
 			controller = core;
 		} catch (Exception & e) {
-			if (e.exitcode == Exit::ESYSCTL &&
-			    e.err == ENOENT) {
+			if (e.exitcode == Exit::ESYSCTL && e.err == ENOENT) {
 				verbose("cannot access sysctl: "_s + name);
 				if (0 > controller) {
 					fail(Exit::ENOFREQ, e.err, "at least the first CPU core must support frequency updates");
@@ -1184,6 +1183,47 @@ class Pidfile final {
 };
 
 /**
+ * A core frequency guard.
+ *
+ * This uses the RAII pattern to achieve two things:
+ *
+ * - Upon creation it reads and writes all controlling cores
+ * - Upon destruction it sets all cores to the maximum frequencies
+ */
+struct FreqGuard final {
+	/**
+	 * Read and write all core frequencies, may throw.
+	 */
+	FreqGuard() {
+		for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
+			auto const & core = g.cores[corei];
+			if (core.controller != corei) { continue; }
+			mhz_t freq;
+			sysctl_get(core.freq_mib, freq);
+			sysctl_set(core.freq_mib, freq);
+		}
+	}
+
+	/**
+	 * Try to set all core frequencies to the maximum, should not throw.
+	 *
+	 * This may not alwas be the optimal approach, but it is arguably
+	 * sane.
+	 */
+	~FreqGuard() {
+		for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
+			auto const & core = g.cores[corei];
+			if (core.controller != corei) { continue; }
+			try {
+				sysctl_set(core.freq_mib, core.max);
+			} catch (Exception &) {
+				/* do nada */
+			}
+		}
+	}
+};
+
+/**
  * Daemonise and run the main loop.
  */
 void run_daemon() {
@@ -1202,13 +1242,7 @@ void run_daemon() {
 	}
 
 	/* try to set frequencies once, before detaching from the terminal */
-	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-		auto const & core = g.cores[corei];
-		if (core.controller != corei) { continue; }
-		mhz_t freq;
-		sysctl_get(core.freq_mib, freq);
-		sysctl_set(core.freq_mib, freq);
-	}
+	FreqGuard fguard;
 
 	/* detach from the terminal */
 	if (!g.verbose && -1 == ::daemon(0, 1)) {
