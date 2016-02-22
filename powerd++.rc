@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# PROVIDE: powerdxx
+# REQUIRE: DAEMON
+# BEFORE: LOGIN
+# KEYWORD: nojail shutdown
+
+. /etc/rc.subr
+
+name="powerdxx"
+rcvar="powerdxx_enable"
+command="%%PREFIX%%/sbin/powerd++"
+pidfile="/var/run/powerd.pid"
+
+load_rc_config $name
+run_rc_command "$1"
