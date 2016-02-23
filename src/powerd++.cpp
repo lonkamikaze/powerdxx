@@ -1115,7 +1115,7 @@ void show_settings() {
 		return;
 	}
 	std::cerr << "Terminal Output\n"
-	          << "\tverbose:                yes\n"
+	          << "\tverbose:               yes\n"
 	          << "\tforeground:            " << (g.foreground ? "yes\n" : "no\n")
 	          << "Load Sampling\n"
 	          << "\tcp_time samples:       " << g.samples << '\n'
