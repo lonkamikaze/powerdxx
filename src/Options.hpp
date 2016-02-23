@@ -474,7 +474,7 @@ class Options {
 	 * @return
 	 *	The option or one of its arguments
 	 */
-	char const * operator [](size_t const i) {
+	char const * operator [](int const i) {
 		/* argument is in the same string as option */
 		if (this->argp && this->argp[0] && this->argp[1] && i > 0) {
 			if (this->argi + i - 1 >= this->argc) {
@@ -484,6 +484,10 @@ class Options {
 				return this->argp + 1;
 			}
 			return this->argv[this->argi + i - 1];
+		}
+		/* read in front of arguments */
+		if (this->argi + i < 0) {
+			return "";
 		}
 		/* argument is in the string following the option */
 		if (this->argi + i < this->argc) {

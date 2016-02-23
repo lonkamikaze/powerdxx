@@ -11,8 +11,8 @@
 #include <thread>    /* std::this_thread::sleep_for() */
 #include <algorithm> /* std::min(), std::max() */
 
-#include <cstdlib>   /* std::atof() */
-#include <cstdio>    /* std::snprintf() */
+#include <cstdlib>   /* atof(), atoi(), strtol() */
+#include <cstdio>    /* snprintf() */
 #include <cstdint>   /* uint64_t */
 
 #include <sys/types.h>     /* sysctl() */
@@ -21,6 +21,30 @@
 
 #include <signal.h>  /* signal() */
 #include <libutil.h> /* pidfile_*() */
+
+/**
+ * Workarounds for compiler/library bugs.
+ */
+namespace fixme {
+
+/**
+ * G++ 5.3 does not believe in std::to_string().
+ *
+ * @tparam T
+ *	The argument type to convert
+ * @param op
+ *	The argument to convert
+ * @return
+ *	A string of the given argument
+ */
+template <typename T>
+inline std::string to_string(T const & op) {
+	std::ostringstream result;
+	result << op;
+	return result.str();
+}
+
+} /* namespace fixme */
 
 namespace {
 
@@ -336,7 +360,7 @@ std::string operator "" _s(char const * const op, size_t const size) {
 }
 
 /**
- * A wrapper around std::snprintf() that automatically pulls in the
+ * A wrapper around snprintf() that automatically pulls in the
  * destination buffer size.
  *
  * @tparam Size
@@ -356,7 +380,7 @@ std::string operator "" _s(char const * const op, size_t const size) {
 template <size_t Size, typename... Args>
 inline int sprintf(char (& dst)[Size], const char * const format,
                    Args const... args) {
-	return std::snprintf(dst, Size, format, args...);
+	return snprintf(dst, Size, format, args...);
 }
 
 /**
@@ -783,7 +807,7 @@ cptime_t load(char const * const str) {
 	std::string load{str};
 	for (char & ch : load) { ch = std::tolower(ch); }
 
-	auto value = std::atof(str);
+	auto value = atof(str);
 	switch (unit(load)) {
 	case Unit::SCALAR:
 		if (value > 1. || value < 0) {
@@ -827,7 +851,7 @@ mhz_t freq(char const * const str) {
 	std::string freqstr{str};
 	for (char & ch : freqstr) { ch = std::tolower(ch); }
 
-	auto value = std::atof(str);
+	auto value = atof(str);
 	switch (unit(freqstr)) {
 	case Unit::HZ:
 		value /= 1000000.;
@@ -952,7 +976,7 @@ ms ival(char const * const str) {
 	std::string interval{str};
 	for (char & ch : interval) { ch = std::tolower(ch); }
 
-	auto value = std::atof(str);
+	auto value = atof(str);
 	if (value < 0) {
 		fail(Exit::EOUTOFRANGE, 0,
 		     "polling interval must be positive: "_s + str);
@@ -983,8 +1007,8 @@ size_t samples(char const * const str) {
 	if (unit(str) != Unit::SCALAR) {
 		fail(Exit::ESAMPLES, 0, "sample count must be a scalar integer: "_s + str);
 	}
-	auto const cnt = std::atoi(str);
-	auto const cntf = std::atof(str);
+	auto const cnt = atoi(str);
+	auto const cntf = atof(str);
 	if (cntf != cnt) {
 		fail(Exit::EOUTOFRANGE, 0, "sample count must be an integer: "_s + str);
 	}
@@ -1091,7 +1115,7 @@ void show_settings() {
 		return;
 	}
 	std::cerr << "Terminal Output\n"
-	          << "\tvebose:                yes\n"
+	          << "\tverbose:                yes\n"
 	          << "\tforeground:            " << (g.foreground ? "yes\n" : "no\n")
 	          << "Load Sampling\n"
 	          << "\tcp_time samples:       " << g.samples << '\n'
@@ -1246,7 +1270,7 @@ void run_daemon() {
 	case EEXIST:
 		fail(Exit::ECONFLICT, pidfile.error(),
 		     "a power daemon is already running under PID: "_s +
-		     std::to_string(pidfile.other()));
+		     fixme::to_string(pidfile.other()));
 	default:
 		fail(Exit::EPID, pidfile.error(),
 		     "cannot create pidfile "_s + g.pidfilename);
@@ -1273,7 +1297,7 @@ void run_daemon() {
 		update_freq();
 	}
 
-	verbose("signal "_s + std::to_string(g.signal) + " received, exiting ...");
+	verbose("signal "_s + fixme::to_string(g.signal) + " received, exiting ...");
 }
 
 /**
