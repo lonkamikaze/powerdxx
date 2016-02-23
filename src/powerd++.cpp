@@ -262,9 +262,14 @@ struct {
 	AcLineState acline{AcLineState::UNKNOWN};
 
 	/**
-	 * Verbose/foreground mode.
+	 * Verbose mode.
 	 */
 	bool verbose{false};
+
+	/**
+	 * Foreground mode.
+	 */
+	bool foreground{false};
 
 	/**
 	 * Name of an alternative pidfile.
@@ -349,7 +354,7 @@ std::string operator "" _s(char const * const op, size_t const size) {
  *	available space
  */
 template <size_t Size, typename... Args>
-inline int sprintf(char (&dst)[Size], const char * const format,
+inline int sprintf(char (& dst)[Size], const char * const format,
                    Args const... args) {
 	return std::snprintf(dst, Size, format, args...);
 }
@@ -733,7 +738,7 @@ void update_freq() {
 			}
 		}
 		/* verbose output */
-		if (!g.verbose) { continue; }
+		if (!g.foreground) { continue; }
 		std::cout << std::right
 		          << "power: " << std::setw(7)
 		          << AcLineStateStr[static_cast<int>(g.acline)]
@@ -746,7 +751,7 @@ void update_freq() {
 		}
 		std::cout << '\n';
 	}
-	std::cout << std::flush;
+	if (g.foreground) { std::cout << std::flush; }
 }
 
 /**
@@ -848,7 +853,6 @@ mhz_t freq(char const * const str) {
 		break;
 	}
 	fail(Exit::EFREQ, 0, "frequency value not recognised: "_s + str);
-	return 0;
 };
 
 /**
@@ -995,31 +999,32 @@ size_t samples(char const * const str) {
  */
 enum class OE {
 	USAGE, MODE_AC, MODE_BATT, FREQ_MIN, FREQ_MAX, MODE_UNKNOWN, IVAL_POLL,
-	FILE_PID, FLAG_VERBOSE, CNT_SAMPLES, IGNORE,
+	FILE_PID, FLAG_VERBOSE, FLAG_FOREGROUND, CNT_SAMPLES, IGNORE,
 	/* obligatory: */ OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH, OPT_DONE
 };
 
 /**
  * The short usage string.
  */
-char const * const USAGE = "[-hv] [-abn mode] [-mM freq] [-p ival] [-s cnt] [-P file]";
+char const * const USAGE = "[-hvf] [-abn mode] [-mM freq] [-p ival] [-s cnt] [-P file]";
 
 /**
  * Definitions of command line options.
  */
 Option<OE> const OPTIONS[]{
-	{OE::USAGE,        'h', "help",    "",     "Show usage and exit"},
-	{OE::FLAG_VERBOSE, 'v', "verbose", "",     "Be verbose, stay in foreground"},
-	{OE::MODE_AC,      'a', "ac",      "mode", "Select the mode while on AC power"},
-	{OE::MODE_BATT,    'b', "batt",    "mode", "Select the mode while on battery power"},
-	{OE::MODE_UNKNOWN, 'n', "unknown", "mode", "Select the mode while power source is unknown"},
-	{OE::FREQ_MIN,     'm', "min",     "freq", "The minimum CPU frequency"},
-	{OE::FREQ_MAX,     'M', "max",     "freq", "The maximum CPU frequency"},
-	{OE::IVAL_POLL,    'p', "poll",    "ival", "The polling interval"},
-	{OE::CNT_SAMPLES,  's', "samples", "cnt",  "The number of samples to use"},
-	{OE::FILE_PID,     'P', "pid",     "file", "Alternative PID file"},
-	{OE::IGNORE,       'i', "",        "load", "Ignored"},
-	{OE::IGNORE,       'r', "",        "load", "Ignored"}
+	{OE::USAGE,           'h', "help",       "",     "Show usage and exit"},
+	{OE::FLAG_VERBOSE,    'v', "verbose",    "",     "Be verbose"},
+	{OE::FLAG_FOREGROUND, 'f', "foreground", "",     "Stay in foreground"},
+	{OE::MODE_AC,         'a', "ac",         "mode", "Select the mode while on AC power"},
+	{OE::MODE_BATT,       'b', "batt",       "mode", "Select the mode while on battery power"},
+	{OE::MODE_UNKNOWN,    'n', "unknown",    "mode", "Select the mode while power source is unknown"},
+	{OE::FREQ_MIN,        'm', "min",        "freq", "The minimum CPU frequency"},
+	{OE::FREQ_MAX,        'M', "max",        "freq", "The maximum CPU frequency"},
+	{OE::IVAL_POLL,       'p', "poll",       "ival", "The polling interval"},
+	{OE::CNT_SAMPLES,     's', "samples",    "cnt",  "The number of samples to use"},
+	{OE::FILE_PID,        'P', "pid",        "file", "Alternative PID file"},
+	{OE::IGNORE,          'i', "",           "load", "Ignored"},
+	{OE::IGNORE,          'r', "",           "load", "Ignored"}
 };
 
 /**
@@ -1036,6 +1041,9 @@ void read_args(int const argc, char const * const argv[]) {
 		throw Exception{Exit::OK, 0, getopt.usage()};
 	case OE::FLAG_VERBOSE:
 		g.verbose = true;
+		break;
+	case OE::FLAG_FOREGROUND:
+		g.foreground = true;
 		break;
 	case OE::MODE_AC:
 		set_mode(AcLineState::ONLINE, getopt[1]);
@@ -1082,7 +1090,10 @@ void show_settings() {
 	if (!g.verbose) {
 		return;
 	}
-	std::cerr << "Load Sampling\n"
+	std::cerr << "Terminal Output\n"
+	          << "\tvebose:                yes\n"
+	          << "\tforeground:            " << (g.foreground ? "yes\n" : "no\n")
+	          << "Load Sampling\n"
 	          << "\tcp_time samples:       " << g.samples << '\n'
 	          << "\tpolling interval:      " << g.interval.count() << " ms\n"
 	          << "\tload average over:     " << ((g.samples - 1) *
@@ -1245,7 +1256,7 @@ void run_daemon() {
 	FreqGuard fguard;
 
 	/* detach from the terminal */
-	if (!g.verbose && -1 == ::daemon(0, 1)) {
+	if (!g.foreground && -1 == ::daemon(0, 1)) {
 		fail(Exit::EDAEMON, errno, "detaching the process failed");
 	}
 

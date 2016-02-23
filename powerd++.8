@@ -40,7 +40,7 @@ Use the highest clock frequency.
 .It Li minimum , Li min
 Use the lowest clock frequency.
 .It Li adaptive , Li adp
-A target load of 0.5 (62.5%).
+A target load of 0.625 (62.5%).
 .It Li hiadaptive , Li hadp
 A target load of 0.375 (37.5%).
 .El
@@ -71,9 +71,10 @@ The following options are supported:
 .It Fl h , -help
 Show usage and exit
 .It Fl v , -verbose
-Be verbose, stay in foreground. Produces initial diagnostics on
-.Pa stderr
-and an event log on
+Be verbose and produce initial diagnostics on
+.Pa stderr .
+.It Fl f , -foreground
+Stay in foreground, produce an event log on
 .Pa stdout .
 .It Fl a , -ac Ar mode
 Mode to use while the AC power line is connected (default
@@ -200,7 +201,10 @@ Common pidfile with
 .El
 .Sh EXAMPLES
 Run in foreground, minimum clock frequency 800 MHz:
-.Dl powerd++ -vm800
+.Dl powerd++ -fm800
+.Pp
+Report configuration before detaching into the background:
+.Dl powerd++ -v
 .Pp
 Target 75% load on battery power and run at 2.4 GHz on AC power:
 .Dl powerd++ -b .75 -a 2.4ghz
