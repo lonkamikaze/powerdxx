@@ -769,7 +769,7 @@ void update_freq() {
 		          << ", load: " << std::setw(3)
 		          << ((core.load * 100 + 512) / 1024)
 		          << "%, cpu" << corei << ".freq: "
-		          << std::setw(4) << oldfreq;
+		          << std::setw(4) << oldfreq << " MHz";
 		if (oldfreq != freq) {
 			std::cout << " -> " << std::setw(4) << freq << " MHz";
 		}
@@ -1139,8 +1139,8 @@ void show_settings() {
 	          << "Core Frequency Limits\n";
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		if (i != g.cores[i].controller) { continue; }
-		std::cerr << '\t' << i << ": [" << g.cores[i].min << ", "
-		          << g.cores[i].max << "]\n";
+		std::cerr << '\t' << i << ": [" << g.cores[i].min << " MHz, "
+		          << g.cores[i].max << " MHz]\n";
 	}
 	std::cerr << "Load Targets\n";
 	for (size_t i = 0; i < countof(g.targets); ++i) {
