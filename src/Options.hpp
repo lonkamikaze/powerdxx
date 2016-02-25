@@ -1,11 +1,11 @@
 /** \file
- * This file provides nih::Options<>, a substitute for `getopt(3)`.
+ * This file provides \ref nih::Options<>, a substitute for `getopt(3)`.
  *
  * The `getopt(3)` interface takes the command line arguments as `char * const`
  * instead of `char const *`. I.e. it reserves the right to mutate the
  * provided arguments, which it actually does.
  *
- * The nih::Options<> functor is not a drop in substitute, but
+ * The \ref nih::Options<> functor is not a drop in substitute, but
  * tries to be easily adoptable and does not change the data given to it.
  *
  * To use the options an enum or enum class is required, e.g.:
@@ -13,7 +13,7 @@
  * ~~~~{.cpp}
  * enum class MyOptions {
  * 	USAGE, FILE_IN, FILE_OUT, FLAG_VERBOSE,
- *      OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH, OPT_DONE
+ * 	OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH, OPT_DONE
  * };
  * ~~~~
  *
@@ -56,7 +56,7 @@
  * #include <iostream>
  * ...
  * 
- * int main(int const argc, char const * const argv[]) {
+ * int main(int argc, char * argv[]) {
  * 	char const * infile = "-";
  * 	char const * outfile = "-";
  * 	bool verbose = false;
@@ -122,7 +122,7 @@
 namespace nih {
 
 /**
- * See std::void_t in C++17 <type_traits>.
+ * See std::void_t in C++17 \<type_traits\>.
  */
 template <class...>
 using void_t = void;
@@ -413,6 +413,10 @@ class Options {
 	 *	was encountered
 	 * @retval OPT_NOOPT
 	 *	An argument that is not an option was encountered
+	 * @retval OPT_DASH
+	 *	A lone dash "-" was encountered
+	 * @retval OPT_LDASH
+	 *	A lone long dash "--" was encountered
 	 * @retval OPT_DONE
 	 *	All arguments have been processed
 	 */
