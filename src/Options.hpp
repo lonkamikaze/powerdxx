@@ -145,7 +145,7 @@ using void_t = void;
  *	An enum or enum class representing the available options
  */
 template <class Enum, class = void>
-struct enum_has_members : std::false_type {};
+struct enum_has_members : /** @cond */ std::false_type {};
 
 template <class Enum>
 struct enum_has_members<Enum, void_t<decltype(Enum::OPT_UNKNOWN),
@@ -153,7 +153,7 @@ struct enum_has_members<Enum, void_t<decltype(Enum::OPT_UNKNOWN),
                                      decltype(Enum::OPT_DASH),
                                      decltype(Enum::OPT_LDASH),
                                      decltype(Enum::OPT_DONE)>> :
-    std::true_type {};
+    /** @endcond */ std::true_type {};
 
 /**
  * Container for an option definition.
@@ -478,7 +478,7 @@ class Options {
 	 * @return
 	 *	The option or one of its arguments
 	 */
-	char const * operator [](int const i) {
+	char const * operator [](int const i) const {
 		/* argument is in the same string as option */
 		if (this->argp && this->argp[0] && this->argp[1] && i > 0) {
 			if (this->argi + i - 1 >= this->argc) {
@@ -508,7 +508,7 @@ class Options {
 	 * @return
 	 *	A usage string for printing on the CLI
 	 */
-	std::string usage() {
+	std::string usage() const {
 		std::ostringstream result;
 		result << "usage: " << removePath(this->argv[0]) << ' '
 		       << this->usageStr << "\n\n" << std::left;

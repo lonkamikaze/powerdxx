@@ -46,6 +46,9 @@ inline std::string to_string(T const & op) {
 
 } /* namespace fixme */
 
+/**
+ * File local scope.
+ */
 namespace {
 
 using nih::Option;
@@ -100,7 +103,9 @@ char const * const ACLINE = "hw.acpi.acline";
  * The available AC line states.
  */
 enum class AcLineState : unsigned int {
-	BATTERY, ONLINE, UNKNOWN
+	BATTERY, /**< Battery is power source */
+	ONLINE,  /**< External power source */
+	UNKNOWN  /**< Unknown power source */
 };
 
 /**
@@ -122,9 +127,20 @@ char const * const FREQ_LEVELS = "dev.cpu.%d.freq_levels";
  * Exit codes.
  */
 enum class Exit : int {
-	OK, ECLARG, EOUTOFRANGE, ELOAD, EFREQ, EMODE, EIVAL,
-	ESAMPLES, ESYSCTL, ENOFREQ, ECONFLICT, EPID, EFORBIDDEN,
-	EDAEMON
+	OK,          /**< Regular termination */
+	ECLARG,      /**< Unexpected command line argument */
+	EOUTOFRANGE, /**< A user provided value is out of range */
+	ELOAD,       /**< The provided value is not a valid load */
+	EFREQ,       /**< The provided value is not a valid frequency */
+	EMODE,       /**< The provided value is not a valid mode */
+	EIVAL,       /**< The provided value is not a valid interval */
+	ESAMPLES,    /**< The provided value is not a valid sample count */
+	ESYSCTL,     /**< A sysctl operation failed */
+	ENOFREQ,     /**< System does not support changing core frequencies */
+	ECONFLICT,   /**< Another frequency daemon instance is running */
+	EPID,        /**< A pidfile could not be created */
+	EFORBIDDEN,  /**< Insufficient privileges to change sysctl */
+	EDAEMON      /**< Unable to detach from terminal */
 };
 
 /**
@@ -334,7 +350,16 @@ static_assert(countof(g.target_freqs) == countof(AcLineStateStr),
  * arguments the behaviour of powerd is to be imitated.
  */
 enum class Unit : size_t {
-	SCALAR, PERCENT, SECOND, MILLISECOND, HZ, KHZ, MHZ, GHZ, THZ, UNKNOWN
+	SCALAR,      /**< Values without a unit */
+	PERCENT,     /**< % */
+	SECOND,      /**< s */
+	MILLISECOND, /**< ms */
+	HZ,          /**< hz */
+	KHZ,         /**< khz */
+	MHZ,         /**< mhz */
+	GHZ,         /**< ghz */
+	THZ,         /**< khz */
+	UNKNOWN      /**< Unknown unit */
 };
 
 /**
@@ -346,7 +371,7 @@ char const * const UnitStr[]{
 
 /**
  * A string literal operator equivalent to the `operator "" s` literal
- * provided by C++14 in <string>.
+ * provided by C++14 in \<string\>.
  *
  * @param op
  *	The raw string to turn into an std::string object
@@ -1022,9 +1047,23 @@ size_t samples(char const * const str) {
  * An enum for command line parsing.
  */
 enum class OE {
-	USAGE, MODE_AC, MODE_BATT, FREQ_MIN, FREQ_MAX, MODE_UNKNOWN, IVAL_POLL,
-	FILE_PID, FLAG_VERBOSE, FLAG_FOREGROUND, CNT_SAMPLES, IGNORE,
-	/* obligatory: */ OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH, OPT_DONE
+	USAGE,           /**< Print help */
+	MODE_AC,         /**< Set AC power mode */
+	MODE_BATT,       /**< Set battery power mode */
+	FREQ_MIN,        /**< Set minimum clock frequency */
+	FREQ_MAX,        /**< Set maximum clock frequency */
+	MODE_UNKNOWN,    /**< Set unknown power source mode */
+	IVAL_POLL,       /**< Set polling interval */
+	FILE_PID,        /**< Set pidfile */
+	FLAG_VERBOSE,    /**< Activate verbose output on stderr */
+	FLAG_FOREGROUND, /**< Stay in foreground, log events to stdout */
+	CNT_SAMPLES,     /**< Set number of cp_times samples */
+	IGNORE,          /**< Legacy settings */
+	OPT_UNKNOWN,     /**< Obligatory */
+	OPT_NOOPT,       /**< Obligatory */
+	OPT_DASH,        /**< Obligatory */
+	OPT_LDASH,       /**< Obligatory */
+	OPT_DONE         /**< Obligatory */
 };
 
 /**
