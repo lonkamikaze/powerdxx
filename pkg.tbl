@@ -1,0 +1,4 @@
+PROGRAM:powerd++:%%PREFIX%%/sbin/powerd++
+MAN:README.md:%%DOCSDIR%%/README.md
+MAN:powerd++.8:%%PREFIX%%/man/man8/powerd++.8
+SCRIPT:powerd++.rc:%%PREFIX%%/etc/rc.d/powerd++
