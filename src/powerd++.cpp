@@ -208,7 +208,7 @@ struct Core {
 	 */
 	mhz_t min{0};
 
-	/*+
+	/**
 	 * The maximum core clock rate.
 	 */
 	mhz_t max{100000};
@@ -325,7 +325,7 @@ struct {
 
 	/**
 	 * This is a ring buffer to be allocated with ncpu × samples
-	 * instances of cptime_t[CPUSTATES] instances.
+	 * instances of cptime_t[CPUSTATES].
 	 */
 	std::unique_ptr<cptime_t[][CPUSTATES]> cp_times;
 
