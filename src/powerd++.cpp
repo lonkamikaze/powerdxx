@@ -925,9 +925,9 @@ mhz_t freq(char const * const str) {
  * | min        |                                              |
  * | maximum    | The maximum clock rate (default 1000000 MHz) |
  * | max        |                                              |
- * | adaptive   | A target load of 50%                         |
+ * | adaptive   | A target load of 62.5%                       |
  * | adp        |                                              |
- * | hiadptive  | A target load of 25%                         |
+ * | hiadptive  | A target load of 37.5%                       |
  * | hadp       |                                              |
  *
  * @param line
