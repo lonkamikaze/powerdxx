@@ -1,15 +1,18 @@
 #!/bin/sh
 set -f
 export "$@"
+sedprog=
+for envvar in CURDIR OBJDIR PREFIX DOCSDIR; do
+	eval "sedprog=\"${sedprog}${sedprog:+;}s!%%${envvar}%%!\${${envvar}%/}!g\""
+done
 IFS=':'
-while read type src tgt; do
-	test -z "${DOCS}" -a "${type}" == "MAN" && continue
+sed "${sedprog}" | while read type src tgt; do
 	eval echo "\${BSD_INSTALL_${type}} ${src} ${DESTDIR:+${DESTDIR%/}/}${tgt}"
 	mkdir -p ${DESTDIR:+${DESTDIR%/}/}${tgt%/*}
-	eval $(eval echo "\${BSD_INSTALL_${type}} ${src} ${DESTDIR:+${DESTDIR%/}/}${tgt%.gz}")
+	eval $(eval echo "\${BSD_INSTALL_${type}} ${src} ${DESTDIR:+${DESTDIR%/}/}${tgt}")
 	case ${type} in
 	MAN | SCRIPT)
-		eval "sed -i '' ${SUB} ${DESTDIR:+${DESTDIR%/}/}${tgt%.gz}"
+		sed -i '' "${sedprog}" "${DESTDIR:+${DESTDIR%/}/}${tgt}"
 	;;
 	esac
 done

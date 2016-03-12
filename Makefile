@@ -7,7 +7,9 @@ powerd++: powerd++.o
 
 powerd++.o: src/powerd++.cpp src/Options.hpp
 
-.if defined(SUB)
+.if defined(PREFIX) && defined(DOCSDIR)
 install: install.sh pkg.tbl powerd++
-	@sed ${SUB} pkg.tbl | ./install.sh DESTDIR="${DESTDIR}"
+	@${.CURDIR}/install.sh < ${.CURDIR}/pkg.tbl \
+		DESTDIR="${DESTDIR}" PREFIX="${PREFIX}" DOCSDIR="${DOCSDIR}" \
+		CURDIR="${.CURDIR}" OBJDIR="${.OBJDIR}"
 .endif
