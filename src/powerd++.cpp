@@ -15,6 +15,7 @@
 #include <cstdio>    /* snprintf() */
 #include <cstdint>   /* uint64_t */
 
+#include <sys/errno.h>     /* errno */
 #include <sys/types.h>     /* sysctl() */
 #include <sys/sysctl.h>    /* sysctl() */
 #include <sys/resource.h>  /* CPUSTATES */
