@@ -287,7 +287,7 @@ struct {
 	cptime_t target = HADP;
 
 	/**
-	 * The target clock for the current AC line state if the target loat
+	 * The target clock for the current AC line state if the target load
 	 * is set to 0.
 	 */
 	mhz_t target_freq{0};
@@ -764,21 +764,22 @@ void update_freq() {
 		mhz_t oldfreq = 0;
 		sysctl_get(core.freq_mib, oldfreq);
 		/* determine target frequency */
-		mhz_t freq = 0;
+		mhz_t wantfreq = 0;
 		if (g.target) {
 			/* adaptive frequency mode */
 			assert(oldfreq == ((oldfreq << 10) >> 10) &&
 			       "CPU clock frequency exceeds values that are safe to compute");
-			freq = oldfreq * core.load / g.target;
+			wantfreq = oldfreq * core.load / g.target;
 		} else {
 			/* fixed frequency mode */
-			freq = g.target_freq;
+			wantfreq = g.target_freq;
 		}
 		/* apply limits */
-		freq = std::min(std::max(freq, core.min), core.max);
+		mhz_t newfreq = std::min(std::max(wantfreq, core.min),
+		                         core.max);
 		/* update CPU frequency */
-		if (oldfreq != freq) try {
-			sysctl_set(core.freq_mib, freq);
+		if (oldfreq != newfreq) try {
+			sysctl_set(core.freq_mib, newfreq);
 		} catch (Exception & e) {
 			if (e.exitcode == Exit::ESYSCTL && e.err == EPERM) {
 				fail(Exit::EFORBIDDEN, e.err,
@@ -795,11 +796,8 @@ void update_freq() {
 		          << ", load: " << std::setw(3)
 		          << ((core.load * 100 + 512) / 1024)
 		          << "%, cpu" << corei << ".freq: "
-		          << std::setw(4) << oldfreq << " MHz";
-		if (oldfreq != freq) {
-			std::cout << " -> " << std::setw(4) << freq << " MHz";
-		}
-		std::cout << '\n';
+		          << std::setw(4) << oldfreq << " MHz"
+		             ", wanted: " << std::setw(4) << wantfreq << " MHz\n";
 	}
 	if (g.foreground) { std::cout << std::flush; }
 }
@@ -881,28 +879,27 @@ mhz_t freq(char const * const str) {
 	switch (unit(freqstr)) {
 	case Unit::HZ:
 		value /= 1000000.;
-		goto unit__mhz;
+		break;
 	case Unit::KHZ:
 		value /= 1000.;
-		goto unit__mhz;
+		break;
 	case Unit::SCALAR: /* for compatibilty with powerd */
 	case Unit::MHZ:
-	unit__mhz:
-		if (value > 1000000. || value < 0) {
-			fail(Exit::EOUTOFRANGE, 0,
-			     "target frequency must be in the range [0Hz, 1THz]: "_s + str);
-		}
-		return mhz_t(value);
+		break;
 	case Unit::GHZ:
 		value *= 1000.;
-		goto unit__mhz;
+		break;
 	case Unit::THZ:
 		value *= 1000000.;
-		goto unit__mhz;
-	default:
 		break;
+	default:
+		fail(Exit::EFREQ, 0, "frequency value not recognised: "_s + str);
 	}
-	fail(Exit::EFREQ, 0, "frequency value not recognised: "_s + str);
+	if (value > 1000000. || value < 0) {
+		fail(Exit::EOUTOFRANGE, 0,
+		     "target frequency must be in the range [0Hz, 1THz]: "_s + str);
+	}
+	return mhz_t(value);
 };
 
 /**
