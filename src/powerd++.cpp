@@ -216,9 +216,9 @@ struct Core {
 };
 
 /**
- * The load target for adaptive mode, equals 62.5% load.
+ * The load target for adaptive mode, equals 50% load.
  */
-cptime_t const ADP{640};
+cptime_t const ADP{512};
 
 /**
  * The load target for hiadaptive mode, equals 37.5% load.
@@ -923,7 +923,7 @@ mhz_t freq(char const * const str) {
  * | min        |                                              |
  * | maximum    | The maximum clock rate (default 1000000 MHz) |
  * | max        |                                              |
- * | adaptive   | A target load of 62.5%                       |
+ * | adaptive   | A target load of 50%                         |
  * | adp        |                                              |
  * | hiadptive  | A target load of 37.5%                       |
  * | hadp       |                                              |
