@@ -1,4 +1,4 @@
 PROGRAM:%%OBJDIR%%/powerd++:%%PREFIX%%/sbin/powerd++
 MAN:%%CURDIR%%/README.md:%%DOCSDIR%%/README.md
-MAN:%%CURDIR%%/powerd++.8:%%PREFIX%%/man/man8/powerd++.8
+MAN:%%CURDIR%%/powerd++.8:%%PREFIX%%/man/man8/powerd++.8.gz
 SCRIPT:%%CURDIR%%/powerd++.rc:%%PREFIX%%/etc/rc.d/powerd++
