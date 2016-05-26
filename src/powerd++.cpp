@@ -359,7 +359,7 @@ enum class Unit : size_t {
 	KHZ,         /**< khz */
 	MHZ,         /**< mhz */
 	GHZ,         /**< ghz */
-	THZ,         /**< khz */
+	THZ,         /**< thz */
 	UNKNOWN      /**< Unknown unit */
 };
 
@@ -706,12 +706,13 @@ void update_cp_times() {
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
 		auto const & cp_times = g.cp_times[g.sample * g.ncpu + core];
 		auto const & cp_times_old = g.cp_times[((g.sample + 1) % g.samples) * g.ncpu + core];
-		uint64_t all = 0;
-		for (auto const time : cp_times) { all += time; }
-		for (auto const time : cp_times_old) { all -= time; }
+		cptime_t all = 0;
+		for (size_t i = 0; i < CPUSTATES; ++i) {
+			all += cp_times[i] - cp_times_old[i];
+		}
 
 		cptime_t idle = cp_times[CP_IDLE] - cp_times_old[CP_IDLE];
-		g.cores[core].load = all ? 1024 - cptime_t((uint64_t{idle} << 10) / all) : 0;
+		g.cores[core].load = all ? (((all - idle) << 10) / all) : 0;
 	}
 	g.sample = (g.sample + 1) % g.samples;
 }
