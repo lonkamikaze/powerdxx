@@ -96,3 +96,9 @@ FAQ
   load on a quad core CPU with hyper threading only has an overall
   load impact of 10%. Use `top -P` to monitor idle times per core/thread.
 
+LICENSE
+-------
+
+For those who care about this stuff, this project is available under
+the [ISC license](LICENSE.md).
+
