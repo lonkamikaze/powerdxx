@@ -7,6 +7,9 @@
         | |
         \_/  multi-core CPU clock daemon for FreeBSD
 
+powerd++
+========
+
 The `powerd++` daemon is a drop-in replacement for FreeBSD's native
 `powerd(8)`. It monitors the system load and adjusts the CPU clock
 accordingly, avoiding some of the pitfalls of `powerd`.
