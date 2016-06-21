@@ -1297,6 +1297,16 @@ struct FreqGuard final {
 };
 
 /**
+ * Sets g.signal, terminating the main loop.
+ *
+ * @param signal
+ *	The signal number received
+ */
+void signal_recv(int const signal) {
+	g.signal = signal;
+}
+
+/**
  * Daemonise and run the main loop.
  */
 void run_daemon() {
@@ -1322,6 +1332,15 @@ void run_daemon() {
 		fail(Exit::EDAEMON, errno, "detaching the process failed");
 	}
 
+	/* Setup SIGHUP */
+	if (g.foreground) {
+		/* Terminate in foreground */
+		signal(SIGHUP, signal_recv);
+	} else {
+		/* Ignore in daemon mode */
+		signal(SIGHUP, SIG_IGN);
+	}
+
 	/* write pid */
 	pidfile.write();
 	if (pidfile.error()){
@@ -1336,13 +1355,6 @@ void run_daemon() {
 	}
 
 	verbose("signal "_s + fixme::to_string(g.signal) + " received, exiting ...");
-}
-
-/**
- * Sets g.signal, terminating the main loop.
- */
-void signal_recv(int const signal) {
-	g.signal = signal;
 }
 
 } /* namespace */
