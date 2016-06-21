@@ -1,4 +1,4 @@
-CXXFLAGS+= -std=c++11 -Wall -Werror
+CXXFLAGS+= -std=c++11 -Wall -Werror -pedantic
 PREFIX?=   /usr/local
 DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
 
