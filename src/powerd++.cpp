@@ -901,7 +901,7 @@ mhz_t freq(char const * const str) {
 		     "target frequency must be in the range [0Hz, 1THz]: "_s + str);
 	}
 	return mhz_t(value);
-};
+}
 
 /**
  * Sets a load target or fixed frequency for the given AC line state.
