@@ -182,41 +182,55 @@ class Sysctl {
 
 };
 
-template <typename... MibTs>
-constexpr Sysctl<sizeof...(MibTs)> make_Sysctl(MibTs const... mib) {
-	return {mib...};
-}
-
-template <size_t MibDepth, typename T>
-class SysctlValue {
+template <typename T, class SysctlT>
+class Sync {
 	private:
-	T value;
-	Sysctl<MibDepth> sysctl;
+	SysctlT sysctl;
 
 	public:
-	template <typename... SysctlArgs>
-	constexpr SysctlValue(T const & value, SysctlArgs const &... args) :
-		value{value}, sysctl{args...} {};
+	constexpr Sync(SysctlT const & sysctl) noexcept : sysctl{sysctl} {}
 
-	SysctlValue & operator =(T const & value) {
-		this->value = value;
-		this->sysctl.set(this->value);
+	Sync & operator =(T const & value) {
+		this->sysctl.set(value);
 		return *this;
+	}
+
+	operator T () const {
+		T value;
+		this->sysctl.update(value);
+		return value;
+	}
+};
+
+template <typename T, size_t MibDepth>
+using SysctlSync = Sync<T, Sysctl<MibDepth>>;
+
+template <typename T, class SysctlT>
+class Once {
+	private:
+	T value;
+
+	public:
+	Once(T const & value, SysctlT const & sysctl) noexcept {
+		try {
+			sysctl.update(this->value);
+		} catch (sc_error) {
+			this->value = value;
+		}
 	}
 
 	operator T const &() const {
 		return this->value;
 	}
-
-	void update() {
-		this->sysctl.update(this->value);
-	}
 };
 
-template <typename T, typename... MibTs>
-constexpr SysctlValue<sizeof...(MibTs), T>
-make_SysctlValue(T const & value, MibTs const... addr) {
-	return {value, addr...};
+template <typename T, size_t MibDepth>
+using SysctlOnce = Once<T, Sysctl<MibDepth>>;
+
+template <typename T, class SysctlT>
+constexpr Once<T, SysctlT> once(T const & value, SysctlT const & sysctl)
+    noexcept {
+	return {value, sysctl};
 }
 
 } /* namespace ctl */
