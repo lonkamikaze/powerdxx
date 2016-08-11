@@ -106,8 +106,8 @@
  * return `file` regardless of argument chaining.
  */
 
-#ifndef _NIH_OPTIONS_HPP_
-#define _NIH_OPTIONS_HPP_
+#ifndef _POWRDXX_NIH_OPTIONS_HPP_
+#define _POWRDXX_NIH_OPTIONS_HPP_
 
 #include <cstddef>     /* size_t */
 #include <iomanip>     /* std::left, std::setw */
@@ -577,4 +577,4 @@ make_Options(int const argc, char const * const argv[],
 
 } /* namespace nih */
 
-#endif /* _NIH_OPTIONS_HPP_ */
+#endif /* _POWRDXX_NIH_OPTIONS_HPP_ */
