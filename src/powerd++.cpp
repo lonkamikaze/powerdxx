@@ -4,6 +4,8 @@
 
 #include "Options.hpp"
 
+#include "sys/sysctl.hpp"
+
 #include <iostream>  /* std::cout, std::cerr */
 #include <locale>    /* std::tolower() */
 #include <memory>    /* std::unique_ptr */
@@ -15,9 +17,6 @@
 #include <cstdio>    /* snprintf() */
 #include <cstdint>   /* uint64_t */
 
-#include <sys/errno.h>     /* errno */
-#include <sys/types.h>     /* sysctl() */
-#include <sys/sysctl.h>    /* sysctl() */
 #include <sys/resource.h>  /* CPUSTATES */
 
 #include <signal.h>  /* signal() */
@@ -61,11 +60,6 @@ using nih::make_Options;
 typedef std::chrono::milliseconds ms;
 
 /**
- * Management Information Base identifier type (see sysctl(3)).
- */
-typedef int mib_t;
-
-/**
  * Type for CPU core indexing.
  */
 typedef int coreid_t;
@@ -84,11 +78,6 @@ typedef unsigned long cptime_t;
  * Type for CPU frequencies in MHz.
  */
 typedef unsigned int mhz_t;
-
-/**
- * The MIB for hw.ncpu.
- */
-mib_t const NCPU_MIB[]{CTL_HW, HW_NCPU};
 
 /**
  * The MIB name for  per-CPU time statistics.
@@ -190,9 +179,9 @@ constexpr size_t countof(T (&)[Count]) { return Count; }
  */
 struct Core {
 	/**
-	 * The MIB to kern.cpu.N.freq, if present.
+	 * The sysctl kern.cpu.N.freq, if present.
 	 */
-	mib_t freq_mib[4]{0};
+	sys::ctl::SysctlSync<mhz_t, 4> freq{{}};
 
 	/**
 	 * The core that controls the frequency for this core.
@@ -256,7 +245,7 @@ struct {
 	/**
 	 * The number of CPU cores or threads.
 	 */
-	coreid_t ncpu{0};
+	sys::ctl::SysctlOnce<coreid_t, 2> ncpu{0, {CTL_HW, HW_NCPU}};
 
 	/**
 	 * Lowest frequency to set in MHz.
@@ -293,9 +282,9 @@ struct {
 	mhz_t target_freq{0};
 
 	/**
-	 * The MIB for the AC line.
+	 * The hw.acpi.acline sysctl.
 	 */
-	mib_t acline_mib[3];
+	sys::ctl::Sysctl<3> acline_ctl{};
 
 	/**
 	 * The current power source.
@@ -320,9 +309,9 @@ struct {
 	char const * pidfilename{"/var/run/powerd.pid"};
 
 	/**
-	 * The MIB for kern.cp_times.
+	 * The kern.cp_times sysctl.
 	 */
-	mib_t cp_times_mib[2];
+	sys::ctl::Sysctl<2> cp_times_ctl{};
 
 	/**
 	 * This is a ring buffer to be allocated with ncpu × samples
@@ -465,148 +454,11 @@ fail(Exit const exitcode, int const err, std::string const & msg) {
  *
  * Fails appropriately for the given error.
  *
- * @param sysret
- *	The value returned by sysctl
  * @param err
  *	The errno value after calling sysctl
  */
-void sysctl_fail(int const sysret, int const err) {
-	if (sysret != -1) { return; }
-	switch(err) {
-	case 0:
-		break;
-	case EFAULT:
-		fail(Exit::ESYSCTL, err, "sysctl failed with EFAULT");
-		break;
-	case EINVAL:
-		fail(Exit::ESYSCTL, err, "sysctl failed with EINVAL");
-		break;
-	case ENOMEM:
-		fail(Exit::ESYSCTL, err, "sysctl failed with ENOMEM");
-		break;
-	case ENOTDIR:
-		fail(Exit::ESYSCTL, err, "sysctl failed with ENOTDIR");
-		break;
-	case EISDIR:
-		fail(Exit::ESYSCTL, err, "sysctl failed with EISDIR");
-		break;
-	case ENOENT:
-		fail(Exit::ESYSCTL, err, "sysctl failed with ENOENT");
-		break;
-	case EPERM:
-		fail(Exit::ESYSCTL, err, "sysctl failed with EPERM");
-		break;
-	default:
-		fail(Exit::ESYSCTL, err, "sysctl failed with an unknown error");
-	};
-}
-
-/**
- * Returns the requested sysctl data into the location given by oldp.
- *
- * @tparam NameLen
- *	The length of MIB array
- * @param name
- *	The MIB of the sysctl to return
- * @param oldp,oldplen
- *	Pointer and size to/of the data structure to return the data to
- */
-template <u_int NameLen>
-void sysctl_get(mib_t const (& name)[NameLen], void * oldp, size_t const oldplen) {
-	auto len = oldplen;
-	auto err = ::sysctl(name, NameLen, oldp, &len, nullptr, 0);
-	sysctl_fail(err, errno);
-	assert(len == oldplen && "buffer size must match the data returned");
-	assert(err != -1 && "untreated error");
-}
-
-/**
- * Returns the requested sysctl data into oldv.
- *
- * @tparam NameLen
- *	The length of MIB array
- * @param name
- *	The MIB of the sysctl to return
- * @param oldv
- *	The data to update with the given sysctl
- */
-template <u_int NameLen, typename T>
-inline void sysctl_get(mib_t const (& name)[NameLen], T & oldv) {
-	return sysctl_get(name, &oldv, sizeof(oldv));
-}
-
-/**
- * Returns a unique pointer to an array of T.
- *
- * Use if the required buffer size is not known.
- *
- * @tparam T
- *	The type of data to return
- * @tparam NameLen
- *	The length of the MIB array
- * @param name
- *	The MIB array to identify the sysctl
- */
-template <typename T, u_int NameLen>
-std::unique_ptr<T[]> sysctl_get(mib_t const (& name)[NameLen]) {
-	size_t len;
-	auto err = ::sysctl(name, NameLen, nullptr, &len, nullptr, 0);
-	sysctl_fail(err, errno);
-	assert(err != -1 && "untreated error");
-	auto result = std::unique_ptr<T[]>(new T[len / sizeof(T)]);
-	sysctl_get(name, result.get(), len);
-	return result;
-}
-
-/**
- * Sets the requested sysctl to the data given by newp.
- *
- * @tparam Namelen
- *	The length of MIB array
- * @param name
- *	The MIB of the sysctl to return
- * @param newp,newplen
- *	Pointer and size to/of the data structure to update the sysctl with
- */
-template <u_int Namelen>
-void sysctl_set(int const (& name)[Namelen], void const * newp, size_t const newplen) {
-	auto err = ::sysctl(name, Namelen, nullptr, nullptr, newp, newplen);
-	sysctl_fail(err, errno);
-	assert(err != -1);
-}
-
-/**
- * Sets the requested sysctl to newv.
- *
- * @tparam Namelen
- *	The length of MIB array
- * @param name
- *	The MIB of the sysctl to return
- * @param newv
- *	The data to update the given sysctl with
- */
-template <u_int Namelen, typename T>
-inline void sysctl_set(int const (& name)[Namelen], T const & newv) {
-	return sysctl_set(name, &newv, sizeof(newv));
-}
-
-/**
- * Sets a MIB array to the correct MIB for the given sysctl name.
- *
- * @tparam MibLen
- *	The lenght of the MIB array
- * @param name
- *	The name of the sysctl
- * @param mibp
- *	A pointer to the MIB array
- */
-template <size_t MibLen>
-void sysctlnametomib(const char * const name, mib_t (& mibp)[MibLen]) {
-	size_t length = MibLen;
-	auto err = ::sysctlnametomib(name, mibp, &length);
-	sysctl_fail(err, errno);
-	assert(MibLen == length &&
-	       "The MIB array length should match the returned MIB length");
+[[noreturn]] inline void sysctl_fail(sys::sc_error const err) {
+	fail(Exit::ESYSCTL, err, "sysctl failed: "_s + err.c_str());
 }
 
 /**
@@ -617,13 +469,10 @@ void sysctlnametomib(const char * const name, mib_t (& mibp)[MibLen]) {
  * - Set the MIBs of hw.acpi.acline and kern.cp_times
  */
 void init() {
-	/* number of cores */
-	sysctl_get(NCPU_MIB, g.ncpu);
-
 	/* get AC line state MIB */
 	try {
-		sysctlnametomib(ACLINE, g.acline_mib);
-	} catch (Exception & e) {
+		g.acline_ctl = {ACLINE};
+	} catch (sys::sc_error) {
 		verbose("cannot read "_s + ACLINE);
 	}
 
@@ -637,16 +486,16 @@ void init() {
 		char name[40];
 		sprintf(name, FREQ, core);
 		try {
-			sysctlnametomib(name, g.cores[core].freq_mib);
+			g.cores[core].freq = {{name}};
 			controller = core;
-		} catch (Exception & e) {
-			if (e.exitcode == Exit::ESYSCTL && e.err == ENOENT) {
+		} catch (sys::sc_error e) {
+			if (e == ENOENT) {
 				verbose("cannot access sysctl: "_s + name);
 				if (0 > controller) {
-					fail(Exit::ENOFREQ, e.err, "at least the first CPU core must support frequency updates");
+					fail(Exit::ENOFREQ, e, "at least the first CPU core must support frequency updates");
 				}
 			} else {
-				throw;
+				sysctl_fail(e);
 			}
 		}
 		g.cores[core].controller = controller;
@@ -659,9 +508,8 @@ void init() {
 		char name[40];
 		sprintf(name, FREQ_LEVELS, i);
 		try {
-			mib_t mib[4];
-			sysctlnametomib(name, mib);
-			auto levels = sysctl_get<char>(mib);
+			sys::ctl::Sysctl<4> const ctl{name};
+			auto levels = ctl.get<char>();
 			/* the maximum should at least be the minimum
 			 * and vice versa */
 			core.max = g.freq_min;
@@ -680,13 +528,13 @@ void init() {
 			core.min = std::max(core.min, g.freq_min);
 			assert(core.min < core.max &&
 			       "minimum must be less than maximum");
-		} catch (Exception &) {
+		} catch (sys::sc_error) {
 			verbose("cannot access sysctl: "_s + name);
 		}
 	}
 
 	/* MIB for kern.cp_times */
-	sysctlnametomib(CP_TIMES, g.cp_times_mib);
+	g.cp_times_ctl = {CP_TIMES};
 	/* create buffer for system load times */
 	g.cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
 	    new cptime_t[g.samples * g.ncpu][CPUSTATES]);
@@ -700,8 +548,12 @@ void init() {
  * Updates the cp_times ring buffer and the load times for each core.
  */
 void update_cp_times() {
-	sysctl_get(g.cp_times_mib, g.cp_times[g.sample * g.ncpu],
-	           g.ncpu * sizeof(g.cp_times[0]));
+	try {
+		g.cp_times_ctl.get(g.cp_times[g.sample * g.ncpu],
+		                   g.ncpu * sizeof(g.cp_times[0]));
+	} catch (sys::sc_error e) {
+		sysctl_fail(e);
+	}
 
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
 		auto const & cp_times = g.cp_times[g.sample * g.ncpu + core];
@@ -737,11 +589,7 @@ void update_load_times() {
  * frequency.
  */
 void update_acline() {
-	try {
-		sysctl_get(g.acline_mib, g.acline);
-	} catch (Exception &) {
-		g.acline = AcLineState::UNKNOWN;
-	}
+	g.acline = sys::ctl::once(AcLineState::UNKNOWN, g.acline_ctl);
 	int const modei = static_cast<int>(g.acline);
 	g.target = g.targets[modei];
 	g.target_freq = g.target_freqs[modei];
@@ -758,12 +606,11 @@ void update_freq() {
 	       "load target must be in the range [0, 1024]");
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-		auto const & core = g.cores[corei];
+		auto & core = g.cores[corei];
 		if (core.controller != corei) { continue; }
 
 		/* get old clock */
-		mhz_t oldfreq = 0;
-		sysctl_get(core.freq_mib, oldfreq);
+		mhz_t const oldfreq = core.freq;
 		/* determine target frequency */
 		mhz_t wantfreq = 0;
 		if (g.target) {
@@ -779,21 +626,14 @@ void update_freq() {
 		mhz_t newfreq = std::min(std::max(wantfreq, core.min),
 		                         core.max);
 		/* update CPU frequency */
-		if (oldfreq != newfreq) try {
-			sysctl_set(core.freq_mib, newfreq);
-		} catch (Exception & e) {
-			if (e.exitcode == Exit::ESYSCTL && e.err == EPERM) {
-				fail(Exit::EFORBIDDEN, e.err,
-				     "insufficient privileges to change core frequency");
-			} else {
-				throw;
-			}
+		if (oldfreq != newfreq) {
+			core.freq = newfreq;
 		}
 		/* verbose output */
 		if (!g.foreground) { continue; }
 		std::cout << std::right
 		          << "power: " << std::setw(7)
-		          << AcLineStateStr[static_cast<int>(g.acline)]
+		          << AcLineStateStr[static_cast<int>(AcLineState{g.acline})]
 		          << ", load: " << std::setw(3)
 		          << ((core.load * 100 + 512) / 1024)
 		          << "%, cpu" << corei << ".freq: "
@@ -1269,11 +1109,18 @@ struct FreqGuard final {
 	 */
 	FreqGuard() {
 		for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-			auto const & core = g.cores[corei];
+			auto & core = g.cores[corei];
 			if (core.controller != corei) { continue; }
-			mhz_t freq;
-			sysctl_get(core.freq_mib, freq);
-			sysctl_set(core.freq_mib, freq);
+			try {
+				core.freq = mhz_t{core.freq};
+			} catch (sys::sc_error e) {
+				if (EPERM == e) {
+					fail(Exit::EFORBIDDEN, e,
+					     "insufficient privileges to change core frequency");
+				} else {
+					sysctl_fail(e);
+				}
+			}
 		}
 	}
 
@@ -1285,11 +1132,11 @@ struct FreqGuard final {
 	 */
 	~FreqGuard() {
 		for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-			auto const & core = g.cores[corei];
+			auto & core = g.cores[corei];
 			if (core.controller != corei) { continue; }
 			try {
-				sysctl_set(core.freq_mib, core.max);
-			} catch (Exception &) {
+				core.freq = core.max;
+			} catch (sys::sc_error) {
 				/* do nada */
 			}
 		}
@@ -1382,6 +1229,9 @@ int main(int argc, char * argv[]) {
 			std::cerr << e.msg << '\n';
 		}
 		return static_cast<int>(e.exitcode);
+	} catch (sys::sc_error e) {
+		std::cerr << "Untreated error: " << e.c_str() << '\n';
+		return e;
 	}
 	return 0;
 }
