@@ -89,6 +89,14 @@ Mode to use while the power line state is unknown (default
 The lowest CPU clock frequency to use (default 0Hz).
 .It Fl M , -max Ar freq
 The highest CPU clock frequency to use (default 1THz).
+.It Fl -min-ac Ar freq
+The lowest CPU clock frequency to use on AC power.
+.It Fl -max-ac Ar freq
+The highest CPU clock frequency to use on AC power.
+.It Fl -min-batt Ar freq
+The lowest CPU clock frequency to use on battery power.
+.It Fl -max-batt Ar freq
+The highest CPU clock frequency to use on battery power.
 .It Fl p , -poll Ar ival
 The polling interval that is used to take load samples and update the
 CPU clock (default 0.5s).
