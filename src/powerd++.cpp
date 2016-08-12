@@ -80,6 +80,21 @@ typedef unsigned long cptime_t;
 typedef unsigned int mhz_t;
 
 /**
+ * Default maximum clock frequency value.
+ */
+mhz_t const FREQ_DEFAULT_MAX{1000000};
+
+/**
+ * Default minimum clock frequency value.
+ */
+mhz_t const FREQ_DEFAULT_MIN{0};
+
+/**
+ * Clock frequency representing an uninitialised value.
+ */
+mhz_t const FREQ_UNSET{1000001};
+
+/**
  * The MIB name for  per-CPU time statistics.
  */
 char const * const CP_TIMES = "kern.cp_times";
@@ -196,12 +211,12 @@ struct Core {
 	/**
 	 * The minimum core clock rate.
 	 */
-	mhz_t min{0};
+	mhz_t min{FREQ_DEFAULT_MIN};
 
 	/**
 	 * The maximum core clock rate.
 	 */
-	mhz_t max{100000};
+	mhz_t max{FREQ_DEFAULT_MAX};
 };
 
 /**
@@ -248,48 +263,41 @@ struct {
 	sys::ctl::SysctlOnce<coreid_t, 2> ncpu{0, {CTL_HW, HW_NCPU}};
 
 	/**
-	 * Lowest frequency to set in MHz.
+	 * Per AC line state settings.
 	 */
-	mhz_t freq_min{0};
+	struct {
+		/**
+		 * Lowest frequency to set in MHz.
+		 */
+		mhz_t freq_min;
 
-	/**
-	 * Highest frequency to set in MHz.
-	 */
-	mhz_t freq_max{1000000};
+		/**
+		 * Highest frequency to set in MHz.
+		 */
+		mhz_t freq_max;
 
-	/**
-	 * Target load times [0, 1024].
-	 *
-	 * The value 0 indicates the corresponding fixed frequency setting
-	 * from target_freqs should be used.
-	 */
-	cptime_t targets[3]{ADP, HADP, HADP};
+		/**
+		 * Target load times [0, 1024].
+		 *
+		 * The value 0 indicates the corresponding fixed frequency setting
+		 * from target_freqs should be used.
+		 */
+		cptime_t target_load;
 
-	/**
-	 * Fixed clock frequencies to use if the target load is set to 0.
-	 */
-	mhz_t target_freqs[3]{0, 0, 0};
-
-	/**
-	 * The target load for the current AC line state.
-	 */
-	cptime_t target = HADP;
-
-	/**
-	 * The target clock for the current AC line state if the target load
-	 * is set to 0.
-	 */
-	mhz_t target_freq{0};
+		/**
+		 * Fixed clock frequencies to use if the target load is set to 0.
+		 */
+		mhz_t target_freq;
+	} acstates[3] {
+		{FREQ_UNSET,       FREQ_UNSET,       ADP,  0},
+		{FREQ_UNSET,       FREQ_UNSET,       HADP, 0},
+		{FREQ_DEFAULT_MIN, FREQ_DEFAULT_MAX, HADP, 0}
+	};
 
 	/**
 	 * The hw.acpi.acline sysctl.
 	 */
 	sys::ctl::Sysctl<3> acline_ctl{};
-
-	/**
-	 * The current power source.
-	 */
-	AcLineState acline{AcLineState::UNKNOWN};
 
 	/**
 	 * Verbose mode.
@@ -327,11 +335,8 @@ struct {
 	std::unique_ptr<Core[]> cores;
 } g;
 
-static_assert(countof(g.targets) == countof(AcLineStateStr),
-              "there must be a target load for each state");
-
-static_assert(countof(g.target_freqs) == countof(AcLineStateStr),
-              "there must be a target frequency for each state");
+static_assert(countof(g.acstates) == countof(AcLineStateStr),
+              "There must be a configuration tuple for each state");
 
 /**
  * Command line argument units.
@@ -501,6 +506,17 @@ void init() {
 		g.cores[core].controller = controller;
 	}
 
+	/* set user frequency boundaries */
+	auto const line_unknown = static_cast<unsigned int>(AcLineState::UNKNOWN);
+	for (auto & state : g.acstates) {
+		if (state.freq_min == FREQ_UNSET) {
+			state.freq_min = g.acstates[line_unknown].freq_min;
+		}
+		if (state.freq_max == FREQ_UNSET) {
+			state.freq_max = g.acstates[line_unknown].freq_max;
+		}
+	}
+
 	/* set per core min/max frequency boundaries */
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		auto & core = g.cores[i];
@@ -512,8 +528,8 @@ void init() {
 			auto levels = ctl.get<char>();
 			/* the maximum should at least be the minimum
 			 * and vice versa */
-			core.max = g.freq_min;
-			core.min = g.freq_max;
+			core.max = FREQ_DEFAULT_MIN;
+			core.min = FREQ_DEFAULT_MAX;
 			for (auto pch = levels.get(); *pch; ++pch) {
 				mhz_t freq = strtol(pch, &pch, 10);
 				if (pch[0] != '/') { break; }
@@ -523,11 +539,8 @@ void init() {
 				/* no idea what that value means */
 				if (pch[0] != ' ') { break; }
 			}
-			/* apply global limits */
-			core.max = std::min(core.max, g.freq_max);
-			core.min = std::max(core.min, g.freq_min);
-			assert(core.min < core.max &&
-			       "minimum must be less than maximum");
+			assert(core.min <= core.max &&
+			       "minimum must not be greater than maximum");
 		} catch (sys::sc_error) {
 			verbose("cannot access sysctl: "_s + name);
 		}
@@ -585,24 +598,17 @@ void update_load_times() {
 }
 
 /**
- * Update AC line status and fetch the corresponding target load and
- * frequency.
- */
-void update_acline() {
-	g.acline = sys::ctl::once(AcLineState::UNKNOWN, g.acline_ctl);
-	int const modei = static_cast<int>(g.acline);
-	g.target = g.targets[modei];
-	g.target_freq = g.target_freqs[modei];
-}
-
-/**
  * Update the CPU clocks depending on the AC line state and targets.
  */
 void update_freq() {
 	update_load_times();
-	update_acline();
 
-	assert(g.target <= 1024 &&
+	/* get AC line status */
+	int const acline = static_cast<unsigned int>(
+	    AcLineState{sys::ctl::once(AcLineState::UNKNOWN, g.acline_ctl)});
+	auto const & acstate = g.acstates[acline];
+
+	assert(acstate.target_load <= 1024 &&
 	       "load target must be in the range [0, 1024]");
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
@@ -613,18 +619,19 @@ void update_freq() {
 		mhz_t const oldfreq = core.freq;
 		/* determine target frequency */
 		mhz_t wantfreq = 0;
-		if (g.target) {
+		if (acstate.target_load) {
 			/* adaptive frequency mode */
 			assert(oldfreq == ((oldfreq << 10) >> 10) &&
 			       "CPU clock frequency exceeds values that are safe to compute");
-			wantfreq = oldfreq * core.load / g.target;
+			wantfreq = oldfreq * core.load / acstate.target_load;
 		} else {
 			/* fixed frequency mode */
-			wantfreq = g.target_freq;
+			wantfreq = acstate.target_freq;
 		}
 		/* apply limits */
-		mhz_t newfreq = std::min(std::max(wantfreq, core.min),
-		                         core.max);
+		auto const max = std::min(core.max, acstate.freq_max);
+		auto const min = std::max(core.min, acstate.freq_min);
+		mhz_t newfreq = std::min(std::max(wantfreq, min), max);
 		/* update CPU frequency */
 		if (oldfreq != newfreq) {
 			core.freq = newfreq;
@@ -633,7 +640,7 @@ void update_freq() {
 		if (!g.foreground) { continue; }
 		std::cout << std::right
 		          << "power: " << std::setw(7)
-		          << AcLineStateStr[static_cast<int>(AcLineState{g.acline})]
+		          << AcLineStateStr[acline]
 		          << ", load: " << std::setw(3)
 		          << ((core.load * 100 + 512) / 1024)
 		          << "%, cpu" << corei << ".freq: "
@@ -778,31 +785,33 @@ void set_mode(AcLineState const line, char const * const str) {
 	std::string mode{str};
 	for (char & ch : mode) { ch = std::tolower(ch); }
 
-	auto const linei = static_cast<unsigned int>(line);
-	g.targets[linei] = 0;
-	g.target_freqs[linei] = 0;
+	auto const acline = static_cast<unsigned int>(line);
+	auto & acstate = g.acstates[acline];
+
+	acstate.target_load = 0;
+	acstate.target_freq = 0;
 
 	if (mode == "minimum" || mode == "min") {
-		g.target_freqs[linei] = 0;
+		acstate.target_freq = FREQ_DEFAULT_MIN;
 		return;
 	}
 	if (mode == "maximum" || mode == "max") {
-		g.target_freqs[linei] = 1000000;
+		acstate.target_freq = FREQ_DEFAULT_MAX;
 		return;
 	}
 	if (mode == "adaptive" || mode == "adp") {
-		g.targets[linei] = ADP;
+		acstate.target_load = ADP;
 		return;
 	}
 	if (mode == "hiadaptive" || mode == "hadp") {
-		g.targets[linei] = HADP;
+		acstate.target_load = HADP;
 		return;
 	}
 
 	/* try to set load,
 	 * do that first so it gets the scalar values */
 	try {
-		g.targets[linei] = load(str);
+		acstate.target_load = load(str);
 		return;
 	} catch (Exception & e) {
 		if (e.exitcode == Exit::EOUTOFRANGE) { throw; }
@@ -810,7 +819,7 @@ void set_mode(AcLineState const line, char const * const str) {
 
 	/* try to set clock frequency */
 	try {
-		g.target_freqs[linei] = freq(str);
+		acstate.target_freq = freq(str);
 		return;
 	} catch (Exception & e) {
 		if (e.exitcode == Exit::EOUTOFRANGE) { throw; }
@@ -891,6 +900,10 @@ enum class OE {
 	MODE_BATT,       /**< Set battery power mode */
 	FREQ_MIN,        /**< Set minimum clock frequency */
 	FREQ_MAX,        /**< Set maximum clock frequency */
+	FREQ_MIN_AC,     /**< Set minimum clock frequency on AC power */
+	FREQ_MAX_AC,     /**< Set maximum clock frequency on AC power */
+	FREQ_MIN_BATT,   /**< Set minimum clock frequency on battery power */
+	FREQ_MAX_BATT,   /**< Set maximum clock frequency on battery power */
 	MODE_UNKNOWN,    /**< Set unknown power source mode */
 	IVAL_POLL,       /**< Set polling interval */
 	FILE_PID,        /**< Set pidfile */
@@ -922,6 +935,10 @@ Option<OE> const OPTIONS[]{
 	{OE::MODE_UNKNOWN,    'n', "unknown",    "mode", "Select the mode while power source is unknown"},
 	{OE::FREQ_MIN,        'm', "min",        "freq", "The minimum CPU frequency"},
 	{OE::FREQ_MAX,        'M', "max",        "freq", "The maximum CPU frequency"},
+	{OE::FREQ_MIN_AC,      0 , "min-ac",     "freq", "The minimum CPU frequency on AC power"},
+	{OE::FREQ_MAX_AC,      0 , "max-ac",     "freq", "The maximum CPU frequency on AC power"},
+	{OE::FREQ_MIN_BATT,    0 , "min-batt",   "freq", "The minimum CPU frequency on battery power"},
+	{OE::FREQ_MAX_BATT,    0 , "max-batt",   "freq", "The maximum CPU frequency on battery power"},
 	{OE::IVAL_POLL,       'p', "poll",       "ival", "The polling interval"},
 	{OE::CNT_SAMPLES,     's', "samples",    "cnt",  "The number of samples to use"},
 	{OE::FILE_PID,        'P', "pid",        "file", "Alternative PID file"},
@@ -957,10 +974,28 @@ void read_args(int const argc, char const * const argv[]) {
 		set_mode(AcLineState::UNKNOWN, getopt[1]);
 		break;
 	case OE::FREQ_MIN:
-		g.freq_min = freq(getopt[1]);
+		g.acstates[static_cast<unsigned int>(AcLineState::UNKNOWN)]
+		    .freq_min = freq(getopt[1]);
 		break;
 	case OE::FREQ_MAX:
-		g.freq_max = freq(getopt[1]);
+		g.acstates[static_cast<unsigned int>(AcLineState::UNKNOWN)]
+		    .freq_max = freq(getopt[1]);
+		break;
+	case OE::FREQ_MIN_AC:
+		g.acstates[static_cast<unsigned int>(AcLineState::ONLINE)]
+		    .freq_min = freq(getopt[1]);
+		break;
+	case OE::FREQ_MAX_AC:
+		g.acstates[static_cast<unsigned int>(AcLineState::ONLINE)]
+		    .freq_max = freq(getopt[1]);
+		break;
+	case OE::FREQ_MIN_BATT:
+		g.acstates[static_cast<unsigned int>(AcLineState::BATTERY)]
+		    .freq_min = freq(getopt[1]);
+		break;
+	case OE::FREQ_MAX_BATT:
+		g.acstates[static_cast<unsigned int>(AcLineState::BATTERY)]
+		    .freq_max = freq(getopt[1]);
 		break;
 	case OE::IVAL_POLL:
 		g.interval = ival(getopt[1]);
@@ -1000,10 +1035,15 @@ void show_settings() {
 	          << "\tpolling interval:      " << g.interval.count() << " ms\n"
 	          << "\tload average over:     " << ((g.samples - 1) *
 	                                             g.interval.count()) << " ms\n"
-	          << "CPU Cores\n"
+	          << "Frequency Limits\n";
+	for (size_t i = 0; i < countof(g.acstates); ++i) {
+		std::cerr << '\t' << std::left << std::setw(23)
+		          << (""_s + AcLineStateStr[i] + ':')
+		          << '[' << g.acstates[i].freq_min << " MHz, "
+		                 << g.acstates[i].freq_max << " MHz]\n";
+	}
+	std::cerr << "CPU Cores\n"
 	          << "\tCPU cores:             " << g.ncpu << '\n'
-	          << "\tuser frequency limits: [" << g.freq_min << " MHz, "
-	                                      << g.freq_max << " MHz]\n"
 	          << "Core Groups\n";
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		if (i == g.cores[i].controller) {
@@ -1021,12 +1061,14 @@ void show_settings() {
 		          << g.cores[i].max << " MHz]\n";
 	}
 	std::cerr << "Load Targets\n";
-	for (size_t i = 0; i < countof(g.targets); ++i) {
+	for (size_t i = 0; i < countof(g.acstates); ++i) {
+		auto const & acstate = g.acstates[i];
 		std::cerr << '\t' << std::left << std::setw(23)
 		          << (""_s + AcLineStateStr[i] + " power target:")
-		          << (g.targets[i] ?
-		              ((g.targets[i] * 100 + 512) / 1024) : g.target_freqs[i])
-		          << (g.targets[i] ? "% load\n" : " MHz\n");
+		          << (acstate.target_load ?
+		              ((acstate.target_load * 100 + 512) / 1024) :
+		              acstate.target_freq)
+		          << (acstate.target_load ? "% load\n" : " MHz\n");
 	}
 }
 
