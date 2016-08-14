@@ -462,7 +462,8 @@ fail(Exit const exitcode, int const err, std::string const & msg) {
  * @param err
  *	The errno value after calling sysctl
  */
-[[noreturn]] inline void sysctl_fail(sys::sc_error const err) {
+[[noreturn]] inline
+void sysctl_fail(sys::sc_error<sys::ctl::error> const err) {
 	fail(Exit::ESYSCTL, err, "sysctl failed: "_s + err.c_str());
 }
 
@@ -477,7 +478,7 @@ void init() {
 	/* get AC line state MIB */
 	try {
 		g.acline_ctl = {ACLINE};
-	} catch (sys::sc_error) {
+	} catch (sys::sc_error<sys::ctl::error>) {
 		verbose("cannot read "_s + ACLINE);
 	}
 
@@ -493,7 +494,7 @@ void init() {
 		try {
 			g.cores[core].freq = {{name}};
 			controller = core;
-		} catch (sys::sc_error e) {
+		} catch (sys::sc_error<sys::ctl::error> e) {
 			if (e == ENOENT) {
 				verbose("cannot access sysctl: "_s + name);
 				if (0 > controller) {
@@ -541,7 +542,7 @@ void init() {
 			}
 			assert(core.min <= core.max &&
 			       "minimum must not be greater than maximum");
-		} catch (sys::sc_error) {
+		} catch (sys::sc_error<sys::ctl::error>) {
 			verbose("cannot access sysctl: "_s + name);
 		}
 	}
@@ -564,7 +565,7 @@ void update_cp_times() {
 	try {
 		g.cp_times_ctl.get(g.cp_times[g.sample * g.ncpu],
 		                   g.ncpu * sizeof(g.cp_times[0]));
-	} catch (sys::sc_error e) {
+	} catch (sys::sc_error<sys::ctl::error> e) {
 		sysctl_fail(e);
 	}
 
@@ -1090,7 +1091,7 @@ struct FreqGuard final {
 			if (core.controller != corei) { continue; }
 			try {
 				core.freq = mhz_t{core.freq};
-			} catch (sys::sc_error e) {
+			} catch (sys::sc_error<sys::ctl::error> e) {
 				if (EPERM == e) {
 					fail(Exit::EFORBIDDEN, e,
 					     "insufficient privileges to change core frequency");
@@ -1113,7 +1114,7 @@ struct FreqGuard final {
 			if (core.controller != corei) { continue; }
 			try {
 				core.freq = core.max;
-			} catch (sys::sc_error) {
+			} catch (sys::sc_error<sys::ctl::error>) {
 				/* do nada */
 			}
 		}
@@ -1205,9 +1206,15 @@ int main(int argc, char * argv[]) {
 			std::cerr << e.msg << '\n';
 		}
 		return static_cast<int>(e.exitcode);
-	} catch (sys::sc_error e) {
-		std::cerr << "Untreated error: " << e.c_str() << '\n';
-		return e;
+	} catch (sys::sc_error<sys::ctl::error> e) {
+		std::cerr << "powerd++: untreated sysctl failure: " << e.c_str() << '\n';
+		throw;
+	} catch (sys::sc_error<sys::pid::error> e) {
+		std::cerr << "powerd++: untreated pidfile failure: " << e.c_str() << '\n';
+		throw;
+	} catch (...) {
+		std::cerr << "powerd++: untreated failure\n";
+		throw;
 	}
 	return 0;
 }

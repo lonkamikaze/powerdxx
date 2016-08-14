@@ -17,8 +17,18 @@ namespace sys {
  *
  * The template class Sysctl represents a sysctl address and offers
  * handles to retrieve or set the stored value.
+ *
+ * The template class Sync represents a sysctl value that is read and
+ * written synchronously.
+ *
+ * The template class Once represents a read once value.
  */
 namespace ctl {
+
+/**
+ * The domain error type.
+ */
+struct error {};
 
 /**
  * Management Information Base identifier type (see sysctl(3)).
@@ -71,14 +81,14 @@ class Sysctl {
 	 *
 	 * @param name
 	 *	The symbolic name of the sysctl
-	 * @throws sc_error
+	 * @throws sys::sc_error<error>
 	 *	May throw an exception if the addressed sysct does
 	 *	not exist or if the address is too long to store
 	 */
 	Sysctl(char const * const name) {
 		size_t length = MibDepth;
 		if (::sysctlnametomib(name, this->mib, &length) == -1) {
-			throw sc_error{errno};
+			throw sc_error<error>{errno};
 		}
 		assert(length == MibDepth && "MIB depth mismatch");
 	}
@@ -112,7 +122,7 @@ class Sysctl {
 	 *
 	 * @param buf,bufsize
 	 *	The target buffer and its size
-	 * @throws sc_error
+	 * @throws sys::sc_error<error>
 	 *	Throws if value retrieval fails or is incomplete,
 	 *	e.g. because the value does not fit into the target
 	 *	buffer
@@ -121,7 +131,7 @@ class Sysctl {
 		auto len = bufsize;
 		if (::sysctl(this->mib, MibDepth, buf, &len, nullptr, 0)
 		    == -1) {
-			throw sc_error{errno};
+			throw sc_error<error>{errno};
 		}
 	}
 
@@ -133,7 +143,7 @@ class Sysctl {
 	 *	The type store the sysctl value in
 	 * @param value
 	 *	A reference to the target value
-	 * @throws sc_error
+	 * @throws sys::sc_error<error>
 	 *	Throws if value retrieval fails or is incomplete,
 	 *	e.g. because the value does not fit into the target
 	 *	type
@@ -154,7 +164,7 @@ class Sysctl {
 	 * @return
 	 *	And array of T with the right length to store the
 	 *	whole sysctl value
-	 * @throws sc_error
+	 * @throws sys::sc_error<error>
 	 *	May throw if the size of the sysctl increases after
 	 *	the length was queried
 	 */
@@ -163,7 +173,7 @@ class Sysctl {
 		size_t len = 0;
 		if (::sysctl(this->mib, MibDepth, nullptr, &len, nullptr, 0)
 		    == -1) {
-			throw sc_error{errno};
+			throw sc_error<error>{errno};
 		}
 		auto result = std::unique_ptr<T[]>(new T[len / sizeof(T)]);
 		get(result.get(), len);
@@ -175,13 +185,13 @@ class Sysctl {
 	 *
 	 * @param buf,bufsize
 	 *	The source buffer
-	 * @throws sc_error
+	 * @throws sys::sc_error<error>
 	 *	If the source buffer cannot be stored in the sysctl
 	 */
 	void set(void const * const buf, size_t const bufsize) {
 		if (::sysctl(this->mib, MibDepth, nullptr, nullptr,
 		             buf, bufsize) == -1) {
-			throw sc_error{errno};
+			throw sc_error<error>{errno};
 		}
 	}
 
@@ -299,7 +309,7 @@ using SysctlSync = Sync<T, Sysctl<MibDepth>>;
  * int hw_ncpu;
  * try {
  * 	Sysctl<2>{CTL_HW, HW_NCPU}.get(hw_ncpu);
- * } catch (sys::sc_error) {
+ * } catch (sys::sc_error<error>) {
  * 	hw_ncpu = 1;
  * }
  * ~~~
@@ -332,7 +342,7 @@ class Once {
 	Once(T const & value, SysctlT const & sysctl) noexcept {
 		try {
 			sysctl.get(this->value);
-		} catch (sc_error) {
+		} catch (sc_error<error>) {
 			this->value = value;
 		}
 	}
