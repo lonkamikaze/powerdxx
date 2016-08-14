@@ -7,7 +7,8 @@ all: powerd++
 powerd++: powerd++.o
 	${CXX} -lutil ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
 
-powerd++.o: src/powerd++.cpp src/Options.hpp src/sys/sysctl.hpp src/sys/error.hpp
+powerd++.o: src/powerd++.cpp src/Options.hpp src/sys/sysctl.hpp \
+            src/sys/pidfile.hpp src/sys/error.hpp
 
 install: install.sh pkg.tbl powerd++
 	@${.CURDIR}/install.sh < ${.CURDIR}/pkg.tbl \

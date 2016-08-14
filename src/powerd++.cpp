@@ -5,6 +5,7 @@
 #include "Options.hpp"
 
 #include "sys/sysctl.hpp"
+#include "sys/pidfile.hpp"
 
 #include <iostream>  /* std::cout, std::cerr */
 #include <locale>    /* std::tolower() */
@@ -20,7 +21,6 @@
 #include <sys/resource.h>  /* CPUSTATES */
 
 #include <signal.h>  /* signal() */
-#include <libutil.h> /* pidfile_*() */
 
 /**
  * Workarounds for compiler/library bugs.
@@ -1073,71 +1073,6 @@ void show_settings() {
 }
 
 /**
- * A wrapper around the pidfile_* family of commands implementing the
- * RAII pattern.
- */
-class Pidfile final {
-	private:
-	/**
-	 * In case of failure to acquire the lock, the PID of the other
-	 * process holding it is stored here.
-	 */
-	pid_t otherpid;
-
-	/**
-	 * Pointer to the pidfile state data structure.
-	 *
-	 * Thus is allocated by pidfile_open() and assumedly freed by
-	 * pidfile_remove().
-	 */
-	pidfh * pfh;
-
-	/**
-	 * The errno value of the last call to a pidfile_*() function.
-	 */
-	int err;
-
-	public:
-	/**
-	 * Attempts to open the pidfile.
-	 *
-	 * @param pfname,mode
-	 *	Arguments to pidfile_open()
-	 */
-	Pidfile(char const * const pfname, mode_t const mode) :
-	    otherpid{0}, pfh{::pidfile_open(pfname, mode, &this->otherpid)},
-	    err{this->pfh == nullptr ? errno : 0} {}
-
-	/**
-	 * Removes the pidfile.
-	 */
-	~Pidfile() {
-		::pidfile_remove(this->pfh);
-	}
-
-	/**
-	 * Returns the last error.
-	 *
-	 * @return
-	 *	Returns the errno of the last pidfile_*() command if an
-	 *	error occured
-	 */
-	int error() { return this->err; }
-
-	/**
-	 * Returns the PID of the other process holding the lock.
-	 */
-	pid_t other() { return this->otherpid; }
-
-	/**
-	 * Write PID to the file, should be called after daemon().
-	 */
-	void write() {
-		this->err = ::pidfile_write(this->pfh) == -1 ? errno : 0;
-	}
-};
-
-/**
  * A core frequency guard.
  *
  * This uses the RAII pattern to achieve two things:
@@ -1200,18 +1135,7 @@ void signal_recv(int const signal) {
  */
 void run_daemon() {
 	/* open pidfile */
-	Pidfile pidfile{g.pidfilename, 0600};
-	switch (pidfile.error()) {
-	case 0:
-		break;
-	case EEXIST:
-		fail(Exit::ECONFLICT, pidfile.error(),
-		     "a power daemon is already running under PID: "_s +
-		     fixme::to_string(pidfile.other()));
-	default:
-		fail(Exit::EPID, pidfile.error(),
-		     "cannot create pidfile "_s + g.pidfilename);
-	}
+	sys::pid::Pidfile pidfile{g.pidfilename, 0600};
 
 	/* try to set frequencies once, before detaching from the terminal */
 	FreqGuard fguard;
@@ -1231,9 +1155,10 @@ void run_daemon() {
 	}
 
 	/* write pid */
-	pidfile.write();
-	if (pidfile.error()){
-		fail(Exit::EPID, pidfile.error(),
+	try {
+		pidfile.write();
+	} catch (sys::sc_error<sys::pid::error> e) {
+		fail(Exit::EPID, e,
 		     "cannot write to pidfile: "_s + g.pidfilename);
 	}
 
@@ -1265,7 +1190,16 @@ int main(int argc, char * argv[]) {
 		init();
 		show_settings();
 		reset_cp_times();
-		run_daemon();
+		try {
+			run_daemon();
+		} catch (pid_t otherpid) {
+			fail(Exit::ECONFLICT, EEXIST,
+			     "a power daemon is already running under PID: "_s +
+			     fixme::to_string(otherpid));
+		} catch (sys::sc_error<sys::pid::error> e) {
+			fail(Exit::EPID, e,
+			     "cannot create pidfile "_s + g.pidfilename);
+		}
 	} catch (Exception & e) {
 		if (e.msg != "") {
 			std::cerr << e.msg << '\n';
