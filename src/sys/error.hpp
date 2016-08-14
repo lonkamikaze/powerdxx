@@ -19,7 +19,11 @@ namespace sys {
  *
  * This is its own type for easy catching, but implicitly casts to
  * int for easy comparison.
+ *
+ * @tparam Domain
+ *	A type marking the domain the error comes from, e.g. sys::ctl::error
  */
+template <class Domain>
 struct sc_error {
 	/**
 	 * The errno set by the native C function.
