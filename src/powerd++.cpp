@@ -10,8 +10,9 @@
 #include <iostream>  /* std::cout, std::cerr */
 #include <locale>    /* std::tolower() */
 #include <memory>    /* std::unique_ptr */
-#include <chrono>    /* std::chrono::milliseconds */
-#include <thread>    /* std::this_thread::sleep_for() */
+#include <chrono>    /* std::chrono::milliseconds,
+                      * std::chrono::steady_clock::now() */
+#include <thread>    /* std::this_thread::sleep_until() */
 #include <algorithm> /* std::min(), std::max() */
 
 #include <cstdlib>   /* atof(), atoi(), strtol() */
@@ -1164,8 +1165,9 @@ void run_daemon() {
 	}
 
 	/* the main loop */
+	auto time = std::chrono::steady_clock::now();
 	while (g.signal == 0) {
-		std::this_thread::sleep_for(g.interval);
+		std::this_thread::sleep_until(time += g.interval);
 		update_freq();
 	}
 
