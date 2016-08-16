@@ -10,6 +10,10 @@
 #include <sys/types.h>     /* sysctl() */
 #include <sys/sysctl.h>    /* sysctl() */
 
+#include <memory>          /* std::unique_ptr */
+
+#include <cassert>         /* assert() */
+
 namespace sys {
 
 /**
