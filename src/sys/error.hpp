@@ -5,8 +5,8 @@
 #ifndef _POWERDXX_SYS_ERROR_HPP_
 #define _POWERDXX_SYS_ERROR_HPP_
 
-#include <sys/errno.h>     /* errno */
-#include <stdio.h>         /* strerror() */
+#include <cerrno>          /* errno */
+#include <cstring>         /* strerror() */
 
 /**
  * Wrappers around native system interfaces.
