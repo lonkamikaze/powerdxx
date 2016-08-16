@@ -552,11 +552,7 @@ void init() {
 	g.cp_times_ctl = {CP_TIMES};
 	/* create buffer for system load times */
 	g.cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
-	    new cptime_t[g.samples * g.ncpu][CPUSTATES]);
-	/* zero-initialise to shut up valgrind */
-	for (size_t i = 0; i < g.samples * g.ncpu; ++i) {
-		for (auto & cp_time : g.cp_times[i]) { cp_time = 0; }
-	}
+	    new cptime_t[g.samples * g.ncpu][CPUSTATES]{});
 }
 
 /**
