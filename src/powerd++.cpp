@@ -6,6 +6,7 @@
 
 #include "fixme.hpp"
 #include "types.hpp"
+#include "utility.hpp"
 
 #include "sys/sysctl.hpp"
 #include "sys/pidfile.hpp"
@@ -18,7 +19,6 @@
 #include <algorithm> /* std::min(), std::max() */
 
 #include <cstdlib>   /* atof(), atoi(), strtol() */
-#include <cstdio>    /* snprintf() */
 #include <cstdint>   /* uint64_t */
 
 #include <sys/resource.h>  /* CPUSTATES */
@@ -39,6 +39,10 @@ using types::cptime_t;
 using types::mhz_t;
 using types::coreid_t;
 using types::ms;
+
+using utility::countof;
+using utility::operator "" _s;
+using utility::sprintf;
 
 /**
  * Default maximum clock frequency value.
