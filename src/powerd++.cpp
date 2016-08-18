@@ -4,14 +4,15 @@
 
 #include "Options.hpp"
 
+#include "types.hpp"
+
 #include "sys/sysctl.hpp"
 #include "sys/pidfile.hpp"
 
 #include <iostream>  /* std::cout, std::cerr */
 #include <locale>    /* std::tolower() */
 #include <memory>    /* std::unique_ptr */
-#include <chrono>    /* std::chrono::milliseconds,
-                      * std::chrono::steady_clock::now() */
+#include <chrono>    /* std::chrono::steady_clock::now() */
 #include <thread>    /* std::this_thread::sleep_until() */
 #include <algorithm> /* std::min(), std::max() */
 
@@ -55,30 +56,10 @@ namespace {
 using nih::Option;
 using nih::make_Options;
 
-/**
- * Millisecond type for polling intervals.
- */
-typedef std::chrono::milliseconds ms;
-
-/**
- * Type for CPU core indexing.
- */
-typedef int coreid_t;
-
-/**
- * Type for load counting.
- *
- * According to src/sys/kern/kern_clock.c the type is `long` (an array of
- * loads  `long[CPUSTATES]` is defined).
- * But in order to have defined wrapping characteristics `unsigned long`
- * will be used here.
- */
-typedef unsigned long cptime_t;
-
-/**
- * Type for CPU frequencies in MHz.
- */
-typedef unsigned int mhz_t;
+using types::cptime_t;
+using types::mhz_t;
+using types::coreid_t;
+using types::ms;
 
 /**
  * Default maximum clock frequency value.
