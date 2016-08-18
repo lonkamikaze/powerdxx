@@ -78,6 +78,18 @@ enum class AcLineState : unsigned int {
 };
 
 /**
+ * Convert an AcLineState into the underlying type.
+ *
+ * @param op
+ *	The operand to convert
+ * @return
+ *	The integer representation of the operand
+ */
+constexpr unsigned int to_value(AcLineState const op) {
+	return static_cast<unsigned int>(op);
+}
+
+/**
  * String descriptions for the AC line states.
  */
 const char * const AcLineStateStr[]{"battery", "online", "unknown"};
@@ -143,7 +155,7 @@ struct {
 	/**
 	 * The number of CPU cores or threads.
 	 */
-	sys::ctl::SysctlOnce<coreid_t, 2> ncpu{0, {CTL_HW, HW_NCPU}};
+	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{1, {CTL_HW, HW_NCPU}};
 
 	/**
 	 * Per AC line state settings.
@@ -287,7 +299,7 @@ void init() {
 	}
 
 	/* set user frequency boundaries */
-	auto const line_unknown = static_cast<unsigned int>(AcLineState::UNKNOWN);
+	auto const line_unknown = to_value(AcLineState::UNKNOWN);
 	for (auto & state : g.acstates) {
 		if (state.freq_min == FREQ_UNSET) {
 			state.freq_min = g.acstates[line_unknown].freq_min;
@@ -380,8 +392,8 @@ void update_freq() {
 	update_load_times();
 
 	/* get AC line status */
-	int const acline = static_cast<unsigned int>(
-	    AcLineState{sys::ctl::once(AcLineState::UNKNOWN, g.acline_ctl)});
+	auto const acline = to_value(sys::ctl::once(AcLineState::UNKNOWN,
+	                                            g.acline_ctl));
 	auto const & acstate = g.acstates[acline];
 
 	assert(acstate.target_load <= 1024 &&
@@ -470,7 +482,7 @@ void set_mode(AcLineState const line, char const * const str) {
 	std::string mode{str};
 	for (char & ch : mode) { ch = std::tolower(ch); }
 
-	auto const acline = static_cast<unsigned int>(line);
+	auto const acline = to_value(line);
 	auto & acstate = g.acstates[acline];
 
 	acstate.target_load = 0;
@@ -596,27 +608,27 @@ void read_args(int const argc, char const * const argv[]) {
 		set_mode(AcLineState::UNKNOWN, getopt[1]);
 		break;
 	case OE::FREQ_MIN:
-		g.acstates[static_cast<unsigned int>(AcLineState::UNKNOWN)]
+		g.acstates[to_value(AcLineState::UNKNOWN)]
 		    .freq_min = freq(getopt[1]);
 		break;
 	case OE::FREQ_MAX:
-		g.acstates[static_cast<unsigned int>(AcLineState::UNKNOWN)]
+		g.acstates[to_value(AcLineState::UNKNOWN)]
 		    .freq_max = freq(getopt[1]);
 		break;
 	case OE::FREQ_MIN_AC:
-		g.acstates[static_cast<unsigned int>(AcLineState::ONLINE)]
+		g.acstates[to_value(AcLineState::ONLINE)]
 		    .freq_min = freq(getopt[1]);
 		break;
 	case OE::FREQ_MAX_AC:
-		g.acstates[static_cast<unsigned int>(AcLineState::ONLINE)]
+		g.acstates[to_value(AcLineState::ONLINE)]
 		    .freq_max = freq(getopt[1]);
 		break;
 	case OE::FREQ_MIN_BATT:
-		g.acstates[static_cast<unsigned int>(AcLineState::BATTERY)]
+		g.acstates[to_value(AcLineState::BATTERY)]
 		    .freq_min = freq(getopt[1]);
 		break;
 	case OE::FREQ_MAX_BATT:
-		g.acstates[static_cast<unsigned int>(AcLineState::BATTERY)]
+		g.acstates[to_value(AcLineState::BATTERY)]
 		    .freq_max = freq(getopt[1]);
 		break;
 	case OE::IVAL_POLL:
