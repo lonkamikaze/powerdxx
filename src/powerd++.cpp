@@ -7,6 +7,7 @@
 #include "fixme.hpp"
 #include "types.hpp"
 #include "constants.hpp"
+#include "errors.hpp"
 #include "utility.hpp"
 
 #include "sys/sysctl.hpp"
@@ -41,6 +42,10 @@ using types::mhz_t;
 using types::coreid_t;
 using types::ms;
 
+using errors::Exit;
+using errors::Exception;
+using errors::fail;
+
 using utility::countof;
 using utility::operator "" _s;
 using utility::sprintf;
@@ -70,55 +75,6 @@ enum class AcLineState : unsigned int {
  * String descriptions for the AC line states.
  */
 const char * const AcLineStateStr[]{"battery", "online", "unknown"};
-
-/**
- * Exit codes.
- */
-enum class Exit : int {
-	OK,          /**< Regular termination */
-	ECLARG,      /**< Unexpected command line argument */
-	EOUTOFRANGE, /**< A user provided value is out of range */
-	ELOAD,       /**< The provided value is not a valid load */
-	EFREQ,       /**< The provided value is not a valid frequency */
-	EMODE,       /**< The provided value is not a valid mode */
-	EIVAL,       /**< The provided value is not a valid interval */
-	ESAMPLES,    /**< The provided value is not a valid sample count */
-	ESYSCTL,     /**< A sysctl operation failed */
-	ENOFREQ,     /**< System does not support changing core frequencies */
-	ECONFLICT,   /**< Another frequency daemon instance is running */
-	EPID,        /**< A pidfile could not be created */
-	EFORBIDDEN,  /**< Insufficient privileges to change sysctl */
-	EDAEMON      /**< Unable to detach from terminal */
-};
-
-/**
- * Printable strings for exit codes.
- */
-const char * const ExitStr[]{
-	"OK", "ECLARG", "EOUTOFRANGE", "ELOAD", "EFREQ", "EMODE", "EIVAL",
-	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
-	"EDAEMON"
-};
-
-/**
- * Exceptions bundle an exit code, errno value and message.
- */
-struct Exception {
-	/**
-	 * The code to exit with.
-	 */
-	Exit exitcode;
-
-	/**
-	 * The errno value at the time of creation.
-	 */
-	int err;
-
-	/**
-	 * An error message.
-	 */
-	std::string msg;
-};
 
 /**
  * Like sizeof(), but it returns the number of elements an array consists
@@ -367,24 +323,6 @@ inline void verbose(std::string const & msg) {
 	if (g.verbose) {
 		std::cerr << "powerd++: " << msg << '\n';
 	}
-}
-
-/**
- * Throws an Exception instance with the given message.
- *
- * @param exitcode
- *	The exit code to return on termination
- * @param err
- *	The errno value at the time the exception was created
- * @param msg
- *	The message to show
- */
-[[noreturn]] inline void
-fail(Exit const exitcode, int const err, std::string const & msg) {
-	assert(size_t(static_cast<int>(exitcode)) < countof(ExitStr) &&
-	       "Enum member must have a corresponding string");
-	throw Exception{exitcode, err,
-	                "powerd++: ("_s + ExitStr[static_cast<int>(exitcode)] + ") " + msg};
 }
 
 /**
@@ -1135,7 +1073,7 @@ int main(int argc, char * argv[]) {
 		if (e.msg != "") {
 			std::cerr << e.msg << '\n';
 		}
-		return static_cast<int>(e.exitcode);
+		return to_value(e.exitcode);
 	} catch (sys::sc_error<sys::ctl::error> e) {
 		std::cerr << "powerd++: untreated sysctl failure: " << e.c_str() << '\n';
 		throw;
