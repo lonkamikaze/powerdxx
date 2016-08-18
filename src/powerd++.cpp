@@ -6,6 +6,7 @@
 
 #include "fixme.hpp"
 #include "types.hpp"
+#include "constants.hpp"
 #include "utility.hpp"
 
 #include "sys/sysctl.hpp"
@@ -44,30 +45,17 @@ using utility::countof;
 using utility::operator "" _s;
 using utility::sprintf;
 
-/**
- * Default maximum clock frequency value.
- */
-mhz_t const FREQ_DEFAULT_MAX{1000000};
+using constants::CP_TIMES;
+using constants::ACLINE;
+using constants::FREQ;
+using constants::FREQ_LEVELS;
 
-/**
- * Default minimum clock frequency value.
- */
-mhz_t const FREQ_DEFAULT_MIN{0};
-
-/**
- * Clock frequency representing an uninitialised value.
- */
-mhz_t const FREQ_UNSET{1000001};
-
-/**
- * The MIB name for  per-CPU time statistics.
- */
-char const * const CP_TIMES = "kern.cp_times";
-
-/**
- * The MIB name for the AC line state.
- */
-char const * const ACLINE = "hw.acpi.acline";
+using constants::FREQ_DEFAULT_MAX;
+using constants::FREQ_DEFAULT_MIN;
+using constants::FREQ_UNSET;
+using constants::POWERD_PIDFILE;
+using constants::ADP;
+using constants::HADP;
 
 /**
  * The available AC line states.
@@ -82,16 +70,6 @@ enum class AcLineState : unsigned int {
  * String descriptions for the AC line states.
  */
 const char * const AcLineStateStr[]{"battery", "online", "unknown"};
-
-/**
- * The MIB name for CPU frequencies.
- */
-char const * const FREQ = "dev.cpu.%d.freq";
-
-/**
- * The MIB name for CPU frequency levels.
- */
-char const * const FREQ_LEVELS = "dev.cpu.%d.freq_levels";
 
 /**
  * Exit codes.
@@ -185,16 +163,6 @@ struct Core {
 };
 
 /**
- * The load target for adaptive mode, equals 50% load.
- */
-cptime_t const ADP{512};
-
-/**
- * The load target for hiadaptive mode, equals 37.5% load.
- */
-cptime_t const HADP{384};
-
-/**
  * A collection of all the gloabl, mutable states.
  *
  * This is mostly for semantic clarity.
@@ -279,7 +247,7 @@ struct {
 	 *
 	 * If not given pidfile_open() uses a default name.
 	 */
-	char const * pidfilename{"/var/run/powerd.pid"};
+	char const * pidfilename{POWERD_PIDFILE};
 
 	/**
 	 * The kern.cp_times sysctl.
