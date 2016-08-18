@@ -4,6 +4,7 @@
 
 #include "Options.hpp"
 
+#include "fixme.hpp"
 #include "types.hpp"
 
 #include "sys/sysctl.hpp"
@@ -25,36 +26,14 @@
 #include <signal.h>  /* signal() */
 
 /**
- * Workarounds for compiler/library bugs.
- */
-namespace fixme {
-
-/**
- * G++ 5.3 does not believe in std::to_string().
- *
- * @tparam T
- *	The argument type to convert
- * @param op
- *	The argument to convert
- * @return
- *	A string of the given argument
- */
-template <typename T>
-inline std::string to_string(T const & op) {
-	std::ostringstream result;
-	result << op;
-	return result.str();
-}
-
-} /* namespace fixme */
-
-/**
  * File local scope.
  */
 namespace {
 
 using nih::Option;
 using nih::make_Options;
+
+using fixme::to_string;
 
 using types::cptime_t;
 using types::mhz_t;
@@ -1148,7 +1127,7 @@ void run_daemon() {
 		update_freq();
 	}
 
-	verbose("signal "_s + fixme::to_string(g.signal) + " received, exiting ...");
+	verbose("signal "_s + to_string(g.signal) + " received, exiting ...");
 }
 
 } /* namespace */
@@ -1175,7 +1154,7 @@ int main(int argc, char * argv[]) {
 		} catch (pid_t otherpid) {
 			fail(Exit::ECONFLICT, EEXIST,
 			     "a power daemon is already running under PID: "_s +
-			     fixme::to_string(otherpid));
+			     to_string(otherpid));
 		} catch (sys::sc_error<sys::pid::error> e) {
 			fail(Exit::EPID, e,
 			     "cannot create pidfile "_s + g.pidfilename);
