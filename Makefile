@@ -2,15 +2,28 @@ CXXFLAGS+= -std=c++11 -Wall -Werror -pedantic
 PREFIX?=   /usr/local
 DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
 
-all: powerd++
+SRCS=      src/powerd++.cpp src/loadrec.cpp
+TARGETS=   ${SRCS:C/.*\///:C/\.cpp$//}
+TMP!=      cd ${.CURDIR} && mkdep ${SRCS}
+
+all: ${TARGETS}
+
+.for file in ${SRCS}
+${file:C/.*\///:C/\.cpp$//}.o: ${file}
+.endfor
+
+.sinclude ".depend"
 
 powerd++: powerd++.o
 	${CXX} -lutil ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
 
-powerd++.o: src/powerd++.cpp src/Options.hpp src/sys/sysctl.hpp \
-            src/sys/pidfile.hpp src/sys/error.hpp
+loadrec: loadrec.o
+	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
 
 install: install.sh pkg.tbl powerd++
 	@${.CURDIR}/install.sh < ${.CURDIR}/pkg.tbl \
 		DESTDIR="${DESTDIR}" PREFIX="${PREFIX}" DOCSDIR="${DOCSDIR}" \
 		CURDIR="${.CURDIR}" OBJDIR="${.OBJDIR}"
+
+clean:
+	rm *.o ${TARGETS}
