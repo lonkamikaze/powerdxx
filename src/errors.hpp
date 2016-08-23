@@ -35,18 +35,6 @@ enum class Exit : int {
 };
 
 /**
- * Convert an Exit into the underlying type.
- *
- * @param op
- *	The operand to convert
- * @return
- *	The integer representation of the operand
- */
-constexpr int to_value(Exit const op) {
-	return static_cast<int>(op);
-}
-
-/**
  * Printable strings for exit codes.
  */
 const char * const ExitStr[]{
@@ -90,7 +78,8 @@ fail(Exit const exitcode, int const err, std::string const & msg) {
 	assert(size_t(static_cast<int>(exitcode)) < utility::countof(ExitStr) &&
 	       "Enum member must have a corresponding string");
 	throw Exception{exitcode, err,
-	                "powerd++: ("_s + ExitStr[static_cast<int>(exitcode)] + ") " + msg};
+	                "powerd++: ("_s +
+	                ExitStr[utility::to_value(exitcode)] + ") " + msg};
 }
 
 } /* namespace errors */

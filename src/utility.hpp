@@ -2,7 +2,9 @@
  * Implements generally useful functions.
  */
 
-#include <cstdio>    /* snprintf() */
+#include <type_traits> /* std::underlying_type */
+
+#include <cstdio>      /* snprintf() */
 
 #ifndef _POWERDXX_UTILITY_HPP_
 #define _POWERDXX_UTILITY_HPP_
@@ -68,6 +70,21 @@ template <size_t Size, typename... Args>
 inline int sprintf(char (& dst)[Size], const char * const format,
                    Args const... args) {
 	return snprintf(dst, Size, format, args...);
+}
+
+/**
+ * Casts an enum to its underlying value.
+ *
+ * @tparam ET,VT
+ *	The enum and value type
+ * @param op
+ *	The operand to convert
+ * @return
+ *	The integer representation of the operand
+ */
+template <class ET, typename VT = typename std::underlying_type<ET>::type>
+constexpr VT to_value(ET const op) {
+	return static_cast<VT>(op);
 }
 
 } /* namespace utility */

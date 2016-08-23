@@ -54,6 +54,7 @@ using clas::samples;
 
 using utility::countof;
 using utility::sprintf;
+using utility::to_value;
 using namespace utility::literals;
 
 using constants::CP_TIMES;
@@ -76,18 +77,6 @@ enum class AcLineState : unsigned int {
 	ONLINE,  /**< External power source */
 	UNKNOWN  /**< Unknown power source */
 };
-
-/**
- * Convert an AcLineState into the underlying type.
- *
- * @param op
- *	The operand to convert
- * @return
- *	The integer representation of the operand
- */
-constexpr unsigned int to_value(AcLineState const op) {
-	return static_cast<unsigned int>(op);
-}
 
 /**
  * String descriptions for the AC line states.
@@ -392,8 +381,8 @@ void update_freq() {
 	update_load_times();
 
 	/* get AC line status */
-	auto const acline = to_value(sys::ctl::once(AcLineState::UNKNOWN,
-	                                            g.acline_ctl));
+	auto const acline = to_value<AcLineState>(
+	    sys::ctl::once(AcLineState::UNKNOWN, g.acline_ctl));
 	auto const & acstate = g.acstates[acline];
 
 	assert(acstate.target_load <= 1024 &&
