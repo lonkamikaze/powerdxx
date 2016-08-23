@@ -1,6 +1,9 @@
+#include "Options.hpp"
 
 #include "types.hpp"
 #include "constants.hpp"
+#include "errors.hpp"
+#include "utility.hpp"
 
 #include "sys/sysctl.hpp"
 
@@ -12,12 +15,87 @@
 
 namespace {
 
+using nih::Option;
+using nih::make_Options;
+
+using errors::Exit;
+using errors::Exception;
+using errors::fail;
+
+using utility::to_value;
+using namespace utility::literals;
+
+/**
+ * An enum for command line parsing.
+ */
+enum class OE {
+	USAGE,           /**< Print help */
+	DUR_LENGTH,      /**< Set the duration of the recording */
+	IVAL_POLL,       /**< Set polling interval */
+	FILE_PID,        /**< Set pidfile */
+	FLAG_VERBOSE,    /**< Verbose output on stderr */
+	OPT_UNKNOWN,     /**< Obligatory */
+	OPT_NOOPT,       /**< Obligatory */
+	OPT_DASH,        /**< Obligatory */
+	OPT_LDASH,       /**< Obligatory */
+	OPT_DONE         /**< Obligatory */
+};
+
+/**
+ * The short usage string.
+ */
+char const * const USAGE = "[-hv] [-l duration] [-p ival] [-P file]";
+
+/**
+ * Definitions of command line options.
+ */
+Option<OE> const OPTIONS[]{
+	{OE::USAGE,           'h', "help",    "",         "Show usage and exit"},
+	{OE::FLAG_VERBOSE,    'v', "verbose", "",         "Be verbose"},
+	{OE::DUR_LENGTH,      'l', "length",  "duration", "The duration of the recording"},
+	{OE::IVAL_POLL,       'p', "poll",    "ival",     "The polling interval"},
+	{OE::FILE_PID,        'P', "pid",     "file",     "Alternative PID file"},
+};
+
+/**
+ * Parse command line arguments.
+ *
+ * @param argc,argv
+ *	The command line arguments
+ */
+void read_args(int const argc, char const * const argv[]) {
+	auto getopt = make_Options(argc, argv, USAGE, OPTIONS);
+
+	while (true) switch (getopt()) {
+	case OE::USAGE:
+		throw Exception{Exit::OK, 0, getopt.usage()};
+	case OE::OPT_UNKNOWN:
+	case OE::OPT_NOOPT:
+	case OE::OPT_DASH:
+	case OE::OPT_LDASH:
+		fail(Exit::ECLARG, 0, "unexpected command line argument: "_s +
+		                      getopt[0] + "\n\n" + getopt.usage());
+	case OE::OPT_DONE:
+	default:
+		return;
+	}
+}
+
+
 using namespace types;
 using namespace constants;
 
 } /* namespace */
 
 int main(int argc, char * argv[]) {
+	try {
+		read_args(argc, argv);
+	} catch (Exception & e) {
+		if (e.msg != "") {
+			std::cerr << e.msg << '\n';
+		}
+		return to_value(e.exitcode);
+	}
 	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{0, {CTL_HW, HW_NCPU}};
 	sys::ctl::Sysctl<2> const cp_times_ctl = {CP_TIMES};
 
