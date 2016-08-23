@@ -53,8 +53,8 @@ using clas::ival;
 using clas::samples;
 
 using utility::countof;
-using utility::operator "" _s;
 using utility::sprintf;
+using namespace utility::literals;
 
 using constants::CP_TIMES;
 using constants::ACLINE;

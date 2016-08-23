@@ -25,6 +25,11 @@ template <typename T, size_t Count>
 constexpr size_t countof(T (&)[Count]) { return Count; }
 
 /**
+ * Contains literals.
+ */
+namespace literals {
+
+/**
  * A string literal operator equivalent to the `operator "" s` literal
  * provided by C++14 in \<string\>.
  *
@@ -38,6 +43,8 @@ constexpr size_t countof(T (&)[Count]) { return Count; }
 inline std::string operator "" _s(char const * const op, size_t const size) {
 	return {op, size};
 }
+
+} /* namespace literals */
 
 /**
  * A wrapper around snprintf() that automatically pulls in the

@@ -12,7 +12,7 @@
  */
 namespace errors {
 
-using utility::operator "" _s;
+using namespace utility::literals;
 
 /**
  * Exit codes.

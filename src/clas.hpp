@@ -17,7 +17,7 @@
  */
 namespace clas {
 
-using utility::operator "" _s;
+using namespace utility::literals;
 
 /**
  * Command line argument units.
