@@ -92,7 +92,7 @@ int main(int argc, char * argv[]) {
 		read_args(argc, argv);
 	} catch (Exception & e) {
 		if (e.msg != "") {
-			std::cerr << e.msg << '\n';
+			std::cerr << "loadrec: " << e.msg << '\n';
 		}
 		return to_value(e.exitcode);
 	}

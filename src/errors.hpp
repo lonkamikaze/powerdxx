@@ -77,9 +77,9 @@ struct Exception {
 fail(Exit const exitcode, int const err, std::string const & msg) {
 	assert(size_t(static_cast<int>(exitcode)) < utility::countof(ExitStr) &&
 	       "Enum member must have a corresponding string");
-	throw Exception{exitcode, err,
-	                "powerd++: ("_s +
-	                ExitStr[utility::to_value(exitcode)] + ") " + msg};
+	throw Exception{exitcode, err, "("_s +
+	                               ExitStr[utility::to_value(exitcode)] +
+	                               ") " + msg};
 }
 
 } /* namespace errors */

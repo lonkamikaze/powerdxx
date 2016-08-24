@@ -826,7 +826,7 @@ int main(int argc, char * argv[]) {
 		}
 	} catch (Exception & e) {
 		if (e.msg != "") {
-			std::cerr << e.msg << '\n';
+			std::cerr << "powerd++: " << e.msg << '\n';
 		}
 		return to_value(e.exitcode);
 	} catch (sys::sc_error<sys::ctl::error> e) {
