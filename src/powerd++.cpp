@@ -81,7 +81,7 @@ enum class AcLineState : unsigned int {
 /**
  * String descriptions for the AC line states.
  */
-const char * const AcLineStateStr[]{"battery", "online", "unknown"};
+char const * const AcLineStateStr[]{"battery", "online", "unknown"};
 
 /**
  * Contains the management information for a single CPU core.
@@ -580,7 +580,8 @@ void read_args(int const argc, char const * const argv[]) {
 
 	while (true) switch (getopt()) {
 	case OE::USAGE:
-		throw Exception{Exit::OK, 0, getopt.usage()};
+		std::cerr << getopt.usage();
+		throw Exception{Exit::OK, 0, ""};
 	case OE::FLAG_VERBOSE:
 		g.verbose = true;
 		break;

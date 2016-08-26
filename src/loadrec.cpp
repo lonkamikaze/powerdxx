@@ -68,7 +68,8 @@ void read_args(int const argc, char const * const argv[]) {
 
 	while (true) switch (getopt()) {
 	case OE::USAGE:
-		throw Exception{Exit::OK, 0, getopt.usage()};
+		std::cerr << getopt.usage();
+		throw Exception{Exit::OK, 0, ""};
 	case OE::OPT_UNKNOWN:
 	case OE::OPT_NOOPT:
 	case OE::OPT_DASH:
