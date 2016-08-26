@@ -38,7 +38,7 @@
  *
  * Every array entry defines an option consisting of the enum value that
  * represents it, a short and a long version (either of which are optional)
- * and a comma seperated list of arguments. The final string appears in the
+ * and a comma separated list of arguments. The final string appears in the
  * usage() output. The details are documented by nih::Option<>.
  *
  * Aliases are created by adding a definition that returns the same enum
@@ -189,7 +189,7 @@ struct Option {
 	char const * lopt;
 
 	/**
-	 * A comma seperated list of arguments.
+	 * A comma separated list of arguments.
 	 *
 	 * Set to nullptr or "" if no argument is available.
 	 */
