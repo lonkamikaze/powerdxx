@@ -30,8 +30,9 @@ using namespace utility::literals;
  */
 enum class OE {
 	USAGE,           /**< Print help */
-	DUR_LENGTH,      /**< Set the duration of the recording */
+	IVAL_DURATION,   /**< Set the duration of the recording */
 	IVAL_POLL,       /**< Set polling interval */
+	FILE_OUTPUT,     /**< Set output file */
 	FILE_PID,        /**< Set pidfile */
 	FLAG_VERBOSE,    /**< Verbose output on stderr */
 	OPT_UNKNOWN,     /**< Obligatory */
@@ -44,17 +45,18 @@ enum class OE {
 /**
  * The short usage string.
  */
-char const * const USAGE = "[-hv] [-l duration] [-p ival] [-P file]";
+char const * const USAGE = "[-hv] [-d ival] [-p ival] [-o file] [-P file]";
 
 /**
  * Definitions of command line options.
  */
 Option<OE> const OPTIONS[]{
-	{OE::USAGE,           'h', "help",    "",         "Show usage and exit"},
-	{OE::FLAG_VERBOSE,    'v', "verbose", "",         "Be verbose"},
-	{OE::DUR_LENGTH,      'l', "length",  "duration", "The duration of the recording"},
-	{OE::IVAL_POLL,       'p', "poll",    "ival",     "The polling interval"},
-	{OE::FILE_PID,        'P', "pid",     "file",     "Alternative PID file"},
+	{OE::USAGE,         'h', "help",     "",     "Show usage and exit"},
+	{OE::FLAG_VERBOSE,  'v', "verbose",  "",     "Be verbose"},
+	{OE::IVAL_DURATION, 'd', "duration", "ival", "The duration of the recording"},
+	{OE::IVAL_POLL,     'p', "poll",     "ival", "The polling interval"},
+	{OE::FILE_OUTPUT,   'o', "output",   "file", "Output to file"},
+	{OE::FILE_PID,      'P', "pid",      "file", "Alternative PID file"}
 };
 
 /**
