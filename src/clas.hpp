@@ -186,7 +186,7 @@ types::ms ival(char const * const str) {
 	auto value = atof(str);
 	if (value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
-		     "polling interval must be positive: "_s + str);
+		     "interval must be positive: "_s + str);
 	}
 	switch (unit(interval)) {
 	case Unit::SECOND:
@@ -198,7 +198,7 @@ types::ms ival(char const * const str) {
 		break;
 	}
 	errors::fail(errors::Exit::EIVAL, 0,
-	             "polling interval not recognised: "_s + str);
+	             "interval not recognised: "_s + str);
 }
 
 /**
