@@ -4,12 +4,15 @@
 #include "constants.hpp"
 #include "errors.hpp"
 #include "utility.hpp"
+#include "clas.hpp"
 
 #include "sys/sysctl.hpp"
 
 #include <iostream>  /* std::cout, std::cerr */
+#include <fstream>   /* std::ofstream */
 #include <chrono>    /* std::chrono::steady_clock::now() */
 #include <thread>    /* std::this_thread::sleep_until() */
+#include <memory>    /* std::unique_ptr */
 
 #include <sys/resource.h>  /* CPUSTATES */
 
@@ -18,12 +21,30 @@ namespace {
 using nih::Option;
 using nih::make_Options;
 
+using constants::POWERD_PIDFILE;
+
+using types::ms;
+
 using errors::Exit;
 using errors::Exception;
 using errors::fail;
 
 using utility::to_value;
 using namespace utility::literals;
+
+using clas::ival;
+
+/**
+ * The global state.
+ */
+struct {
+	bool verbose{false};
+	ms duration{0};
+	ms interval{25};
+	std::ofstream outfile{};
+	std::ostream * out = &std::cout;
+	char const * pidfilename = POWERD_PIDFILE;
+} g;
 
 /**
  * An enum for command line parsing.
@@ -60,6 +81,21 @@ Option<OE> const OPTIONS[]{
 };
 
 /**
+ * Set up output to the given file.
+ *
+ * @param name
+ *	Name of the file
+ */
+void set_outfile(char const * const name) {
+	g.outfile.open(name);
+	if (!g.outfile.good()) {
+		fail(Exit::EWOPEN, errno,
+		     "could not open file for writing: "_s + name);
+	}
+	g.out = &g.outfile;
+}
+
+/**
  * Parse command line arguments.
  *
  * @param argc,argv
@@ -72,6 +108,21 @@ void read_args(int const argc, char const * const argv[]) {
 	case OE::USAGE:
 		std::cerr << getopt.usage();
 		throw Exception{Exit::OK, 0, ""};
+	case OE::FLAG_VERBOSE:
+		g.verbose = true;
+		break;
+	case OE::IVAL_DURATION:
+		g.duration = ival(getopt[1]);
+		break;
+	case OE::IVAL_POLL:
+		g.interval = ival(getopt[1]);
+		break;
+	case OE::FILE_OUTPUT:
+		set_outfile(getopt[1]);
+		break;
+	case OE::FILE_PID:
+		g.pidfilename = getopt[1];
+		break;
 	case OE::OPT_UNKNOWN:
 	case OE::OPT_NOOPT:
 	case OE::OPT_DASH:
@@ -79,7 +130,6 @@ void read_args(int const argc, char const * const argv[]) {
 		fail(Exit::ECLARG, 0, "unexpected command line argument: "_s +
 		                      getopt[0] + "\n\n" + getopt.usage());
 	case OE::OPT_DONE:
-	default:
 		return;
 	}
 }

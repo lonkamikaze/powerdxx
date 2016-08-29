@@ -31,7 +31,8 @@ enum class Exit : int {
 	ECONFLICT,   /**< Another frequency daemon instance is running */
 	EPID,        /**< A pidfile could not be created */
 	EFORBIDDEN,  /**< Insufficient privileges to change sysctl */
-	EDAEMON      /**< Unable to detach from terminal */
+	EDAEMON,     /**< Unable to detach from terminal */
+	EWOPEN       /**< Could not open file for writing */
 };
 
 /**
@@ -40,7 +41,7 @@ enum class Exit : int {
 const char * const ExitStr[]{
 	"OK", "ECLARG", "EOUTOFRANGE", "ELOAD", "EFREQ", "EMODE", "EIVAL",
 	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
-	"EDAEMON"
+	"EDAEMON", "EWOPEN"
 };
 
 /**
