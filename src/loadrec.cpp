@@ -204,7 +204,9 @@ void run() try {
 	auto last = time;
 	auto const stop = time + g.duration;
 	size_t sample = 0;
-	while (time < stop) {
+	/* Takes a sample and prints it, avoids duplicating code
+	 * behind the loop. */
+	auto const takeAndPrintSample = [&]() {
 		cp_times_ctl.get(cp_times[sample * g.ncpu],
 		                 g.ncpu * sizeof(cp_times[0]));
 		*g.out << std::chrono::duration_cast<ms>(time - last).count();
@@ -215,11 +217,16 @@ void run() try {
 				           cp_times[((sample + 1) % 2) * g.ncpu + i][q]);
 			}
 		}
-		*g.out << std::endl;
+	};
+	while (time < stop) {
+		takeAndPrintSample();
+		*g.out << '\n';
 		sample = (sample + 1) % 2;
 		last = time;
 		std::this_thread::sleep_until(time += g.interval);
 	}
+	takeAndPrintSample();
+	*g.out << std::endl;
 } catch (sys::sc_error<sys::ctl::error> e) {
 	fail(Exit::ESYSCTL, e, "failed to access sysctl: "_s + CP_TIMES);
 }
