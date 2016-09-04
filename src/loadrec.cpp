@@ -1,3 +1,8 @@
+/** \file
+ * Implements a load recorder, useful for simulating loads to test
+ * CPU clock daemons and settings.
+ */
+
 #include "Options.hpp"
 
 #include "types.hpp"
@@ -17,6 +22,9 @@
 
 #include <sys/resource.h>  /* CPUSTATES */
 
+/**
+ * File local scope.
+ */
 namespace {
 
 using nih::Option;
@@ -194,6 +202,12 @@ void print_sysctls() {
 	}
 }
 
+/**
+ * Report the load frames.
+ *
+ * This prints the time in ms since the last frame and the cp_times
+ * growth as a space separated list.
+ */
 void run() try {
 	sys::ctl::Sysctl<2> const cp_times_ctl = {CP_TIMES};
 
@@ -233,6 +247,16 @@ void run() try {
 
 } /* namespace */
 
+
+/**
+ * Main routine, setup and execute daemon, print errors.
+ *
+ * @param argc,argv
+ *	The command line arguments
+ * @return
+ *	An exit code
+ * @see Exit
+ */
 int main(int argc, char * argv[]) {
 	try {
 		read_args(argc, argv);
