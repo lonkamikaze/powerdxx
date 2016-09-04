@@ -759,7 +759,7 @@ void signal_recv(int const signal) {
 /**
  * Daemonise and run the main loop.
  */
-void run_daemon() {
+void run_daemon() try {
 	/* open pidfile */
 	sys::pid::Pidfile pidfile{g.pidfilename, 0600};
 
@@ -796,6 +796,13 @@ void run_daemon() {
 	}
 
 	verbose("signal "_s + to_string(g.signal) + " received, exiting ...");
+} catch (pid_t otherpid) {
+	fail(Exit::ECONFLICT, EEXIST,
+	     "a power daemon is already running under PID: "_s +
+	     to_string(otherpid));
+} catch (sys::sc_error<sys::pid::error> e) {
+	fail(Exit::EPID, e,
+	     "cannot create pidfile "_s + g.pidfilename);
 }
 
 } /* namespace */
@@ -817,16 +824,7 @@ int main(int argc, char * argv[]) {
 		init();
 		show_settings();
 		reset_cp_times();
-		try {
-			run_daemon();
-		} catch (pid_t otherpid) {
-			fail(Exit::ECONFLICT, EEXIST,
-			     "a power daemon is already running under PID: "_s +
-			     to_string(otherpid));
-		} catch (sys::sc_error<sys::pid::error> e) {
-			fail(Exit::EPID, e,
-			     "cannot create pidfile "_s + g.pidfilename);
-		}
+		run_daemon();
 	} catch (Exception & e) {
 		if (e.msg != "") {
 			std::cerr << "powerd++: " << e.msg << '\n';
