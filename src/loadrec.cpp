@@ -87,7 +87,7 @@ enum class OE {
 /**
  * The short usage string.
  */
-char const * const USAGE = "[-hv] [-d ival] [-p ival] [-o file] [-P file]";
+char const * const USAGE = "[-hv] [-d ival] [-p ival] [-o file]";
 
 /**
  * Definitions of command line options.
