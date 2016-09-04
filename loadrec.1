@@ -1,0 +1,117 @@
+.Dd 4 September, 2016
+.Dt loadrec 1
+.Os
+.Sh NAME
+.Nm loadrec
+.Nd CPU load recorder
+.Sh SYNOPSIS
+.Nm
+.Op Fl hv
+.Op Fl d Ar ival
+.Op Fl p Ar ival
+.Op Fl o Ar file
+.Sh DESCRIPTION
+The
+.Nm
+command performs a recording of the current load. The purpose is to
+reproduce this load to test different
+.Xr powerd 8
+and
+.Xr powerd++ 8
+configurations under identical load conditions.
+.Ss ARGUMENTS
+The following argument types can be given:
+.Bl -tag -width indent
+.It Ar ival
+A time interval can be given in seconds or milliseconds.
+.D1 Li s , Li ms
+An interval without a unit is treated as milliseconds.
+.It Ar file
+A file name.
+.El
+.Ss OPTIONS
+The following options are supported:
+.Bl -tag -width indent
+.It Fl h , -help
+Show usage and exit
+.It Fl v , -verbose
+Be verbose and produce initial diagnostics on
+.Pa stderr .
+.It Fl d , -duration Ar ival
+The duration of the recording session, defaults to 30 seconds.
+.It Fl p , -poll Ar ival
+The polling interval to take load samples at, defaults to 25 milliseconds.
+.It Fl o , -output Ar file
+The output file to write the load to.
+.El
+.Sh USAGE NOTES
+To create reproducible results stop any running CPU clock daemons
+like
+.Xr powerd 8
+or
+.Xr powerd++ 8 . And set a fixed CPU frequency below the threshold
+at which the turbo mode is activated. E.g. an
+.Nm Intel(R) Core(TM) i7-4500U CPU
+supports the following frequency settings:
+.Bd -literal -offset indent
+> sysctl dev.cpu.0.freq_levels
+dev.cpu.0.freq_levels: 2401/15000 2400/15000 2300/14088 2200/13340 2000/11888 1900/11184 1800/10495 1700/9680 1500/8372 1400/7738 1300/7119 1200/6511 1100/5789 900/4643 800/4090 768/3550
+.Ed
+.Pp
+Supposedly the first mode, which is off by 1 MHz, invokes the turbo
+mode. However all modes down to 1800 MHz actually invoke the turbo
+mode for this model. The only way to determine this is by benchmarking
+the steppings to find out that there is a huge performance step between
+1700 and 1800 MHz and that all the modes above 1700 MHz show the exact
+same performance (given similar thermal conditions).
+.Pp
+So in order to produce a usable measurement for this CPU the clock
+needs to be set to 1700 MHz or lower (higher is better to be able
+to record a wider range of loads):
+.Bd -literal -offset indent
+# service powerd++ stop
+Stopping powerdxx.
+Waiting for PIDS: 63574.
+# sysctl dev.cpu.0.freq=1700
+dev.cpu.0.freq: 2401 -> 1700
+.Ed
+.Pp
+Run
+.Nm
+for a brief time to test it:
+.Bd -literal -offset indent
+> loadrec -d.25s
+hw.machine=amd64
+hw.model=Intel(R) Core(TM) i7-4500U CPU @ 1.80GHz
+hw.ncpu=4
+hw.acpi.acline=1
+dev.cpu.0.freq=1700
+dev.cpu.0.freq_levels=2401/15000 2400/15000 2300/14088 2200/13340 2000/11888 1900/11184 1800/10495 1700/9680 1500/8372 1400/7738 1300/7119 1200/6511 1100/5789 900/4643 800/4090 768/3550
+0 1658618 4728 563004 146277 7197047 1900009 5683 552503 10915 7100524 1849422 5838 528699 25364 7160311 1883098 5987 539053 12131 7129365
+25 0 0 0 0 3 0 0 1 0 2 1 0 0 0 2 0 0 0 0 3
+25 0 0 0 0 3 0 0 2 0 1 0 0 0 0 3 0 0 0 0 3
+25 0 0 0 0 4 1 0 2 0 1 0 0 0 0 4 0 0 0 0 2
+25 0 0 1 1 1 0 0 1 0 2 0 0 0 0 3 1 0 0 0 4
+25 0 0 0 0 3 0 0 0 0 2 0 0 0 0 3 1 0 0 0 2
+25 0 0 0 0 3 2 0 0 0 1 0 0 0 0 3 0 0 0 0 3
+25 0 0 1 0 2 1 0 1 0 2 0 0 0 0 3 0 0 0 1 2
+25 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
+25 0 0 2 0 2 0 0 1 0 3 0 0 0 0 3 0 0 0 0 3
+25 1 0 2 0 0 1 0 0 0 2 1 0 0 0 3 0 0 0 0 4
+.Ed
+.Pp
+Printing the load creates significant load itself, so for the actual
+measurement the output should be written to a file. Create your workload
+and start your measurement:
+.Bd -literal -offset indent
+> loadrec -o video-session.load
+.Ed
+.Pp
+On the example setup
+.Nm
+produces a load of 0.001 (i.e. 0.1%), so its effect on the measurement is negligible.
+.Sh SEE ALSO
+.Xr cpufreq 4 , Xr powerd 8 , Xr powerd++ 8 , Xr sysctl 8
+.Sh AUTHORS
+Implementation and manual by
+.An Dominic Fandrey Aq kami@freebsd.org
