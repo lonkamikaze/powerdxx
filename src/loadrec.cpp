@@ -194,7 +194,7 @@ void print_sysctls() {
 	}
 }
 
-void run() {
+void run() try {
 	sys::ctl::Sysctl<2> const cp_times_ctl = {CP_TIMES};
 
 	auto cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
@@ -220,6 +220,8 @@ void run() {
 		last = time;
 		std::this_thread::sleep_until(time += g.interval);
 	}
+} catch (sys::sc_error<sys::ctl::error> e) {
+	fail(Exit::ESYSCTL, e, "failed to access sysctl: "_s + CP_TIMES);
 }
 
 } /* namespace */
