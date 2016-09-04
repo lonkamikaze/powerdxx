@@ -214,6 +214,23 @@ class Sysctl {
 };
 
 /**
+ * Create a Sysctl instances.
+ *
+ * This is only compatible with creating sysctls from predefined MIBs.
+ *
+ * @tparam Args
+ *	List of argument types, should all be pid_t
+ * @param args
+ *	List of initialising arguments
+ * @return
+ *	A Sysctl instance with the depth matching the number of arguments
+ */
+template <typename... Args>
+constexpr Sysctl<sizeof...(Args)> make_Sysctl(Args const... args) {
+	return {args...};
+}
+
+/**
  * This is a wrapper around Sysctl that allows semantically transparent
  * use of a sysctl.
  *
