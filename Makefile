@@ -14,10 +14,10 @@ ${file:C/.*\///:C/\.cpp$//}.o: ${file}
 
 .sinclude ".depend"
 
-powerd++: powerd++.o
+powerd++: ${.TARGET}.o
 	${CXX} -lutil ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
 
-loadrec: loadrec.o
+loadrec: ${.TARGET}.o
 	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
 
 install: install.sh pkg.tbl powerd++
