@@ -5,6 +5,7 @@
 #include "errors.hpp"
 #include "utility.hpp"
 #include "clas.hpp"
+#include "fixme.hpp"
 
 #include "sys/sysctl.hpp"
 
@@ -22,28 +23,41 @@ using nih::Option;
 using nih::make_Options;
 
 using constants::POWERD_PIDFILE;
+using constants::ACLINE;
+using constants::FREQ;
+using constants::FREQ_LEVELS;
+using constants::CP_TIMES;
 
 using types::ms;
+using types::coreid_t;
+using types::cptime_t;
 
 using errors::Exit;
 using errors::Exception;
 using errors::fail;
 
 using utility::to_value;
+using utility::sprintf;
 using namespace utility::literals;
 
 using clas::ival;
+
+using fixme::to_string;
+
+using sys::ctl::make_Sysctl;
+using sys::ctl::make_Once;
 
 /**
  * The global state.
  */
 struct {
 	bool verbose{false};
-	ms duration{0};
+	ms duration{30000};
 	ms interval{25};
 	std::ofstream outfile{};
 	std::ostream * out = &std::cout;
-	char const * pidfilename = POWERD_PIDFILE;
+	char const * outfilename{nullptr};
+	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{0, {CTL_HW, HW_NCPU}};
 } g;
 
 /**
@@ -54,7 +68,6 @@ enum class OE {
 	IVAL_DURATION,   /**< Set the duration of the recording */
 	IVAL_POLL,       /**< Set polling interval */
 	FILE_OUTPUT,     /**< Set output file */
-	FILE_PID,        /**< Set pidfile */
 	FLAG_VERBOSE,    /**< Verbose output on stderr */
 	OPT_UNKNOWN,     /**< Obligatory */
 	OPT_NOOPT,       /**< Obligatory */
@@ -77,22 +90,32 @@ Option<OE> const OPTIONS[]{
 	{OE::IVAL_DURATION, 'd', "duration", "ival", "The duration of the recording"},
 	{OE::IVAL_POLL,     'p', "poll",     "ival", "The polling interval"},
 	{OE::FILE_OUTPUT,   'o', "output",   "file", "Output to file"},
-	{OE::FILE_PID,      'P', "pid",      "file", "Alternative PID file"}
 };
 
 /**
- * Set up output to the given file.
+ * Outputs the given message on stderr if g.verbose is set.
  *
- * @param name
- *	Name of the file
+ * @param msg
+ *	The message to output
  */
-void set_outfile(char const * const name) {
-	g.outfile.open(name);
-	if (!g.outfile.good()) {
-		fail(Exit::EWOPEN, errno,
-		     "could not open file for writing: "_s + name);
+inline void verbose(std::string const & msg) {
+	if (g.verbose) {
+		std::cerr << "powerd++: " << msg << '\n';
 	}
-	g.out = &g.outfile;
+}
+
+/**
+ * Set up output to the given file.
+ */
+void init() {
+	if (g.outfilename) {
+		g.outfile.open(g.outfilename);
+		if (!g.outfile.good()) {
+			fail(Exit::EWOPEN, errno,
+			     "could not open file for writing: "_s + g.outfilename);
+		}
+		g.out = &g.outfile;
+	}
 }
 
 /**
@@ -118,10 +141,7 @@ void read_args(int const argc, char const * const argv[]) {
 		g.interval = ival(getopt[1]);
 		break;
 	case OE::FILE_OUTPUT:
-		set_outfile(getopt[1]);
-		break;
-	case OE::FILE_PID:
-		g.pidfilename = getopt[1];
+		g.outfilename = getopt[1];
 		break;
 	case OE::OPT_UNKNOWN:
 	case OE::OPT_NOOPT:
@@ -134,44 +154,93 @@ void read_args(int const argc, char const * const argv[]) {
 	}
 }
 
+/**
+ * Print the sysctls
+ */
+void print_sysctls() {
+	sys::ctl::Sysctl<3> hw_acpi_acline;
+	try {
+		hw_acpi_acline = {ACLINE};
+	} catch (sys::sc_error<sys::ctl::error>) {
+		verbose("cannot read "_s + ACLINE);
+	}
+	*g.out << "hw.machine=" << make_Sysctl(CTL_HW, HW_MACHINE).get<char>().get() << '\n'
+	       << "hw.model=" << make_Sysctl(CTL_HW, HW_MODEL).get<char>().get() << '\n'
+	       << "hw.ncpu=" << g.ncpu << '\n'
+	       << ACLINE << '=' << make_Once(1U, hw_acpi_acline) << '\n';
 
-using namespace types;
-using namespace constants;
+	char mibname[40];
+	for (coreid_t i = 0; i < g.ncpu; ++i) {
+		sprintf(mibname, FREQ, i);
+		try {
+			sys::ctl::Sysctl<4> ctl{mibname};
+			*g.out << mibname << '='
+			       << make_Once(0, ctl) << '\n';
+		} catch (sys::sc_error<sys::ctl::error> e) {
+			verbose("cannot access sysctl: "_s + mibname);
+			if (i == 0) {
+				fail(Exit::ENOFREQ, e,
+				     "at least the first CPU core must support frequency updates");
+			}
+		}
+		sprintf(mibname, FREQ_LEVELS, i);
+		try {
+			sys::ctl::Sysctl<4> ctl{mibname};
+			*g.out << mibname << '='
+			       << ctl.get<char>().get() << '\n';
+		} catch (sys::sc_error<sys::ctl::error>) {
+			/* do nada */
+		}
+	}
+}
+
+void run() {
+	sys::ctl::Sysctl<2> const cp_times_ctl = {CP_TIMES};
+
+	auto cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
+	    new cptime_t[2 * g.ncpu][CPUSTATES]{});
+
+	auto time = std::chrono::steady_clock::now();
+	auto last = time;
+	auto const stop = time + g.duration;
+	size_t sample = 0;
+	while (time < stop) {
+		cp_times_ctl.get(cp_times[sample * g.ncpu],
+		                 g.ncpu * sizeof(cp_times[0]));
+		*g.out << std::chrono::duration_cast<ms>(time - last).count();
+		for (size_t i = 0; i < g.ncpu; ++i) {
+			for (size_t q = 0; q < CPUSTATES; ++q) {
+				*g.out << ' '
+				       << (cp_times[sample * g.ncpu + i][q] -
+				           cp_times[((sample + 1) % 2) * g.ncpu + i][q]);
+			}
+		}
+		*g.out << std::endl;
+		sample = (sample + 1) % 2;
+		last = time;
+		std::this_thread::sleep_until(time += g.interval);
+	}
+}
 
 } /* namespace */
 
 int main(int argc, char * argv[]) {
 	try {
 		read_args(argc, argv);
+		init();
+		print_sysctls();
+		run();
 	} catch (Exception & e) {
 		if (e.msg != "") {
 			std::cerr << "loadrec: " << e.msg << '\n';
 		}
 		return to_value(e.exitcode);
-	}
-	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{0, {CTL_HW, HW_NCPU}};
-	sys::ctl::Sysctl<2> const cp_times_ctl = {CP_TIMES};
-
-	auto cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
-	    new cptime_t[2 * ncpu][CPUSTATES]{});
-
-	auto time = std::chrono::steady_clock::now();
-	//auto const start = time;
-	size_t sample = 0;
-	while (true) {
-		std::this_thread::sleep_until(time += ms{50});
-		cp_times_ctl.get(cp_times[sample * ncpu],
-		                 ncpu * sizeof(cp_times[0]));
-		for (size_t i = 0; i < ncpu; ++i) {
-			std::cout << "cpu" << i << ':';
-			for (size_t q = 0; q < CPUSTATES; ++q) {
-				std::cout << ' '
-				          << (cp_times[sample * ncpu + i][q] -
-				              cp_times[((sample + 1) % 2) * ncpu + i][q]);
-			}
-			std::cout << '\n';
-		}
-		sample = (sample + 1) % 2;
+	} catch (sys::sc_error<sys::ctl::error> e) {
+		std::cerr << "loadrec: untreated sysctl failure: " << e.c_str() << '\n';
+		throw;
+	} catch (...) {
+		std::cerr << "loadrec: untreated failure\n";
+		throw;
 	}
 }
 
