@@ -69,6 +69,8 @@ using constants::POWERD_PIDFILE;
 using constants::ADP;
 using constants::HADP;
 
+using sys::ctl::make_Once;
+
 /**
  * The available AC line states.
  */
@@ -382,7 +384,7 @@ void update_freq() {
 
 	/* get AC line status */
 	auto const acline = to_value<AcLineState>(
-	    sys::ctl::once(AcLineState::UNKNOWN, g.acline_ctl));
+	    make_Once(AcLineState::UNKNOWN, g.acline_ctl));
 	auto const & acstate = g.acstates[acline];
 
 	assert(acstate.target_load <= 1024 &&

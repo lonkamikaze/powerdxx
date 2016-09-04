@@ -395,7 +395,7 @@ using SysctlOnce = Once<T, Sysctl<MibDepth>>;
  *	The sysctl to try and read from
  */
 template <typename T, class SysctlT>
-constexpr Once<T, SysctlT> once(T const & value, SysctlT const & sysctl)
+constexpr Once<T, SysctlT> make_Once(T const & value, SysctlT const & sysctl)
 noexcept { return {value, sysctl}; }
 
 } /* namespace ctl */
