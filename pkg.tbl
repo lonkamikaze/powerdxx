@@ -1,4 +1,6 @@
 PROGRAM:%%OBJDIR%%/powerd++:%%PREFIX%%/sbin/powerd++
+PROGRAM:%%OBJDIR%%/loadrec:%%PREFIX%%/bin/loadrec
 MAN:%%CURDIR%%/README.md:%%DOCSDIR%%/README.md
 MAN:%%CURDIR%%/powerd++.8:%%PREFIX%%/man/man8/powerd++.8.gz
+MAN:%%CURDIR%%/loadrec.1:%%PREFIX%%/man/man1/loadrec.1.gz
 SCRIPT:%%CURDIR%%/powerd++.rc:%%PREFIX%%/etc/rc.d/powerd++
