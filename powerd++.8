@@ -1,4 +1,4 @@
-.Dd 4 September, 2016
+.Dd 15 September, 2016
 .Dt powerd++ 8
 .Os
 .Sh NAME
@@ -200,7 +200,7 @@ and
 cause an orderly shutdown of
 .Nm .
 An orderly shutdown means the pidfile is removed and the clock frequencies
-are set to their maximums.
+are restored to their original values.
 .Sh FILES
 .Bl -tag -width indent
 .Pa /var/run/powerd.pid

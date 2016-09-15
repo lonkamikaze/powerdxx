@@ -706,16 +706,26 @@ void show_settings() {
  * - Upon creation it reads and writes all controlling cores
  * - Upon destruction it sets all cores to the maximum frequencies
  */
-struct FreqGuard final {
+class FreqGuard final {
+	private:
+	/**
+	 * The list of initial frequencies.
+	 */
+	std::unique_ptr<mhz_t[]> freqs;
+
+	public:
 	/**
 	 * Read and write all core frequencies, may throw.
 	 */
-	FreqGuard() {
+	FreqGuard() : freqs{new mhz_t[g.ncpu]} {
 		for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 			auto & core = g.cores[corei];
 			if (core.controller != corei) { continue; }
 			try {
-				core.freq = mhz_t{core.freq};
+				/* remember clock frequency */
+				this->freqs[corei] = core.freq;
+				/* attempt clock frequency write */
+				core.freq = this->freqs[corei];
 			} catch (sys::sc_error<sys::ctl::error> e) {
 				if (EPERM == e) {
 					fail(Exit::EFORBIDDEN, e,
@@ -728,17 +738,14 @@ struct FreqGuard final {
 	}
 
 	/**
-	 * Try to set all core frequencies to the maximum, should not throw.
-	 *
-	 * This may not alwas be the optimal approach, but it is arguably
-	 * sane.
+	 * Restore all core frequencies.
 	 */
 	~FreqGuard() {
 		for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 			auto & core = g.cores[corei];
 			if (core.controller != corei) { continue; }
 			try {
-				core.freq = core.max;
+				core.freq = this->freqs[corei];
 			} catch (sys::sc_error<sys::ctl::error>) {
 				/* do nada */
 			}
