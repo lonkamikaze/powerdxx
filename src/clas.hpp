@@ -9,6 +9,8 @@
 #include "errors.hpp"
 #include "utility.hpp"
 
+#include <cstdlib>   /* atof() */
+
 #include <string>    /* std::string */
 #include <locale>    /* std::tolower() */
 
