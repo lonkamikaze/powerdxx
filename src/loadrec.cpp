@@ -65,7 +65,7 @@ struct {
 	std::ofstream outfile{};
 	std::ostream * out = &std::cout;
 	char const * outfilename{nullptr};
-	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{0, {CTL_HW, HW_NCPU}};
+	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{1U, {CTL_HW, HW_NCPU}};
 } g;
 
 /**
@@ -224,7 +224,7 @@ void run() try {
 		cp_times_ctl.get(cp_times[sample * g.ncpu],
 		                 g.ncpu * sizeof(cp_times[0]));
 		*g.out << std::chrono::duration_cast<ms>(time - last).count();
-		for (size_t i = 0; i < g.ncpu; ++i) {
+		for (int i = 0; i < g.ncpu; ++i) {
 			for (size_t q = 0; q < CPUSTATES; ++q) {
 				*g.out << ' '
 				       << (cp_times[sample * g.ncpu + i][q] -
