@@ -11,6 +11,7 @@
 #include <mutex>
 #include <chrono>    /* std::chrono::steady_clock::now() */
 #include <vector>
+#include <atomic>
 
 #include <cstring>
 #include <cassert>
@@ -322,7 +323,7 @@ class Emulator {
 	 */
 	void fixFreqs() {
 		for (int i = 0; i < this->ncpu; ++i) {
-			auto const freq = this->freqs[i]->get<int>();
+			auto const freq = this->freqs[i]->get<unsigned int>();
 			auto diff = freq + 1000000;
 			for (auto lvl : this->levels[i]) {
 				auto lvldiff = (lvl > freq ? lvl - freq : freq - lvl);
@@ -504,7 +505,7 @@ typedef int (*fn_sysctlnametomib)(const char*, int*, size_t*);
 
 static fn_sysctl           orig_sysctl = nullptr;
 static fn_sysctlbyname     orig_sysctlbyname = nullptr;
-static fn_sysctlnametomib  orig_sysctlnametomib = nullptr;;
+static fn_sysctlnametomib  orig_sysctlnametomib = nullptr;
 
 int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
            const void * newp, size_t newlen) try {
