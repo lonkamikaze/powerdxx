@@ -14,7 +14,6 @@
 
 #include <cstring>
 #include <cassert>
-#include <cstdlib>
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
@@ -283,7 +282,8 @@ class {
 			auto str = name;
 			for (size_t i = 1;
 			     std::regex_search(str, match, expr); ++i) {
-				mib[i] = atoi(std::string{match[1]}.c_str()) + 1;
+				std::istringstream{match[1]} >> mib[i];
+				++mib[i]; /* offset, because 0 is the base mib */
 				str = match.suffix();
 			}
 			/* map name → mib */
@@ -476,7 +476,7 @@ class Main {
 		auto const expr = "([^=]*)=(.*)"_r;
 		while (std::getline(std::cin, input) &&
 		       std::regex_match(input, match, expr)) {
-			sysctls.addValue(std::string{match[1]}, match[2]);
+			sysctls.addValue(match[1].str(), match[2].str());
 		}
 
 		/* initialise kern.cp_times */
