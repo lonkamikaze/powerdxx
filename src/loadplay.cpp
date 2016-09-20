@@ -381,8 +381,14 @@ class Emulator {
 		cp_times.get(sum.get(), size);
 
 		/* output headers */
-		std::cout << "time[s] max(freq)[MHz] sum(recloads) max(recloads) sum(loads) max(loads)\n";
-		std::cout << std::fixed << std::setprecision(3);
+		std::cout << "time[s]";
+		for (int i = 0; i < this->ncpu; ++i) {
+			std::cout << " core" << i << ".freq[Mhz]"
+			          << " core" << i << ".recload"
+			          << " core" << i << ".load";
+		}
+		std::cout << " max(freqs)[MHz] sum(recloads) max(recloads) sum(loads) max(loads)\n"
+		          << std::fixed << std::setprecision(3);
 	}
 
 	void operator ()(std::atomic<bool> const * const die) {
@@ -398,6 +404,8 @@ class Emulator {
 			double statSumLoads = 0.;
 			double statMaxLoads = 0.;
 			int statMaxFreq = 0;
+			statTime += double(interval) / 1000;
+			std::cout << statTime;
 			/* perform calculations */
 			for (int core = 0; core < this->ncpu; ++core) {
 				/* get frame load */
@@ -409,16 +417,19 @@ class Emulator {
 					frameSum += ticks;
 					frameLoad += state == CP_IDLE ? 0 : ticks;
 				}
-				if (!frameSum) {
-					continue;
-				}
 				auto const coreFreq = this->freqs[core]->get<int>();
 				auto const coreRefFreq = this->freqRefs[core];
 
+				if (!frameSum) {
+					std::cout << ' ' << coreFreq << ' ' << 0. << ' ' << 0.;
+					continue;
+				}
+
 				/* calc recorded stats */
-				double load = double(frameLoad) / frameSum;
-				statSumRecloads += load;
-				statMaxRecloads = statMaxRecloads > load ? statMaxRecloads : load;
+				double const recLoad = double(frameLoad) / frameSum;
+				statSumRecloads += recLoad;
+				statMaxRecloads = statMaxRecloads > recLoad ? statMaxRecloads : recLoad;
+				std::cout << ' ' << coreFreq << ' ' << recLoad;
 
 				/* weigh load and sum */
 				frameLoad *= coreRefFreq;
@@ -440,16 +451,18 @@ class Emulator {
 
 				/* calc stats */
 				statMaxFreq = statMaxFreq > coreFreq ? statMaxFreq : coreFreq;
-				load = double(frameLoad) / frameSum;
+				double const load = double(frameLoad) / frameSum;
 				statSumLoads += load;
 				statMaxLoads = statMaxLoads > load ? statMaxLoads : load;
+				std::cout << ' ' << load;
 			}
 
 			/* print stats */
-			statTime += double(interval) / 1000;
-			std::cout << statTime << ' ' << statMaxFreq << ' '
-			          << statSumRecloads << ' ' << statMaxRecloads << ' '
-			          << statSumLoads << ' ' << statMaxLoads << '\n';
+			std::cout << ' ' << statMaxFreq
+			          << ' ' << statSumRecloads
+			          << ' ' << statMaxRecloads
+			          << ' ' << statSumLoads
+			          << ' ' << statMaxLoads << '\n';
 
 			/* sleep */
 			std::this_thread::sleep_until(time += ms{interval});
