@@ -383,9 +383,9 @@ class Emulator {
 		/* output headers */
 		std::cout << "time[s]";
 		for (int i = 0; i < this->ncpu; ++i) {
-			std::cout << " core" << i << ".freq[Mhz]"
-			          << " core" << i << ".recload"
-			          << " core" << i << ".load";
+			std::cout << " cpu." << i << ".freq[Mhz]"
+			          << " cpu." << i << ".recload"
+			          << " cpu." << i << ".load";
 		}
 		std::cout << " max(freqs)[MHz] sum(recloads) max(recloads) sum(loads) max(loads)\n"
 		          << std::fixed << std::setprecision(3);
