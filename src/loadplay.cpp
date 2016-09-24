@@ -383,7 +383,7 @@ class Emulator {
 		/* output headers */
 		std::cout << "time[s]";
 		for (int i = 0; i < this->ncpu; ++i) {
-			std::cout << " cpu." << i << ".freq[Mhz]"
+			std::cout << " cpu." << i << ".freq[MHz]"
 			          << " cpu." << i << ".recload"
 			          << " cpu." << i << ".load";
 		}
