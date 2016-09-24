@@ -85,6 +85,7 @@ class SysctlValue {
 	std::mutex mutable mtx;
 	unsigned int type;
 	std::string value;
+	std::function<std::string(std::string &&)> onSet;
 
 	template <typename T>
 	int doGet(T * dst, size_t & size) const {
@@ -111,30 +112,36 @@ class SysctlValue {
 	}
 
 	public:
-	SysctlValue() : type{0}, value{""} {}
+	SysctlValue() : type{0}, value{""}, onSet{nullptr} {}
 
 	SysctlValue(SysctlValue const & copy) {
 		std::lock_guard<std::mutex> const lock{copy.mtx};
 		this->type = copy.type;
 		this->value = copy.value;
+		this->onSet = copy.onSet;
 	}
 
 	SysctlValue(SysctlValue && move) :
-	    type{move.type}, value{std::move(move.value)} {}
+	    type{move.type}, value{std::move(move.value)},
+	    onSet{move.onSet} {}
 
-	SysctlValue(unsigned int type, std::string const & value) :
-	    type{type}, value{value} {}
+	SysctlValue(unsigned int type, std::string const & value,
+	            std::function<std::string(std::string &&)> const callback
+	            = nullptr) :
+	    type{type}, value{value}, onSet{callback} {}
 
 	SysctlValue & operator =(SysctlValue const & copy) {
 		std::lock_guard<std::mutex> const lock{copy.mtx};
 		this->type = copy.type;
 		this->value = copy.value;
+		this->onSet = copy.onSet;
 		return *this;
 	}
 
 	SysctlValue & operator =(SysctlValue && move) {
 		this->type = move.type;
 		this->value = std::move(move.value);
+		this->onSet = move.onSet;
 		return *this;
 	}
 
@@ -213,6 +220,9 @@ class SysctlValue {
 		default:
 			return -1;
 		}
+		if (this->onSet) {
+			this->value = this->onSet(std::move(this->value));
+		}
 		return 0;
 	}
 
@@ -225,6 +235,10 @@ class SysctlValue {
 	void set(T const value) {
 		std::lock_guard<std::mutex> const lock{this->mtx};
 		this->value = to_string(value);
+	}
+
+	void notifyOnSet(std::function<std::string(std::string &&)> const callback) {
+		this->onSet = callback;
 	}
 };
 
@@ -316,28 +330,11 @@ class Emulator {
 	std::unique_ptr<unsigned long[]> sum{new unsigned long[CPUSTATES * ncpu]{}};
 	std::unique_ptr<unsigned long[]> carry{new unsigned long[ncpu]{}};
 	size_t const size = CPUSTATES * ncpu * sizeof(unsigned long);
-	std::unique_ptr<std::vector<unsigned long>[]> levels{new std::vector<unsigned long>[ncpu]{}};
-
-	/**
-	 * Fix core frequencies to the available frequency levels.
-	 */
-	void fixFreqs() {
-		for (int i = 0; i < this->ncpu; ++i) {
-			auto const freq = this->freqs[i]->get<unsigned int>();
-			auto diff = freq + 1000000;
-			for (auto lvl : this->levels[i]) {
-				auto lvldiff = (lvl > freq ? lvl - freq : freq - lvl);
-				if (lvldiff < diff) {
-					diff = lvldiff;
-					this->freqs[i]->set(lvl);
-				}
-			}
-		}
-	}
 
 	public:
 	Emulator() {
 		/* get freq and freq_levels sysctls */
+		std::vector<unsigned long> freqLevels{};
 		for (int i = 0; i < this->ncpu; ++i) {
 			/* get freqency handler */
 			char name[40];
@@ -362,17 +359,32 @@ class Emulator {
 				              .get<std::string>();
 				levels = std::regex_replace(levels, "/[0-9]*"_r, "");
 				std::istringstream levelstream{levels};
+				freqLevels.clear();
 				for (unsigned long level; levelstream.good();) {
 					levelstream >> level;
-					this->levels[i].push_back(level);
+					freqLevels.push_back(level);
 				}
 			} catch (std::out_of_range &) {
 				if (i == 0) {
 					std::cerr << "TODO WTF\n";
 					throw;
 				}
-				this->levels[i] = this->levels[i - 1];
 			}
+
+			this->freqs[i]->notifyOnSet([freqLevels](std::string && value) {
+				int freq;
+				std::istringstream{value} >> freq;
+				auto result = freq;
+				auto diff = freq + 1000000;
+				for (auto lvl : freqLevels) {
+					auto lvldiff = (lvl > freq ? lvl - freq : freq - lvl);
+					if (lvldiff < diff) {
+						diff = lvldiff;
+						result = lvl;
+					}
+				}
+				return (std::ostringstream{} << result).str();
+			});
 		}
 
 		/* initialise kern.cp_times buffer */
@@ -396,8 +408,6 @@ class Emulator {
 		auto time = std::chrono::steady_clock::now();
 		for (uint64_t interval;
 		     !*die && (std::cin >> interval).good();) {
-			/* align freqs to freq_levels */
-			fixFreqs();
 			/* reporting variables */
 			double statSumRecloads = 0.;
 			double statMaxRecloads = 0.;
