@@ -60,13 +60,35 @@ using sys::ctl::make_Once;
  * The global state.
  */
 struct {
-	bool verbose{false};
-	ms duration{30000};
-	ms interval{25};
+	bool verbose{false};  /**< Verbosity flag. */
+	ms duration{30000};   /**< Recording duration in ms. */
+	ms interval{25};      /**< Recording sample interval in ms. */
+
+	/**
+	 * The output file stream to use if an \ref outfilename is
+	 * provided on the CLI.
+	 */
 	std::ofstream outfile{};
+
+	/**
+	 * A pointer to the stream to use for output, either std::cout
+	 * or \ref outfile.
+	 */
 	std::ostream * out = &std::cout;
+
+	/**
+	 * The user provided output file name.
+	 */
 	char const * outfilename{nullptr};
+
+	/**
+	 * The PID file location for clock frequency daemons.
+	 */
 	char const * pidfilename{POWERD_PIDFILE};
+
+	/**
+	 * The number of CPU cores/threads.
+	 */
 	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{1U, {CTL_HW, HW_NCPU}};
 } g;
 
