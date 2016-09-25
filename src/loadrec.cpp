@@ -21,6 +21,7 @@
 #include <memory>    /* std::unique_ptr */
 
 #include <sys/resource.h>  /* CPUSTATES */
+#include <sys/stat.h>      /* stat() */
 
 /**
  * File local scope.
@@ -65,6 +66,7 @@ struct {
 	std::ofstream outfile{};
 	std::ostream * out = &std::cout;
 	char const * outfilename{nullptr};
+	char const * pidfilename{POWERD_PIDFILE};
 	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{1U, {CTL_HW, HW_NCPU}};
 } g;
 
@@ -76,6 +78,7 @@ enum class OE {
 	IVAL_DURATION,   /**< Set the duration of the recording */
 	IVAL_POLL,       /**< Set polling interval */
 	FILE_OUTPUT,     /**< Set output file */
+	FILE_PID,        /**< Set PID file */
 	FLAG_VERBOSE,    /**< Verbose output on stderr */
 	OPT_UNKNOWN,     /**< Obligatory */
 	OPT_NOOPT,       /**< Obligatory */
@@ -98,6 +101,7 @@ Option<OE> const OPTIONS[]{
 	{OE::IVAL_DURATION, 'd', "duration", "ival", "The duration of the recording"},
 	{OE::IVAL_POLL,     'p', "poll",     "ival", "The polling interval"},
 	{OE::FILE_OUTPUT,   'o', "output",   "file", "Output to file"},
+	{OE::FILE_PID,      'P', "pid",      "file", "PID file of the local clock frequency daemon"},
 };
 
 /**
@@ -116,6 +120,10 @@ inline void verbose(std::string const & msg) {
  * Set up output to the given file.
  */
 void init() {
+	for (struct stat dummy{}; 0 == stat(g.pidfilename, &dummy);) {
+		fail(Exit::EPID, errno,
+		     "please record without a clock control daemon running, pidfile encountered: "_s + POWERD_PIDFILE);
+	}
 	if (g.outfilename) {
 		g.outfile.open(g.outfilename);
 		if (!g.outfile.good()) {
@@ -150,6 +158,9 @@ void read_args(int const argc, char const * const argv[]) {
 		break;
 	case OE::FILE_OUTPUT:
 		g.outfilename = getopt[1];
+		break;
+	case OE::FILE_PID:
+		g.pidfilename = getopt[1];
 		break;
 	case OE::OPT_UNKNOWN:
 	case OE::OPT_NOOPT:
