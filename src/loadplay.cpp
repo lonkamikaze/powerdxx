@@ -1,11 +1,19 @@
-#include <iostream>
-#include <iomanip>
+/** \file
+ * Implements a library intended to be injected into a clock frequency
+ * deamon via LD_PRELOAD.
+ *
+ * This library reads instructions from std::cin and outputs statistics
+ * about the hijacked process on std::cout.
+ */
+
+#include <iostream>  /* std::cin, std::cout, std::cerr */
+#include <iomanip>   /* std::fixed, std::setprecision */
 #include <unordered_map>
 #include <map>
 #include <string>
 #include <regex>
-#include <sstream>
-#include <memory>
+#include <sstream>   /* std::ostringstream, std::istringstream */
+#include <memory>    /* std::unique_ptr */
 #include <thread>
 #include <exception>
 #include <mutex>
@@ -13,15 +21,15 @@
 #include <vector>
 #include <atomic>
 
-#include <cstring>
-#include <cassert>
+#include <cstring>   /* strncmp() */
+#include <cassert>   /* assert() */
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #include <sys/resource.h>  /* CPUSTATES */
 #include <libutil.h>       /* struct pidfh */
 
-#include <dlfcn.h>
+#include <dlfcn.h>         /* dlfung() */
 #include <unistd.h>        /* getpid() */
 #include <signal.h>        /* kill() */
 
@@ -29,6 +37,9 @@
 #include "constants.hpp"
 #include "fixme.hpp"
 
+/**
+ * File local scope.
+ */
 namespace {
 
 using constants::CP_TIMES;
@@ -43,21 +54,66 @@ using types::ms;
 
 using fixme::to_string;
 
-template <size_t Size, typename... Args>
+/**
+ * Safe wrapper around strncmp, which automatically determines the
+ * buffer size of s2.
+ *
+ * @tparam Size
+ *	The size of the buffer s2
+ * @param s1,s2
+ *	The strings to compare
+ * @retval 0
+ *	Strings are equal
+ * @retval !0
+ *	Strings are not equal
+ */
+template <size_t Size>
 inline int strcmp(char const * const s1, char const (&s2)[Size]) {
 	return strncmp(s1, s2, Size);
 }
 
+/**
+ * User defined literal for regular expressions.
+ *
+ * @param str,len
+ *	The literal string and its length
+ * @return
+ *	A regular expression
+ */
 inline std::regex operator "" _r(char const * const str, size_t const len) {
 	return {str, len, std::regex::ECMAScript};
 }
 
+/**
+ * Represents MIB, but wraps it to provide the necessary operators
+ * to use it as an std::map key.
+ */
 struct mib_t {
+	/**
+	 * The mib values.
+	 */
 	int mibs[CTL_MAXNAME];
 
+	/**
+	 * Construct a mib with the given number of arguments.
+	 *
+	 * @tparam Ints
+	 *	A list of integer types
+	 * @param ints
+	 *	A list of integers to create a mib from
+	 */
 	template <typename... Ints>
 	constexpr mib_t(Ints const... ints) : mibs{ints...} {}
 
+	/**
+	 * Equality operator required by std::map.
+	 *
+	 * @param op
+	 *	Another mib_t instance
+	 * @return
+	 *	Whether all values in this and the given mib are
+	 *	equal
+	 */
 	bool operator ==(mib_t const & op) const {
 		for (size_t i = 0; i < CTL_MAXNAME; ++i) {
 			if (this->mibs[i] != op[i]) {
@@ -67,6 +123,14 @@ struct mib_t {
 		return true;
 	}
 
+	/**
+	 * Less than operator required by std::map.
+	 *
+	 * @param op
+	 *	Another mib_t instance
+	 * @return
+	 *	Whether this mib is less than the given one
+	 */
 	bool operator < (mib_t const & op) const {
 		for (size_t i = 0; i < CTL_MAXNAME; ++i) {
 			if (this->mibs[i] != op[i]) {
@@ -76,7 +140,20 @@ struct mib_t {
 		return false;
 	}
 
+	/**
+	 * Cast to `int *` for value access.
+	 *
+	 * @return
+	 *	A pointer to mibs
+	 */
 	operator int *() { return mibs; }
+
+	/**
+	 * Cast to `int const *` for value access.
+	 *
+	 * @return
+	 *	A pointer to mibs
+	 */
 	operator int const *() const { return mibs; }
 };
 
