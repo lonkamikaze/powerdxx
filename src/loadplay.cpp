@@ -319,6 +319,17 @@ class SysctlValue {
 		return 0;
 	}
 
+	int get(char * dst, size_t & size) const {
+		lock_guard const lock{this->mtx};
+		auto const strsize = this->value.size();
+		size = std::min(strsize, size - 1);
+		for (size_t i = 0; i < size; ++i) { dst[i] = value[i]; }
+		dst[size] = 0;
+		if (size++ <= strsize) { return 0; }
+		errno = ENOMEM;
+		return -1;
+	}
+
 	template <typename T>
 	T get() const {
 		lock_guard const lock{this->mtx};
@@ -329,24 +340,12 @@ class SysctlValue {
 		return result;
 	}
 
-	int get(void * dst, size_t & size) const try {
+	int get(void * dst, size_t & size) const {
 		lock_guard const lock{this->mtx};
 
 		switch (this->type) {
 		case CTLTYPE_STRING: {
-			auto const strsize = this->value.size();
-			size_t i = 0;
-			for (; i < strsize; ++i) {
-				if (i + 1 >= size) {
-					static_cast<char *>(dst)[i] = 0;
-					errno = ENOMEM;
-					return -1;
-				}
-				static_cast<char *>(dst)[i] = value[i];
-			}
-			static_cast<char *>(dst)[i] = 0;
-			size = i + 1;
-			return 0;
+			return this->get(static_cast<char *>(dst), size);
 		} case CTLTYPE_INT:
 			return this->get(static_cast<int *>(dst), size);
 		case CTLTYPE_LONG:
@@ -354,8 +353,6 @@ class SysctlValue {
 		default:
 			return -1;
 		}
-	} catch (int e) {
-		return e;
 	}
 
 	template <typename T>
