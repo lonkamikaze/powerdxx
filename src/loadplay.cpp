@@ -159,40 +159,26 @@ struct mib_t {
 
 class SysctlValue {
 	private:
-	std::mutex mutable mtx;
+	std::recursive_mutex mutable mtx;
+	typedef std::lock_guard<decltype(mtx)> lock_guard;
 	unsigned int type;
 	std::string value;
-	std::function<std::string(std::string &&)> onSet;
+	typedef std::function<void(SysctlValue &)> callback_function;
+	bool onSetCalled{false};
+	callback_function onSet;
 
-	template <typename T>
-	int doGet(T * dst, size_t & size) const {
-		std::istringstream stream{this->value};
-		size_t i = 0;
-		for (; stream.good(); ++i) {
-			if ((i + 1) * sizeof(T) > size) {
-				errno = ENOMEM;
-				return -1;
-			}
-			stream >> dst[i];
+	void notifyOnSet() {
+		if (this->onSetCalled) {
+			return;
 		}
-		size = i * sizeof(T);
-		return 0;
-	}
-
-	template <typename T>
-	void doSet(T const * const newp, size_t newlen) {
-		std::ostringstream stream;
-		for (size_t i = 0; i < newlen / sizeof(T); ++i) {
-			stream << (i ? " " : "") << newp[i];
-		}
-		this->value = stream.str();
+		this->onSet(*this);
 	}
 
 	public:
 	SysctlValue() : type{0}, value{""}, onSet{nullptr} {}
 
 	SysctlValue(SysctlValue const & copy) {
-		std::lock_guard<std::mutex> const lock{copy.mtx};
+		lock_guard const copylock{copy.mtx};
 		this->type = copy.type;
 		this->value = copy.value;
 		this->onSet = copy.onSet;
@@ -203,12 +189,12 @@ class SysctlValue {
 	    onSet{move.onSet} {}
 
 	SysctlValue(unsigned int type, std::string const & value,
-	            std::function<std::string(std::string &&)> const callback
-	            = nullptr) :
+	            callback_function const callback = nullptr) :
 	    type{type}, value{value}, onSet{callback} {}
 
 	SysctlValue & operator =(SysctlValue const & copy) {
-		std::lock_guard<std::mutex> const lock{copy.mtx};
+		lock_guard const copylock{copy.mtx};
+		lock_guard const lock{this->mtx};
 		this->type = copy.type;
 		this->value = copy.value;
 		this->onSet = copy.onSet;
@@ -216,6 +202,7 @@ class SysctlValue {
 	}
 
 	SysctlValue & operator =(SysctlValue && move) {
+		lock_guard const lock{this->mtx};
 		this->type = move.type;
 		this->value = std::move(move.value);
 		this->onSet = move.onSet;
@@ -223,7 +210,7 @@ class SysctlValue {
 	}
 
 	size_t size() const {
-		std::lock_guard<std::mutex> const lock{this->mtx};
+		lock_guard const lock{this->mtx};
 
 		switch (this->type) {
 		case CTLTYPE_STRING:
@@ -241,13 +228,29 @@ class SysctlValue {
 			while ((stream >> value).good()) { ++count; }
 			return count * sizeof(value);
 		} default:
-			throw -1; /* TODO unsupportedType */
+			throw -1;
 		}
 	}
 
 	template <typename T>
+	int get(T * dst, size_t & size) const {
+		lock_guard const lock{this->mtx};
+		std::istringstream stream{this->value};
+		size_t i = 0;
+		for (; stream.good(); ++i) {
+			if ((i + 1) * sizeof(T) > size) {
+				errno = ENOMEM;
+				return -1;
+			}
+			stream >> dst[i];
+		}
+		size = i * sizeof(T);
+		return 0;
+	}
+
+	template <typename T>
 	T get() {
-		std::lock_guard<std::mutex> const lock{this->mtx};
+		lock_guard const lock{this->mtx};
 
 		std::istringstream stream{this->value};
 		T result;
@@ -255,13 +258,14 @@ class SysctlValue {
 		return result;
 	}
 
-	int get(void * dst, size_t & size) const {
-		std::lock_guard<std::mutex> const lock{this->mtx};
+	int get(void * dst, size_t & size) const try {
+		lock_guard const lock{this->mtx};
 
 		switch (this->type) {
 		case CTLTYPE_STRING: {
+			auto const strsize = this->value.size();
 			size_t i = 0;
-			for (; i < this->value.size(); ++i) {
+			for (; i < strsize; ++i) {
 				if (i + 1 >= size) {
 					static_cast<char *>(dst)[i] = 0;
 					errno = ENOMEM;
@@ -273,61 +277,87 @@ class SysctlValue {
 			size = i + 1;
 			return 0;
 		} case CTLTYPE_INT:
-			return this->doGet(static_cast<int *>(dst), size);
+			return this->get(static_cast<int *>(dst), size);
 		case CTLTYPE_LONG:
-			return this->doGet(static_cast<long *>(dst), size);
+			return this->get(static_cast<long *>(dst), size);
 		default:
 			return -1;
 		}
+	} catch (int e) {
+		return e;
+	}
+
+	template <typename T>
+	void set(T const * const newp, size_t newlen) {
+		std::ostringstream stream;
+		for (size_t i = 0; i < newlen / sizeof(T); ++i) {
+			stream << (i ? " " : "") << newp[i];
+		}
+		this->set(stream.str());
 	}
 
 	int set(void const * const newp, size_t newlen) {
-		std::lock_guard<std::mutex> const lock{this->mtx};
-
+		lock_guard const lock{this->mtx};
 		switch (this->type) {
 		case CTLTYPE_STRING:
-			this->value = std::string{static_cast<char const *>(newp), newlen - 1};
+			this->set(std::string{static_cast<char const *>(newp), newlen - 1});
 			break;
 		case CTLTYPE_INT:
-			this->doSet(static_cast<int const *>(newp), newlen);
+			this->set(static_cast<int const *>(newp), newlen);
 			break;
 		case CTLTYPE_LONG:
-			this->doSet(static_cast<long const *>(newp), newlen);
+			this->set(static_cast<long const *>(newp), newlen);
 			break;
 		default:
 			return -1;
-		}
-		if (this->onSet) {
-			this->value = this->onSet(std::move(this->value));
 		}
 		return 0;
 	}
 
+	void set(std::string && value) {
+		lock_guard const lock{this->mtx};
+		this->value = std::move(value);
+		notifyOnSet();
+	}
+
 	void set(std::string const & value) {
-		std::lock_guard<std::mutex> const lock{this->mtx};
+		lock_guard const lock{this->mtx};
 		this->value = value;
+		notifyOnSet();
 	}
 
 	template <typename T>
 	void set(T const value) {
-		std::lock_guard<std::mutex> const lock{this->mtx};
-		this->value = to_string(value);
+		this->set(to_string(value));
 	}
 
-	void notifyOnSet(std::function<std::string(std::string &&)> const callback) {
+	void registerOnSet(callback_function const & callback) {
+		lock_guard const lock{this->mtx};
 		this->onSet = callback;
 	}
 };
 
 template <>
 std::string SysctlValue::get<std::string>() {
-	std::lock_guard<std::mutex> const lock{this->mtx};
+	lock_guard const lock{this->mtx};
 	return this->value;
+}
+
+inline void warn(std::string const & msg) {
+	std::cerr << "libloadplay: WARNING: " << msg << std::endl;
+}
+
+int sys_results = 0;
+
+inline void fail(std::string const & msg) {
+	sys_results = -1;
+	std::cerr << "libloadplay: ERROR:   " << msg << std::endl;
 }
 
 class {
 	private:
 	std::mutex mutable mtx;
+	typedef std::lock_guard<decltype(mtx)> lock_guard;
 
 	/** name → mib */
 	std::unordered_map<std::string, mib_t> mibs{
@@ -344,21 +374,21 @@ class {
 	std::map<mib_t, SysctlValue> sysctls{
 		{{CTL_HW, HW_MACHINE}, {CTLTYPE_STRING, "hw.machine"}},
 		{{CTL_HW, HW_MODEL},   {CTLTYPE_STRING, "hw.model"}},
-		{{CTL_HW, HW_NCPU},    {CTLTYPE_INT,    "hw.ncpu"}},
-		{{1000},               {CTLTYPE_INT,    ACLINE}},
-		{{1001},               {CTLTYPE_INT,    FREQ}},
-		{{1002},               {CTLTYPE_STRING, FREQ_LEVELS}},
-		{{1003},               {CTLTYPE_LONG,   CP_TIMES}}
+		{{CTL_HW, HW_NCPU},    {CTLTYPE_INT,    "0"}},
+		{{1000},               {CTLTYPE_INT,    "2"}},
+		{{1001},               {CTLTYPE_INT,    "0"}},
+		{{1002},               {CTLTYPE_STRING, ""}},
+		{{1003},               {CTLTYPE_LONG,   ""}}
 	};
 
 	public:
 	void addValue(mib_t const & mib, std::string const & value) {
-		std::lock_guard<std::mutex> const lock{this->mtx};
+		lock_guard const lock{this->mtx};
 		this->sysctls[mib].set(value);
 	}
 
 	void addValue(std::string const & name, std::string const & value) {
-		std::lock_guard<std::mutex> const lock{this->mtx};
+		lock_guard const lock{this->mtx};
 
 		mib_t mib{};
 		try {
@@ -368,7 +398,11 @@ class {
 			auto const expr = "\\.([0-9]*)\\."_r;
 			auto const baseName = std::regex_replace(name, expr, ".%d.");
 			/* get the base mib */
-			mib = this->mibs.at(baseName); /* TODO handle throw */
+			try {
+				mib = this->mibs.at(baseName);
+			} catch (std::out_of_range &) {
+				return warn("unsupported sysctl: "_s + name);
+			}
 			/* get mib numbers */
 			std::smatch match;
 			auto str = name;
@@ -388,12 +422,12 @@ class {
 	}
 
 	mib_t const & getMib(std::string const & op) const {
-		std::lock_guard<std::mutex> const lock{this->mtx};
+		lock_guard const lock{this->mtx};
 		return this->mibs.at(op);
 	}
 
 	SysctlValue & operator [](mib_t const & mib) {
-		std::lock_guard<std::mutex> const lock{this->mtx};
+		lock_guard const lock{this->mtx};
 		return this->sysctls.at(mib);
 	}
 } sysctls{};
@@ -403,7 +437,7 @@ class Emulator {
 	int const ncpu = sysctls[{CTL_HW, HW_NCPU}].get<int>();
 	std::unique_ptr<SysctlValue * []> freqs{new SysctlValue *[ncpu]{}};
 	std::unique_ptr<int[]> freqRefs{new int[ncpu]{}};
-	SysctlValue & cp_times = sysctls[sysctls.getMib("kern.cp_times")];
+	SysctlValue & cp_times = sysctls[sysctls.getMib(CP_TIMES)];
 	std::unique_ptr<unsigned long[]> sum{new unsigned long[CPUSTATES * ncpu]{}};
 	std::unique_ptr<unsigned long[]> carry{new unsigned long[ncpu]{}};
 	size_t const size = CPUSTATES * ncpu * sizeof(unsigned long);
@@ -420,10 +454,12 @@ class Emulator {
 				this->freqs[i] = &sysctls[sysctls.getMib(name)];
 			} catch (std::out_of_range &) {
 				if (i == 0) {
-					std::cerr << "TODO WTF\n";
+					/* should never be reached */
+					fail("missing sysctl: "_s + name);
 					throw;
+				} else {
+					this->freqs[i] = this->freqs[i - 1];
 				}
-				this->freqs[i] = this->freqs[i - 1];
 			}
 
 			/* take current clock frequency as reference */
@@ -443,14 +479,12 @@ class Emulator {
 				}
 			} catch (std::out_of_range &) {
 				if (i == 0) {
-					std::cerr << "TODO WTF\n";
-					throw;
+					/* warning handled in Main::main() */
 				}
 			}
 
-			this->freqs[i]->notifyOnSet([freqLevels](std::string && value) {
-				int freq;
-				std::istringstream{value} >> freq;
+			this->freqs[i]->registerOnSet([freqLevels](SysctlValue & ctl) {
+				auto const freq = ctl.get<int>();
 				auto result = freq;
 				auto diff = freq + 1000000;
 				for (auto lvl : freqLevels) {
@@ -460,13 +494,19 @@ class Emulator {
 						result = lvl;
 					}
 				}
-				return (std::ostringstream{} << result).str();
+				ctl.set(result);
 			});
 		}
 
 		/* initialise kern.cp_times buffer */
 		auto size = this->size;
-		assert(size == cp_times.size());
+		try {
+			if (size != cp_times.size()) {
+				fail("hw.ncpu does not fit the encountered kern.cp_times columns");
+			}
+		} catch (int) {
+			fail("kern.cp_times not initialised");
+		}
 		cp_times.get(sum.get(), size);
 
 		/* output headers */
@@ -480,7 +520,7 @@ class Emulator {
 		          << std::fixed << std::setprecision(3);
 	}
 
-	void operator ()(std::atomic<bool> const * const die) {
+	void operator ()(std::atomic<bool> const * const die) try {
 		double statTime = 0.; /* in seconds */
 		auto time = std::chrono::steady_clock::now();
 		for (uint64_t interval;
@@ -504,6 +544,7 @@ class Emulator {
 					frameSum += ticks;
 					frameLoad += state == CP_IDLE ? 0 : ticks;
 				}
+
 				auto const coreFreq = this->freqs[core]->get<int>();
 				auto const coreRefFreq = this->freqRefs[core];
 
@@ -560,6 +601,8 @@ class Emulator {
 
 		/* tell process to die */
 		kill(getpid(), SIGINT);
+	} catch (std::out_of_range &) {
+		fail("incomplete emulation setup, please check your load record for complete initialisation");
 	}
 };
 
@@ -581,14 +624,60 @@ class Main {
 		}
 
 		/* initialise kern.cp_times */
-		input = input.substr(input.find(' '));
-		sysctls.addValue(std::string{CP_TIMES}, input);
-		this->bgthread = std::thread{Emulator{}, &this->die};
+		try {
+			input = input.substr(input.find(' '));
+			sysctls.addValue(std::string{CP_TIMES}, input);
+		} catch (std::out_of_range &) {
+			fail("kern.cp_times cannot be set, please check your load record");
+			return;
+		}
+
+		/* check for dev.cpu.0.freq */
+		char name[40];
+		sprintf(name, FREQ, 0);
+		try {
+			sysctls.getMib(name);
+		} catch (std::out_of_range &) {
+			fail(""_s + name + " is not set, please check your load record");
+			return;
+		}
+
+		/* check for dev.cpu.0.freq_levels */
+		sprintf(name, FREQ_LEVELS, 0);
+		try {
+			sysctls.getMib(name);
+		} catch (std::out_of_range &) {
+			warn(""_s + name + " is not set, please check your load record");
+		}
+
+
+		/* check for hw.ncpu */
+		if (sysctls[{CTL_HW, HW_NCPU}].get<int>() < 1) {
+			fail("hw.ncpu is not set to a valid value, please check your load record");
+			return;
+		}
+
+		/* check for hw.acpi.acline */
+		try {
+			sysctls.getMib(ACLINE);
+		} catch (std::out_of_range &) {
+			warn(""_s + ACLINE + " is not set, please check your load record");
+		}
+
+		/* start background thread */
+		try {
+			this->bgthread = std::thread{Emulator{}, &this->die};
+		} catch (std::out_of_range &) {
+			fail("failed to start emulator thread");
+			return;
+		}
 	}
 
 	~Main() {
 		this->die = true;
-		this->bgthread.join();
+		if (this->bgthread.joinable()) {
+			this->bgthread.join();
+		}
 	}
 } main{};
 
@@ -628,7 +717,11 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 	}
 
 	if (!oldp && oldlenp) {
-		*oldlenp = sysctls[mib].size();
+		try {
+			*oldlenp = sysctls[mib].size();
+		} catch (int e) {
+			return e;
+		}
 	}
 
 	if (oldp && oldlenp) {
@@ -643,9 +736,10 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 		}
 	}
 
-	return 0;
+	return sys_results;
 } catch (std::out_of_range &) {
-	return orig_sysctl(name, namelen, oldp, oldlenp, newp, newlen);
+	errno = ENOENT;
+	return -1;
 }
 
 int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
@@ -659,9 +753,10 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
 	for (size_t i = 0; i < *sizep; ++i) {
 		mibp[i] = mib[i];
 	}
-	return 0;
+	return sys_results;
 } catch (std::out_of_range &) {
-	return orig_sysctlnametomib(name, mibp, sizep);
+	errno = ENOENT;
+	return -1;
 }
 
 int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
@@ -695,23 +790,24 @@ int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
 	}
 	return sysctl(mib, mibs, oldp, oldlenp, newp, newlen);
 } catch (std::out_of_range &) {
-	return orig_sysctlbyname(name, oldp, oldlenp, newp, newlen);
+	errno = ENOENT;
+	return -1;
 }
 
-int daemon(int, int) { return 0; }
+int daemon(int, int) { return sys_results; }
 
-uid_t geteuid(void) { return 0; }
+uid_t geteuid(void) { return sys_results; }
 
 pidfh * pidfile_open(const char *, mode_t, pid_t *) {
 	return reinterpret_cast<pidfh *>(&pidfile_open);
 }
 
-int pidfile_write(pidfh *) { return 0; }
+int pidfile_write(pidfh *) { return sys_results; }
 
-int pidfile_close(pidfh *) { return 0; }
+int pidfile_close(pidfh *) { return sys_results; }
 
-int pidfile_remove(pidfh *) { return 0; }
+int pidfile_remove(pidfh *) { return sys_results; }
 
-int pidfile_fileno(pidfh const *) { return 0; }
+int pidfile_fileno(pidfh const *) { return sys_results; }
 
 } /* extern "C" */
