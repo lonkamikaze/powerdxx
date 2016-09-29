@@ -257,7 +257,7 @@ class SysctlValue {
 
 	SysctlValue(SysctlValue && move) :
 	    type{move.type}, value{std::move(move.value)},
-	    onSet{move.onSet} {}
+	    onSet{std::move(move.onSet)} {}
 
 	SysctlValue(unsigned int type, std::string const & value,
 	            callback_function const callback = nullptr) :
@@ -320,7 +320,7 @@ class SysctlValue {
 	}
 
 	template <typename T>
-	T get() {
+	T get() const {
 		lock_guard const lock{this->mtx};
 
 		std::istringstream stream{this->value};
@@ -414,7 +414,7 @@ class SysctlValue {
 };
 
 template <>
-std::string SysctlValue::get<std::string>() {
+std::string SysctlValue::get<std::string>() const {
 	lock_guard const lock{this->mtx};
 	return this->value;
 }
