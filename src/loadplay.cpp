@@ -157,22 +157,93 @@ struct mib_t {
 	operator int const *() const { return mibs; }
 };
 
+/**
+ * Implements a recursion safe std::function wrapper.
+ *
+ * The purpose is to prevent recursive calls of a callback function
+ * handle, in cases when a callback function performs actions that
+ * cause a successive call of the callback function.
+ *
+ * To avoid having to return a value when a successive function call
+ * occurs only functions returning void are valid callback functions.
+ *
+ * This is not thread safe.
+ *
+ * @tparam FunctionArgs
+ *	The argument types of the callback function
+ */
+template <typename... FunctionArgs>
+class Callback {
+	public:
+	/**
+	 * The callback function type.
+	 */
+	typedef std::function<void(FunctionArgs...)> function_t;
+
+	private:
+	/**
+	 * Storage for the callback function.
+	 */
+	function_t callback;
+
+	/**
+	 * Set if this handle is currently in use.
+	 */
+	bool called{false};
+
+	public:
+	/**
+	 * Default constructor, creates a non-callable handle.
+	 */
+	Callback() : callback{nullptr} {}
+
+	/**
+	 * Construct from function.
+	 *
+	 * @param callback
+	 *	The callback function
+	 */
+	Callback(function_t const & callback) : callback{callback} {}
+
+	/**
+	 * Construct from temporary function.
+	 *
+	 * @param callback
+	 *	The callback function
+	 */
+	Callback(function_t && callback) : callback{std::move(callback)} {}
+
+	/**
+	 * Forward call to callback functions.
+	 *
+	 * @param args
+	 *	The arguments to the callback function
+	 * @throws std::bad_function_call
+	 *	In case this handler was default constructed or constructed
+	 *	from a nullptr
+	 */
+	void operator ()(FunctionArgs... args) {
+		if (!this->callback) {
+			return;
+		}
+		if (this->called) {
+			return;
+		}
+		this->called = true;
+		this->callback(args...);
+		this->called = false;
+	}
+};
+
 class SysctlValue {
 	private:
 	std::recursive_mutex mutable mtx;
 	typedef std::lock_guard<decltype(mtx)> lock_guard;
 	unsigned int type;
 	std::string value;
-	typedef std::function<void(SysctlValue &)> callback_function;
-	bool onSetCalled{false};
-	callback_function onSet;
 
-	void notifyOnSet() {
-		if (this->onSetCalled) {
-			return;
-		}
-		this->onSet(*this);
-	}
+	Callback<SysctlValue &> onSet;
+	typedef decltype(onSet)::function_t callback_function;
 
 	public:
 	SysctlValue() : type{0}, value{""}, onSet{nullptr} {}
@@ -205,7 +276,7 @@ class SysctlValue {
 		lock_guard const lock{this->mtx};
 		this->type = move.type;
 		this->value = std::move(move.value);
-		this->onSet = move.onSet;
+		this->onSet = std::move(move.onSet);
 		return *this;
 	}
 
@@ -317,18 +388,23 @@ class SysctlValue {
 	void set(std::string && value) {
 		lock_guard const lock{this->mtx};
 		this->value = std::move(value);
-		notifyOnSet();
+		this->onSet(*this);
 	}
 
 	void set(std::string const & value) {
 		lock_guard const lock{this->mtx};
 		this->value = value;
-		notifyOnSet();
+		this->onSet(*this);
 	}
 
 	template <typename T>
 	void set(T const value) {
 		this->set(to_string(value));
+	}
+
+	void registerOnSet(callback_function && callback) {
+		lock_guard const lock{this->mtx};
+		this->onSet = std::move(callback);
 	}
 
 	void registerOnSet(callback_function const & callback) {
