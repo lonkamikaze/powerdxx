@@ -247,7 +247,7 @@ class SysctlValue {
 	/**
 	 * A stackable mutex.
 	 *
-	 * nice for exposing methods publicly* and still let them
+	 * nice for exposing methods publicly and still let them
 	 * allow accessing each other.
 	 */
 	std::recursive_mutex mutable mtx;
@@ -599,23 +599,51 @@ std::string SysctlValue::get<std::string>() const {
 	return this->value;
 }
 
+/**
+ * Print a warning.
+ *
+ * @param msg
+ *	The warning message
+ */
 inline void warn(std::string const & msg) {
 	std::cerr << "libloadplay: WARNING: " << msg << std::endl;
 }
 
+/**
+ * The success return value of intercepted functions.
+ */
 int sys_results = 0;
 
+/**
+ * This prints an error message and sets sys_results to make the hijacked
+ * process fail.
+ *
+ * @param msg
+ *	The error message
+ */
 inline void fail(std::string const & msg) {
 	sys_results = -1;
 	std::cerr << "libloadplay: ERROR:   " << msg << std::endl;
 }
 
+/**
+ * An anonymous class representing the sysctl table for this library.
+ */
 class {
 	private:
+	/**
+	 * A simple mutex.
+	 */
 	std::mutex mutable mtx;
+
+	/**
+	 * The appropriate lock guard type for mtx.
+	 */
 	typedef std::lock_guard<decltype(mtx)> lock_guard;
 
-	/** name → mib */
+	/**
+	 * Maps name → mib.
+	 */
 	std::unordered_map<std::string, mib_t> mibs{
 		{"hw.machine", {CTL_HW, HW_MACHINE}},
 		{"hw.model",   {CTL_HW, HW_MODEL}},
@@ -626,7 +654,9 @@ class {
 		{CP_TIMES,     {1003}}
 	};
 
-	/** mib → (type, value) */
+	/**
+	 * Maps mib → (type, value).
+	 */
 	std::map<mib_t, SysctlValue> sysctls{
 		{{CTL_HW, HW_MACHINE}, {CTLTYPE_STRING, "hw.machine"}},
 		{{CTL_HW, HW_MODEL},   {CTLTYPE_STRING, "hw.model"}},
@@ -638,11 +668,27 @@ class {
 	};
 
 	public:
+	/**
+	 * Add a value to the sysctls map.
+	 *
+	 * @param mib
+	 *	The mib to add the value for
+	 * @param value
+	 *	The value to store
+	 */
 	void addValue(mib_t const & mib, std::string const & value) {
 		lock_guard const lock{this->mtx};
 		this->sysctls[mib].set(value);
 	}
 
+	/**
+	 * Add a value to the sysctls map.
+	 *
+	 * @param name
+	 *	The symbolic name of the mib to add the value for
+	 * @param value
+	 *	The value to store
+	 */
 	void addValue(std::string const & name, std::string const & value) {
 		lock_guard const lock{this->mtx};
 
@@ -677,11 +723,27 @@ class {
 		this->sysctls[mib].set(value);
 	}
 
-	mib_t const & getMib(std::string const & op) const {
+	/**
+	 * Returns a mib for a given symbolic name.
+	 *
+	 * @param name
+	 *	The MIB name
+	 * @return
+	 *	The MIB
+	 */
+	mib_t const & getMib(std::string const & name) const {
 		lock_guard const lock{this->mtx};
-		return this->mibs.at(op);
+		return this->mibs.at(name);
 	}
 
+	/**
+	 * Returns a reference to a sysctl value container.
+	 *
+	 * @param mib
+	 *	The MIB to return the reference for
+	 * @return
+	 *	A SysctlValue reference
+	 */
 	SysctlValue & operator [](mib_t const & mib) {
 		lock_guard const lock{this->mtx};
 		return this->sysctls.at(mib);
