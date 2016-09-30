@@ -235,19 +235,63 @@ class Callback {
 	}
 };
 
+/**
+ * Instances of this class represents a specific sysctl value.
+ *
+ * There should only be one instance of this class per MIB.
+ *
+ * Instances are thread safe.
+ */
 class SysctlValue {
 	private:
+	/**
+	 * A stackable mutex.
+	 *
+	 * nice for exposing methods publicly* and still let them
+	 * allow accessing each other.
+	 */
 	std::recursive_mutex mutable mtx;
+
+	/**
+	 * Lock guard type, fitting the mutex.
+	 */
 	typedef std::lock_guard<decltype(mtx)> lock_guard;
+
+	/**
+	 * The sysctl type.
+	 */
 	unsigned int type;
+
+	/**
+	 * The value of the sysctl.
+	 *
+	 * This is stored as a string and converted to the appropriate
+	 * type by the set() and get() methods.
+	 */
 	std::string value;
 
+	/**
+	 * Callback function handle.
+	 */
 	Callback<SysctlValue &> onSet;
+
+	/**
+	 * Callback function type.
+	 */
 	typedef decltype(onSet)::function_t callback_function;
 
 	public:
+	/**
+	 * Default constructor.
+	 */
 	SysctlValue() : type{0}, value{""}, onSet{nullptr} {}
 
+	/**
+	 * Copy constructor.
+	 *
+	 * @param copy
+	 *	The instance to copy
+	 */
 	SysctlValue(SysctlValue const & copy) {
 		lock_guard const copylock{copy.mtx};
 		this->type = copy.type;
@@ -255,14 +299,39 @@ class SysctlValue {
 		this->onSet = copy.onSet;
 	}
 
+	/**
+	 * Move constructor.
+	 *
+	 * @param move
+	 *	The instance to move
+	 */
 	SysctlValue(SysctlValue && move) :
 	    type{move.type}, value{std::move(move.value)},
 	    onSet{std::move(move.onSet)} {}
 
+	/**
+	 * Construct from a type, value and optionally callback tuple.
+	 *
+	 * @param type
+	 *	The CTLTYPE
+	 * @param value
+	 *	A string representation of the value
+	 * @param callback
+	 *	A callback function that is called for each set()
+	 *	call
+	 */
 	SysctlValue(unsigned int type, std::string const & value,
 	            callback_function const callback = nullptr) :
 	    type{type}, value{value}, onSet{callback} {}
 
+	/**
+	 * Copy assignment operator.
+	 *
+	 * @param copy
+	 *	The instance to copy
+	 * @return
+	 *	A self reference
+	 */
 	SysctlValue & operator =(SysctlValue const & copy) {
 		lock_guard const copylock{copy.mtx};
 		lock_guard const lock{this->mtx};
@@ -272,6 +341,14 @@ class SysctlValue {
 		return *this;
 	}
 
+	/**
+	 * Move assignment operator.
+	 *
+	 * @param move
+	 *	The instance to move
+	 * @return
+	 *	A self reference
+	 */
 	SysctlValue & operator =(SysctlValue && move) {
 		lock_guard const lock{this->mtx};
 		this->type = move.type;
@@ -280,6 +357,14 @@ class SysctlValue {
 		return *this;
 	}
 
+	/**
+	 * Returns the required storage size according to the CTLTYPE.
+	 *
+	 * @return
+	 *	The required buffer size to hold the values.
+	 * @throws int
+	 *	Throws -1 if the current CTLTYPE is not implemented.
+	 */
 	size_t size() const {
 		lock_guard const lock{this->mtx};
 
@@ -303,6 +388,19 @@ class SysctlValue {
 		}
 	}
 
+	/**
+	 * Copy a list of values into the given buffer.
+	 *
+	 * @tparam T
+	 *	The type of the values to extract
+	 * @param dst,size
+	 *	The destination buffer and size
+	 * @retval 0
+	 *	On success
+	 * @retval -1
+	 *	On failure to fit all values into the taget buffer,
+	 *	also sets errno=ENOMEM
+	 */
 	template <typename T>
 	int get(T * dst, size_t & size) const {
 		lock_guard const lock{this->mtx};
@@ -319,6 +417,17 @@ class SysctlValue {
 		return 0;
 	}
 
+	/**
+	 * Copy a C string into the given buffer.
+	 *
+	 * @param dst,size
+	 *	The destination buffer and size
+	 * @retval 0
+	 *	On success
+	 * @retval -1
+	 *	On failure to fit all values into the taget buffer,
+	 *	also sets errno=ENOMEM
+	 */
 	int get(char * dst, size_t & size) const {
 		lock_guard const lock{this->mtx};
 		auto const strsize = this->value.size();
@@ -330,6 +439,14 @@ class SysctlValue {
 		return -1;
 	}
 
+	/**
+	 * Returns a single value.
+	 *
+	 * @tparam T
+	 *	The type of the value
+	 * @return
+	 *	The value
+	 */
 	template <typename T>
 	T get() const {
 		lock_guard const lock{this->mtx};
@@ -340,6 +457,18 @@ class SysctlValue {
 		return result;
 	}
 
+
+	/**
+	 * Copy a list of values into the given buffer.
+	 *
+	 * @param dst,size
+	 *	The destination buffer and size
+	 * @retval 0
+	 *	On success
+	 * @retval -1
+	 *	On failure to fit all values into the taget buffer,
+	 *	also sets errno=ENOMEM
+	 */
 	int get(void * dst, size_t & size) const {
 		lock_guard const lock{this->mtx};
 
@@ -355,6 +484,14 @@ class SysctlValue {
 		}
 	}
 
+	/**
+	 * Set this value to the values in the given buffer.
+	 *
+	 * @tparam T
+	 *	The type of the values
+	 * @param newp,newlen
+	 *	The source buffer and size
+	 */
 	template <typename T>
 	void set(T const * const newp, size_t newlen) {
 		std::ostringstream stream;
@@ -364,6 +501,14 @@ class SysctlValue {
 		this->set(stream.str());
 	}
 
+	/**
+	 * Set this value to the values in the given buffer.
+	 *
+	 * The buffer will be treated as an array of CTLTYPE values.
+	 *
+	 * @param newp,newlen
+	 *	The source buffer and size
+	 */
 	int set(void const * const newp, size_t newlen) {
 		lock_guard const lock{this->mtx};
 		switch (this->type) {
@@ -382,34 +527,72 @@ class SysctlValue {
 		return 0;
 	}
 
+	/**
+	 * Move a string to the value.
+	 *
+	 * @param value
+	 *	The new value
+	 */
 	void set(std::string && value) {
 		lock_guard const lock{this->mtx};
 		this->value = std::move(value);
 		this->onSet(*this);
 	}
 
+	/**
+	 * Copy a string to the value.
+	 *
+	 * @param value
+	 *	The new value
+	 */
 	void set(std::string const & value) {
 		lock_guard const lock{this->mtx};
 		this->value = value;
 		this->onSet(*this);
 	}
 
+	/**
+	 * Set the value.
+	 *
+	 * @tparam T
+	 *	The value type
+	 * @param value
+	 *	The value to set
+	 */
 	template <typename T>
-	void set(T const value) {
+	void set(T const & value) {
 		this->set(to_string(value));
 	}
 
+	/**
+	 * Register a callback function.
+	 *
+	 * @param callback
+	 *	The function to move to the callback handler
+	 */
 	void registerOnSet(callback_function && callback) {
 		lock_guard const lock{this->mtx};
 		this->onSet = std::move(callback);
 	}
 
+	/**
+	 * Register a callback function.
+	 *
+	 * @param callback
+	 *	The function to copy to the callback handler
+	 */
 	void registerOnSet(callback_function const & callback) {
 		lock_guard const lock{this->mtx};
 		this->onSet = callback;
 	}
 };
 
+/**
+ * Returns a copy of the value string.
+ *
+ * @return
+ *	The value
+ */
 template <>
 std::string SysctlValue::get<std::string>() const {
 	lock_guard const lock{this->mtx};
