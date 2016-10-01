@@ -1007,11 +1007,9 @@ class Main {
 extern "C" {
 
 typedef int (*fn_sysctl)(const int*, u_int, void*, size_t*, const void*, size_t);
-typedef int (*fn_sysctlbyname)(const char*, void*, size_t*, const void*, size_t);
 typedef int (*fn_sysctlnametomib)(const char*, int*, size_t*);
 
 static fn_sysctl           orig_sysctl = nullptr;
-static fn_sysctlbyname     orig_sysctlbyname = nullptr;
 static fn_sysctlnametomib  orig_sysctlnametomib = nullptr;
 
 int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
@@ -1082,9 +1080,6 @@ int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
 	#ifdef EBUG
 	fprintf(stderr, "sysctlbyname(%s)\n", name);
 	#endif /* EBUG */
-	if (!orig_sysctlbyname) {
-		orig_sysctlbyname = (fn_sysctlbyname)dlfunc(RTLD_NEXT, "sysctlbyname");
-	}
 	if (!orig_sysctlnametomib) {
 		orig_sysctlnametomib = (fn_sysctlnametomib)dlfunc(RTLD_NEXT, "sysctlnametomib");
 	}
