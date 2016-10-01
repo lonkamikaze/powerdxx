@@ -95,14 +95,40 @@ struct Core {
 	sys::ctl::SysctlSync<mhz_t, 4> freq{{}};
 
 	/**
+	 * The kern.cpu.N.freq value for the current load sample.
+	 *
+	 * This is updated by update_loads().
+	 */
+	mhz_t sample_freq{0};
+
+	/**
 	 * The core that controls the frequency for this core.
 	 */
 	coreid_t controller{-1};
 
 	/**
-	 * The load during the last frame, a value in the range [0, 1024].
+	 * For the controlling core this is set to the group loadsum.
+	 *
+	 * This is reset by update_loads() and set by update_group_loads().
 	 */
-	cptime_t load{0};
+	mhz_t group_loadsum{0};
+
+	/**
+	 * The sum of all load samples.
+	 *
+	 * This is updated by update_loads().
+	 */
+	mhz_t loadsum{0};
+
+	/**
+	 * A ring buffer of load samples for this core.
+	 *
+	 * Each load sample is weighted with the core frequency at
+	 * which it was taken.
+	 *
+	 * This is updated by update_loads().
+	 */
+	std::unique_ptr<mhz_t[]> loads;
 
 	/**
 	 * The minimum core clock rate.
@@ -127,11 +153,9 @@ struct {
 	int signal{0};
 
 	/**
-	 * The number of cp_times samples to take.
-	 *
-	 * At least 2 are required.
+	 * The number of load samples to take.
 	 */
-	size_t samples{5};
+	size_t samples{4};
 
 	/**
 	 * The polling interval.
@@ -208,12 +232,6 @@ struct {
 	sys::ctl::Sysctl<2> cp_times_ctl{};
 
 	/**
-	 * This is a ring buffer to be allocated with ncpu × samples
-	 * instances of cptime_t[CPUSTATES].
-	 */
-	std::unique_ptr<cptime_t[][CPUSTATES]> cp_times;
-
-	/**
 	 * This buffer is to be allocated with ncpu instances of the
 	 * Core struct to store the management information of every
 	 * core.
@@ -271,6 +289,7 @@ void init() {
 	g.cores = std::unique_ptr<Core[]>(new Core[g.ncpu]);
 	coreid_t controller = -1;
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
+		/* get the frequency handler */
 		char name[40];
 		sprintf(name, FREQ, core);
 		try {
@@ -287,6 +306,9 @@ void init() {
 			}
 		}
 		g.cores[core].controller = controller;
+
+		/* create loads buffer */
+		g.cores[core].loads = std::unique_ptr<mhz_t[]>{new mhz_t[g.samples]{}};
 	}
 
 	/* set user frequency boundaries */
@@ -331,33 +353,62 @@ void init() {
 
 	/* MIB for kern.cp_times */
 	g.cp_times_ctl = {CP_TIMES};
-	/* create buffer for system load times */
-	g.cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
-	    new cptime_t[g.samples * g.ncpu][CPUSTATES]{});
 }
 
 /**
- * Updates the cp_times ring buffer and the load times for each core.
+ * Updates the cp_times ring buffer and computes the load average for
+ * each core.
  */
-void update_cp_times() {
+void update_loads() {
+	static size_t cp_times_sample = 0;
+	/* create buffer for system load times */
+	static std::unique_ptr<cptime_t[][CPUSTATES]> cp_times{
+		new cptime_t[2 * g.ncpu][CPUSTATES]{}};
+
 	try {
-		g.cp_times_ctl.get(g.cp_times[g.sample * g.ncpu],
-		                   g.ncpu * sizeof(g.cp_times[0]));
+		g.cp_times_ctl.get(cp_times[cp_times_sample * g.ncpu],
+		                   g.ncpu * sizeof(cp_times[0]));
 	} catch (sys::sc_error<sys::ctl::error> e) {
 		sysctl_fail(e);
 	}
 
-	for (coreid_t core = 0; core < g.ncpu; ++core) {
-		auto const & cp_times = g.cp_times[g.sample * g.ncpu + core];
-		auto const & cp_times_old = g.cp_times[((g.sample + 1) % g.samples) * g.ncpu + core];
-		cptime_t all = 0;
-		for (size_t i = 0; i < CPUSTATES; ++i) {
-			all += cp_times[i] - cp_times_old[i];
+	mhz_t freq = 0;
+	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
+		auto const & cp_times_new =
+		    cp_times[cp_times_sample * g.ncpu + corei];
+		auto const & cp_times_old =
+		    cp_times[((cp_times_sample + 1) % 2) * g.ncpu + corei];
+		auto & core = g.cores[corei];
+
+		/* reset controling core data */
+		if (core.controller == corei) {
+			core.sample_freq = core.freq;
+			freq = core.sample_freq;
+			core.group_loadsum = 0;
 		}
 
-		cptime_t idle = cp_times[CP_IDLE] - cp_times_old[CP_IDLE];
-		g.cores[core].load = all ? (((all - idle) << 10) / all) : 0;
+		cptime_t all = 0;
+		for (size_t i = 0; i < CPUSTATES; ++i) {
+			all += cp_times_new[i] - cp_times_old[i];
+		}
+		cptime_t idle = cp_times_new[CP_IDLE] - cp_times_old[CP_IDLE];
+
+		/* subtract oldest sample */
+		core.loadsum -= core.loads[g.sample];
+		/* update current sample */
+		if (all) {
+			/* measurement succeeded */
+			core.loads[g.sample] = freq - (freq * idle) / all;
+		} else {
+			/* no samples since last sampling, reuse the previous
+			 * load */
+			core.loads[g.sample] =
+			    core.loads[(g.sample + g.samples - 1) % g.samples];
+		}
+		/* add current sample */
+		core.loadsum += core.loads[g.sample];
 	}
+	cp_times_sample = (cp_times_sample + 1) % 2;
 	g.sample = (g.sample + 1) % g.samples;
 }
 
@@ -365,14 +416,14 @@ void update_cp_times() {
  * Sets the load time of each clock controlling core to the maximum load
  * in the group.
  */
-void update_load_times() {
-	update_cp_times();
+void update_group_loads() {
+	update_loads();
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto const & core = g.cores[corei];
-		if (core.controller == corei) { continue; }
 		auto & controller = g.cores[core.controller];
-		controller.load = std::max(controller.load, core.load);
+		controller.group_loadsum = std::max(controller.group_loadsum,
+		                                    core.loadsum);
 	}
 }
 
@@ -380,7 +431,7 @@ void update_load_times() {
  * Update the CPU clocks depending on the AC line state and targets.
  */
 void update_freq() {
-	update_load_times();
+	update_group_loads();
 
 	/* get AC line status */
 	auto const acline = to_value<AcLineState>(
@@ -394,15 +445,12 @@ void update_freq() {
 		auto & core = g.cores[corei];
 		if (core.controller != corei) { continue; }
 
-		/* get old clock */
-		mhz_t const oldfreq = core.freq;
 		/* determine target frequency */
 		mhz_t wantfreq = 0;
 		if (acstate.target_load) {
 			/* adaptive frequency mode */
-			assert(oldfreq == ((oldfreq << 10) >> 10) &&
-			       "CPU clock frequency exceeds values that are safe to compute");
-			wantfreq = oldfreq * core.load / acstate.target_load;
+			wantfreq = core.group_loadsum / g.samples *
+			           1024 / acstate.target_load;
 		} else {
 			/* fixed frequency mode */
 			wantfreq = acstate.target_freq;
@@ -412,29 +460,54 @@ void update_freq() {
 		auto const min = std::max(core.min, acstate.freq_min);
 		mhz_t newfreq = std::min(std::max(wantfreq, min), max);
 		/* update CPU frequency */
-		if (oldfreq != newfreq) {
+		if (core.sample_freq != newfreq) {
 			core.freq = newfreq;
 		}
 		/* verbose output */
 		if (!g.foreground) { continue; }
 		std::cout << std::right
 		          << "power: " << std::setw(7)
-		          << AcLineStateStr[acline]
-		          << ", load: " << std::setw(3)
-		          << ((core.load * 100 + 512) / 1024)
-		          << "%, cpu" << corei << ".freq: "
-		          << std::setw(4) << oldfreq << " MHz"
-		             ", wanted: " << std::setw(4) << wantfreq << " MHz\n";
+		          << AcLineStateStr[acline] << ", load: "
+		          << std::setw(4) << (core.group_loadsum / g.samples)
+		          << " MHz, cpu" << corei << ".freq: " << std::setw(4)
+		          << core.sample_freq << " MHz, wanted: "
+		          << std::setw(4) << wantfreq << " MHz\n";
 	}
 	if (g.foreground) { std::cout << std::flush; }
 }
 
 /**
- * Fill the cp_times buffer with n - 1 samples.
+ * Fill the loads buffers with n samples.
+ *
+ * The samples are filled with the target load, this creates a bias
+ * to stay at the initial frequency until sufficient real measurements
+ * come in to flush these initial samples out.
  */
-void reset_cp_times() {
-	for (size_t i = 1; i < g.samples; ++i) {
-		update_cp_times();
+void init_loads() {
+	/* call it once to initialise its internal state */
+	update_loads();
+
+	/* get AC line status */
+	auto const acline = to_value<AcLineState>(
+	    make_Once(AcLineState::UNKNOWN, g.acline_ctl));
+	auto const & acstate = g.acstates[acline];
+
+	/* fill the load buffer for each core */
+	mhz_t load = 0;
+	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
+		auto & core = g.cores[corei];
+
+		/* recalculate target load for controlling cores */
+		if (core.controller == corei) {
+			load = core.freq * acstate.target_load / 1024;
+		}
+
+		/* apply target load to the whole sample buffer */
+		for (size_t i = 0; i < g.samples; ++i) {
+			core.loadsum -= core.loads[i];
+			core.loadsum += load;
+			core.loads[i] = load;
+		}
 	}
 }
 
@@ -534,7 +607,7 @@ enum class OE {
 	FILE_PID,        /**< Set pidfile */
 	FLAG_VERBOSE,    /**< Activate verbose output on stderr */
 	FLAG_FOREGROUND, /**< Stay in foreground, log events to stdout */
-	CNT_SAMPLES,     /**< Set number of cp_times samples */
+	CNT_SAMPLES,     /**< Set number of load samples */
 	IGNORE,          /**< Legacy settings */
 	OPT_UNKNOWN,     /**< Obligatory */
 	OPT_NOOPT,       /**< Obligatory */
@@ -657,9 +730,9 @@ void show_settings() {
 	          << "\tverbose:               yes\n"
 	          << "\tforeground:            " << (g.foreground ? "yes\n" : "no\n")
 	          << "Load Sampling\n"
-	          << "\tcp_time samples:       " << g.samples << '\n'
+	          << "\tload samples:          " << g.samples << '\n'
 	          << "\tpolling interval:      " << g.interval.count() << " ms\n"
-	          << "\tload average over:     " << ((g.samples - 1) *
+	          << "\tload average over:     " << (g.samples *
 	                                             g.interval.count()) << " ms\n"
 	          << "Frequency Limits\n";
 	for (size_t i = 0; i < countof(g.acstates); ++i) {
@@ -830,7 +903,7 @@ int main(int argc, char * argv[]) {
 		read_args(argc, argv);
 		init();
 		show_settings();
-		reset_cp_times();
+		init_loads();
 		run_daemon();
 	} catch (Exception & e) {
 		if (e.msg != "") {
