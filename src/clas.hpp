@@ -224,9 +224,9 @@ size_t samples(char const * const str) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
 		             "sample count must be an integer: "_s + str);
 	}
-	if (cnt < 2 || cnt > 1001) {
+	if (cnt < 1 || cnt > 1000) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
-		             "sample count must be in the range [2, 1001]: "_s + str);
+		             "sample count must be in the range [1, 1000]: "_s + str);
 	}
 	return size_t(cnt);
 }
