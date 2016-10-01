@@ -51,6 +51,9 @@ using utility::sprintf;
 using namespace utility::literals;
 
 using types::ms;
+using types::cptime_t;
+using types::mhz_t;
+using types::coreid_t;
 
 using fixme::to_string;
 
@@ -750,17 +753,59 @@ class {
 	}
 } sysctls{};
 
+/**
+ * Instances of this class represent an emulator session.
+ *
+ * This should be run in its own thread and expects the sysctl table
+ * to be complete.
+ */
 class Emulator {
 	private:
+	/**
+	 * The hw.ncpu value.
+	 */
 	int const ncpu = sysctls[{CTL_HW, HW_NCPU}].get<int>();
+
+	/**
+	 * Pointers to the dev.cpu.%d.freq handlers.
+	 */
 	std::unique_ptr<SysctlValue * []> freqs{new SysctlValue *[ncpu]{}};
-	std::unique_ptr<int[]> freqRefs{new int[ncpu]{}};
+
+	/**
+	 * The reference frequencies the recording was based on.
+	 */
+	std::unique_ptr<mhz_t[]> freqRefs{new mhz_t[ncpu]{}};
+
+	/**
+	 * The kern.cp_times sysctl handler.
+	 */
 	SysctlValue & cp_times = sysctls[sysctls.getMib(CP_TIMES)];
-	std::unique_ptr<unsigned long[]> sum{new unsigned long[CPUSTATES * ncpu]{}};
-	std::unique_ptr<unsigned long[]> carry{new unsigned long[ncpu]{}};
-	size_t const size = CPUSTATES * ncpu * sizeof(unsigned long);
+
+	/**
+	 * The current kern.cp_times values.
+	 */
+	std::unique_ptr<cptime_t[]> sum{new cptime_t[CPUSTATES * ncpu]{}};
+
+	/**
+	 * The load points to carry over to the next frame.
+	 */
+	std::unique_ptr<cptime_t[]> carry{new cptime_t[ncpu]{}};
+
+	/**
+	 * The size of the kern.cp_times buffer.
+	 */
+	size_t const size = CPUSTATES * ncpu * sizeof(cptime_t);
 
 	public:
+	/**
+	 * The constructor initialises all the members necessary for
+	 * emulation.
+	 *
+	 * It also prints the column headers on stdout.
+	 *
+	 * @throws std::out_of_range
+	 *	In case one of the required sysctls is missing
+	 */
 	Emulator() {
 		/* get freq and freq_levels sysctls */
 		std::vector<unsigned long> freqLevels{};
@@ -838,6 +883,19 @@ class Emulator {
 		          << std::fixed << std::setprecision(3);
 	}
 
+	/**
+	 * Performs load emulation and prints statistics std::cout.
+	 *
+	 * Reads std::cin to pull in load changes and updates the
+	 * kern.cp_times sysctl to represent the current state.
+	 *
+	 * When it runs out of load changes it terminates emulation
+	 * and sends a SIGINT to the process.
+	 *
+	 * @param die
+	 *	If the referenced bool is true, emulation is terminated
+	 *	prematurely
+	 */
 	void operator ()(std::atomic<bool> const * const die) try {
 		double statTime = 0.; /* in seconds */
 		auto time = std::chrono::steady_clock::now();
@@ -848,22 +906,22 @@ class Emulator {
 			double statMaxRecloads = 0.;
 			double statSumLoads = 0.;
 			double statMaxLoads = 0.;
-			int statMaxFreq = 0;
+			mhz_t statMaxFreq = 0;
 			statTime += double(interval) / 1000;
 			std::cout << statTime;
 			/* perform calculations */
-			for (int core = 0; core < this->ncpu; ++core) {
+			for (coreid_t core = 0; core < this->ncpu; ++core) {
 				/* get frame load */
-				unsigned long frameSum = 0;
-				unsigned long frameLoad = 0;
+				cptime_t frameSum = 0;
+				cptime_t frameLoad = 0;
 				for (size_t state = 0; state < CPUSTATES; ++state) {
-					unsigned long ticks;
+					cptime_t ticks;
 					std::cin >> ticks;
 					frameSum += ticks;
 					frameLoad += state == CP_IDLE ? 0 : ticks;
 				}
 
-				auto const coreFreq = this->freqs[core]->get<int>();
+				auto const coreFreq = this->freqs[core]->get<mhz_t>();
 				auto const coreRefFreq = this->freqRefs[core];
 
 				if (!frameSum) {
