@@ -982,12 +982,29 @@ class Emulator {
 	}
 };
 
+/**
+ * Represents the main execution environment.
+ */
 class Main {
 	private:
+	/**
+	 * The background emulation thread.
+	 */
 	std::thread bgthread;
+
+	/**
+	 * Used to request premature death from the emulation thread.
+	 */
 	std::atomic<bool> die{false};
 
 	public:
+	/**
+	 * The constructor starts up the emulation.
+	 *
+	 * - Read the headers from std::cin and populate sysctls
+	 * - Ensure the existence of all required sysctls
+	 * - Spawn an Emulator instance in its own thread
+	 */
 	Main() {
 		std::string input;
 		std::smatch match;
@@ -1049,6 +1066,9 @@ class Main {
 		}
 	}
 
+	/**
+	 * Clean up the background emulation thread.
+	 */
 	~Main() {
 		this->die = true;
 		if (this->bgthread.joinable()) {
