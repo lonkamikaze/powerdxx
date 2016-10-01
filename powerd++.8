@@ -1,4 +1,4 @@
-.Dd 15 September, 2016
+.Dd 1 October, 2016
 .Dt powerd++ 8
 .Os
 .Sh NAME
@@ -101,8 +101,8 @@ The highest CPU clock frequency to use on battery power.
 The polling interval that is used to take load samples and update the
 CPU clock (default 0.5s).
 .It Fl s , -samples Ar cnt
-The number of samples to use to calculate the current load. The minimum is 2,
-the default 5.
+The number of load samples to use to calculate the current load.
+The default is 4.
 .It Fl P , -pid Ar file
 Use an alternative pidfile, the default is
 .Pa /var/run/powerd.pid .
@@ -172,7 +172,7 @@ polling interval) and uses a lower and an upper load boundary to decide
 whether it should update the frequency or not.
 .Pp
 .Nm
-has some core differences. It can take more than two samples (five by
+has some core differences. It can take more than two samples (four by
 default), this makes it more robust against small spikes in load, while
 retaining much of its ability to quickly react to sudden surges in load.
 Changing the number of samples does not change the runtime cost of running
