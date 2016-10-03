@@ -1136,13 +1136,30 @@ bool sysctl_fallback = false;
  */
 extern "C" {
 
-typedef int (*fn_sysctl)(const int*, u_int, void*, size_t*, const void*, size_t);
-typedef int (*fn_sysctlbyname)(const char*, void*, size_t*, const void*, size_t);
-typedef int (*fn_sysctlnametomib)(const char*, int*, size_t*);
-
+/**
+ * Intercept calls to sysctl().
+ *
+ * Uses the local \ref sysctls store.
+ *
+ * Falls back to the original if kern.usrstack is requested or
+ * sysctl_fallback is set.
+ *
+ * The call may fail for 3 reasons:
+ *
+ * 1. The fail() function was called and sys_results was assigned -1
+ * 2. A target buffer was too small (errno == ENOMEM)
+ * 3. The given sysctl is not in the sysctls store (errno == ENOENT)
+ *
+ * @param name,namelen,oldp,oldlenp,newp,newlen
+ *	Please refer to sysctl(3)
+ * @retval 0
+ *	The call succeeded
+ * @retval -1
+ *	The call failed
+ */
 int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
            const void * newp, size_t newlen) try {
-	static auto orig = (fn_sysctl)dlfunc(RTLD_NEXT, "sysctl");
+	static auto const orig = (decltype(&sysctl))dlfunc(RTLD_NEXT, "sysctl");
 	#ifdef EBUG
 	fprintf(stderr, "sysctl(%d, %d) fallback = %d\n", name[0], name[1], int{sysctl_fallback});
 	#endif /* EBUG */
@@ -1178,9 +1195,19 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 	return -1;
 }
 
+/**
+ * Intercept calls to sysctlnametomib().
+ *
+ * @param name,mibp,sizep
+ *	Please refer to sysctl(3)
+ * @retval 0
+ *	The call succeeded
+ * @retval -1
+ *	The call failed
+ */
 int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
-	static auto orig =
-		(fn_sysctlnametomib)dlfunc(RTLD_NEXT, "sysctlnametomib");
+	static auto const orig = (decltype(&sysctlnametomib))
+	    dlfunc(RTLD_NEXT, "sysctlnametomib");
 	#ifdef EBUG
 	fprintf(stderr, "sysctlnametomib(%s) fallback = %d\n", name, int{sysctl_fallback});
 	#endif /* EBUG */
@@ -1197,9 +1224,27 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
 	return -1;
 }
 
+/**
+ * Intercept calls to sysctlbyname().
+ *
+ * Falls back on the original sysctlbyname() for the following names:
+ *
+ * - vm.overcommit
+ * - kern.smp.cpus
+ *
+ * May fail for the same reasons as sysctl().
+ *
+ * @param name,oldp,oldlenp,newp,newlen
+ *	Please refer to sysctl(3)
+ * @retval 0
+ *	The call succeeded
+ * @retval -1
+ *	The call failed
+ */
 int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
                  const void * newp, size_t newlen) {
-	static auto orig = (fn_sysctlbyname)dlfunc(RTLD_NEXT, "sysctlbyname");
+	static auto const orig = (decltype(&sysctlbyname))
+	    dlfunc(RTLD_NEXT, "sysctlbyname");
 	#ifdef EBUG
 	fprintf(stderr, "sysctlbyname(%s)\n", name);
 	#endif /* EBUG */
@@ -1214,20 +1259,68 @@ int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
 	return orig(name, oldp, oldlenp, newp, newlen);
 }
 
+/**
+ * Intercept calls to daemon().
+ *
+ * Prevents process from separating from the controlling terminal.
+ *
+ * @return
+ *	The value of sys_results
+ */
 int daemon(int, int) { return sys_results; }
 
-uid_t geteuid(void) { return sys_results; }
+/**
+ * Intercept calls to geteuid().
+ *
+ * Tells the asking process that it is running as root.
+ *
+ * @return
+ *	Always returns 0
+ */
+uid_t geteuid(void) { return 0; }
 
+/**
+ * Intercept calls to pidfile_open().
+ *
+ * Prevents pidfile locking and creation by the hijacked process.
+ *
+ * @return
+ *	A dummy pointer
+ */
 pidfh * pidfile_open(const char *, mode_t, pid_t *) {
 	return reinterpret_cast<pidfh *>(&pidfile_open);
 }
 
+/**
+ * Intercept calls to pidfile_write().
+ *
+ * @return
+ *	The value of sys_results
+ */
 int pidfile_write(pidfh *) { return sys_results; }
 
+/**
+ * Intercept calls to pidfile_close().
+ *
+ * @return
+ *	The value of sys_results
+ */
 int pidfile_close(pidfh *) { return sys_results; }
 
+/**
+ * Intercept calls to pidfile_remove().
+ *
+ * @return
+ *	The value of sys_results
+ */
 int pidfile_remove(pidfh *) { return sys_results; }
 
+/**
+ * Intercept calls to pidfile_fileno().
+ *
+ * @return
+ *	The value of sys_results
+ */
 int pidfile_fileno(pidfh const *) { return sys_results; }
 
 } /* extern "C" */
