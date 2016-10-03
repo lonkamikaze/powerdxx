@@ -820,7 +820,7 @@ class Emulator {
 	 */
 	Emulator() {
 		/* get freq and freq_levels sysctls */
-		std::vector<unsigned long> freqLevels{};
+		std::vector<mhz_t> freqLevels{};
 		for (int i = 0; i < this->ncpu; ++i) {
 			/* get freqency handler */
 			char name[40];
@@ -838,7 +838,7 @@ class Emulator {
 			}
 
 			/* take current clock frequency as reference */
-			this->freqRefs[i] = this->freqs[i]->get<int>();
+			this->freqRefs[i] = this->freqs[i]->get<mhz_t>();
 
 			/* get freq_levels */
 			sprintf(name, FREQ_LEVELS, i);
@@ -859,7 +859,7 @@ class Emulator {
 			}
 
 			this->freqs[i]->registerOnSet([freqLevels](SysctlValue & ctl) {
-				auto const freq = ctl.get<int>();
+				auto const freq = ctl.get<mhz_t>();
 				auto result = freq;
 				auto diff = freq + 1000000;
 				for (auto lvl : freqLevels) {
