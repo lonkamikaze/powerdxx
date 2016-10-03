@@ -1,4 +1,4 @@
-.Dd 4 September, 2016
+.Dd 3 October, 2016
 .Dt loadrec 1
 .Os
 .Sh NAME
@@ -18,7 +18,8 @@ reproduce this load to test different
 .Xr powerd 8
 and
 .Xr powerd++ 8
-configurations under identical load conditions.
+configurations under identical load conditions using
+.Xr loadplay 1 .
 .Ss ARGUMENTS
 The following argument types can be given:
 .Bl -tag -width indent
@@ -33,7 +34,7 @@ A file name.
 The following options are supported:
 .Bl -tag -width indent
 .It Fl h , -help
-Show usage and exit
+Show usage and exit.
 .It Fl v , -verbose
 Be verbose and produce initial diagnostics on
 .Pa stderr .
@@ -111,7 +112,7 @@ On the example setup
 .Nm
 produces a load of 0.001 (i.e. 0.1%), so its effect on the measurement is negligible.
 .Sh SEE ALSO
-.Xr cpufreq 4 , Xr powerd 8 , Xr powerd++ 8 , Xr sysctl 8
+.Xr cpufreq 4 , Xr loadplay 1 , Xr powerd 8 , Xr powerd++ 8 , Xr sysctl 8
 .Sh AUTHORS
 Implementation and manual by
 .An Dominic Fandrey Aq kami@freebsd.org
