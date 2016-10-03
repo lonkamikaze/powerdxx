@@ -1,0 +1,174 @@
+.Dd 3 October, 2016
+.Dt loadplay 1
+.Os
+.Sh NAME
+.Nm loadplay
+.Nd CPU load player
+.Sh SYNOPSIS
+.Nm
+.Op Fl i Ar file
+.Op Fl o Ar file
+.Ar command ...
+.Sh DESCRIPTION
+The
+.Nm
+command replays a load recording created with
+.Xr loadrec 1 .
+The
+.Ar command
+can either be
+.Xr powerd 8
+or
+.Xr powerd++ 8 ,
+compatibility with other tools has not been tested.
+.Ss OPTIONS
+The following options are supported:
+.Bl -tag -width indent
+.It Fl h , -help
+Show usage and exit.
+.It Fl i , -input Ar file
+Read load recording from
+.Ar file
+instead of
+.Pa stdin .
+.It Fl o , -output Ar file
+Output statistics to
+.Ar file
+instead of
+.Pa stdout .
+.El
+.Sh USAGE NOTES
+The
+.Nm
+command is a shell script that injects
+.Pa libloadplay.so
+into
+.Ar command .
+This library simulates the load from the input and outputs load statistics.
+If
+.Ar command
+generates output on
+.Pa stdout ,
+it will be mixed into the load statistics. So
+.Xr powerd 8
+should be run without the
+.Fl v
+flag and
+.Xr powerd++ 8
+without the
+.Fl f
+flag.
+.Ss OUTPUT
+The first line of output contains column headings, columns are separated
+by a single space.
+.Pp
+The Following columns are present, columns containing
+.Ic %d
+occur for each core simulated:
+.Bl -tag -width indent
+.It Ic time[s]
+The simulation progress in seconds.
+.It Ic cpu.%d.freq[MHz]
+The current clock speed rating.
+.It Ic cpu.%d.recload
+The load as recorded, a value in the range [0,\ 1.0].
+.It Ic cpu.%d.load
+The load under the current clock speed. This value may go above 1.0,
+because the current speed rating may be too low to consume the load.
+In this case the unconsumed load (i.e. everything above 1.0) spills
+over to the next simulation frame.
+.It Ic max(freqs)[MHz]
+The highest clock speed in the output line.
+.It Ic sum(recloads)
+The sum of recorded loads in in the output line, a value in the range
+[0,\ ncpu].
+.It Ic max(recloads)
+The highest recorded load in this output line, a value in the range
+[0,\ 1.0].
+.It Ic sum(loads)
+The sum of loads according to the current clock speed in the output line.
+.It Ic max(loads)
+The highest load according to the current clock speed in the output line.
+.El
+.Pp
+.Ss SAMPLING
+There is one sample for each recorded line. The duration of each frame
+depends on the recording, which defaults to 25\ ms. 
+At this sample rate loads are dominated by noise, so a gliding average
+should be applied to any load columns for further use, such as plotting.
+Note that the
+.Ic max()
+columns must be recreated in this case.
+.Sh IMPLEMENTATION
+The injected
+.Pa libloadplay.so
+works by intercepting system function calls and substituting the host
+environment with the recording. To achieve this the following function
+calls are intercepted:
+.Bl -bullet
+.It
+.Xr sysctl 3 , Xr sysctlnametomib 3 , Xr sysctlbyname 3
+.It
+.Xr daemon 3
+.It
+.Xr geteuid 2
+.It
+.Xr pidfile_open 3 , Xr pidfile_write , Xr pidfile_close 3 ,
+.Xr pidfile_remove 3 , Xr pidfile_fileno 3
+.El
+.Ss INITIALISATION
+The
+.Nm sysctl
+family of functions is backed by a table that is initialised from
+the header of the load recording. If the heading is incomplete the
+setup routines print a message on
+.Pa stderr .
+All the following intercepted function calls will return failure,
+ensuring that the hijacked process is unable to operate and terminates.
+.Pp
+Like
+.Xr powerd++ 8
+and
+.Xr loadrec 1
+.Nm
+is core agnostic. Meaning that any core may have a
+.Ic .freq
+and
+.Ic .freq_levels
+sysctl handle. Due to this flexibility load recordings may in part
+or wholly be fabricated to test artificial loads or systems and features
+that do not yet exist. E.g. it is possible to offer a
+.Ic .freq
+handle for each core or fabricate new
+.Ic .freq_levels .
+.Ss SIMULATION
+If setup succeeds a simulation thread is started that reads the remaining
+input lines, simulates the load and updates the
+.Nm kern.cp_times
+entry in the thread safe sysctl table. For each frame a line of output
+with load statistics is produced.
+.Pp
+Interaction with the hijacked process happens solely through the sysctl
+table. The simulation reads the recorded loads and the current core
+frequencies to update
+.Nm kern.cp_times .
+The hijacked process reads this data and adjusts the clock frequencies,
+which in turn affects the next frame.
+.Ss FINALISATION
+After reading the last line of input the simulation thread sends a
+.Nm SIGINT
+to the process to cause it to terminate.
+.Sh FILES
+.Bl -tag -width indent
+.Pa %%PREFIX%%/lib/libloadplay.so
+A library injected into
+.Ar command
+via the
+.Ev LD_PRELOAD
+environment variable.
+.El
+.Sh SEE ALSO
+.Xr loadrec 1 , Xr powerd 8 , Xr powerd++ 8 , Xr rtld 1 , Xr signal 3
+.Sh AUTHORS
+Implementation and manual by
+.An Dominic Fandrey Aq kami@freebsd.org
