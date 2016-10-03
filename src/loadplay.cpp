@@ -109,6 +109,18 @@ struct mib_t {
 	constexpr mib_t(Ints const... ints) : mibs{ints...} {}
 
 	/**
+	 * Initialise from a pointer to an int array.
+	 *
+	 * @param mibs,len
+	 *	The array and its length
+	 */
+	mib_t(int const * const mibs, u_int const len) : mibs{} {
+		for (u_int i = 0; i < len && i < CTL_MAXNAME; ++i) {
+			this->mibs[i] = mibs[i];
+		}
+	}
+
+	/**
 	 * Equality operator required by std::map.
 	 *
 	 * @param op
@@ -1077,6 +1089,46 @@ class Main {
 	}
 } main{};
 
+/**
+ * Sets a referenced variable to a given value and restores it when
+ * going out of context.
+ *
+ * @tparam T
+ *	The type of the value to hold
+ */
+template <typename T>
+class Hold {
+	private:
+	T const restore; /**< The original value. */
+	T & ref;         /**< Reference to the variable. */
+	public:
+
+	/**
+	 * The constructor sets the referenced varibale to the given
+	 * value.
+	 *
+	 * @param ref
+	 *	The variable to hold and restore
+	 * @param value
+	 *	The value to set the variable to
+	 */
+	Hold(T & ref, T const value) : restore{ref}, ref{ref} {
+		ref = value;
+	}
+
+	/**
+	 * Restores the original value.
+	 */
+	~Hold() {
+		this->ref = this->restore;
+	}
+};
+
+/**
+ * Set to activate fallback to the original sysctl functions.
+ */
+bool sysctl_fallback = false;
+
 } /* namespace */
 
 /**
@@ -1085,46 +1137,36 @@ class Main {
 extern "C" {
 
 typedef int (*fn_sysctl)(const int*, u_int, void*, size_t*, const void*, size_t);
+typedef int (*fn_sysctlbyname)(const char*, void*, size_t*, const void*, size_t);
 typedef int (*fn_sysctlnametomib)(const char*, int*, size_t*);
-
-static fn_sysctl           orig_sysctl = nullptr;
-static fn_sysctlnametomib  orig_sysctlnametomib = nullptr;
 
 int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
            const void * newp, size_t newlen) try {
+	static auto orig = (fn_sysctl)dlfunc(RTLD_NEXT, "sysctl");
 	#ifdef EBUG
-	fprintf(stderr, "sysctl(%d, %d)\n", name[0], name[1]);
+	fprintf(stderr, "sysctl(%d, %d) fallback = %d\n", name[0], name[1], int{sysctl_fallback});
 	#endif /* EBUG */
-	if (!orig_sysctl) {
-		orig_sysctl = (fn_sysctl)dlfunc(RTLD_NEXT, "sysctl");
-	}
-	/* hard-coded fallbacks */
-	if (/* -lpthread */         (namelen == 2 && name[0] == CTL_KERN &&
-	                             name[1] == KERN_USRSTACK) ||
-	    /* sysctlnametomib() */ (namelen == 2 && name[0] == 0 &&
-	                             name[1] == 3)) {
-		return orig_sysctl(name, namelen, oldp, oldlenp, newp, newlen);
-	}
-	mib_t mib{};
-	for (size_t i = 0; i < namelen; ++i) {
-		mib[i] = name[i];
+	if (sysctl_fallback ||
+	    /* hard-coded fallback for kern.usrstack, required by -lpthread */
+	    (namelen == 2 && name[0] == CTL_KERN && name[1] == KERN_USRSTACK)) {
+		return orig(name, namelen, oldp, oldlenp, newp, newlen);
 	}
 
-	if (!oldp && oldlenp) {
-		try {
+	mib_t mib{name, namelen};
+
+	if (oldlenp) {
+		if (oldp) {       /* data requested */
+			if (-1 == sysctls[mib].get(oldp, *oldlenp)) {
+				return -1;
+			}
+		} else try {      /* size requested */
 			*oldlenp = sysctls[mib].size();
-		} catch (int e) {
+		} catch (int e) { /* ….size() may throw */
 			return e;
 		}
 	}
 
-	if (oldp && oldlenp) {
-		if (-1 == sysctls[mib].get(oldp, *oldlenp)) {
-			return -1;
-		}
-	}
-
-	if (newp && newlen) {
+	if (newp && newlen) {     /* update data */
 		if (-1 == sysctls[mib].set(newp, newlen)) {
 			return -1;
 		}
@@ -1137,14 +1179,16 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 }
 
 int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
+	static auto orig =
+		(fn_sysctlnametomib)dlfunc(RTLD_NEXT, "sysctlnametomib");
 	#ifdef EBUG
-	fprintf(stderr, "sysctlnametomib(%s)\n", name);
+	fprintf(stderr, "sysctlnametomib(%s) fallback = %d\n", name, int{sysctl_fallback});
 	#endif /* EBUG */
-	if (!orig_sysctlnametomib) {
-		orig_sysctlnametomib = (fn_sysctlnametomib)dlfunc(RTLD_NEXT, "sysctlnametomib");
+	if (sysctl_fallback) {
+		return orig(name, mibp, sizep);
 	}
 	auto const & mib = sysctls.getMib(name);
-	for (size_t i = 0; i < *sizep; ++i) {
+	for (size_t i = 0; i < *sizep && i < CTL_MAXNAME; ++i) {
 		mibp[i] = mib[i];
 	}
 	return sys_results;
@@ -1154,35 +1198,20 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
 }
 
 int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
-                 const void * newp, size_t newlen) try {
+                 const void * newp, size_t newlen) {
+	static auto orig = (fn_sysctlbyname)dlfunc(RTLD_NEXT, "sysctlbyname");
 	#ifdef EBUG
 	fprintf(stderr, "sysctlbyname(%s)\n", name);
 	#endif /* EBUG */
-	if (!orig_sysctlnametomib) {
-		orig_sysctlnametomib = (fn_sysctlnametomib)dlfunc(RTLD_NEXT, "sysctlnametomib");
-	}
-	if (!orig_sysctl) {
-		orig_sysctl = (fn_sysctl)dlfunc(RTLD_NEXT, "sysctl");
-	}
-	int mib[CTL_MAXNAME];
-	size_t mibs = CTL_MAXNAME;
 	/* explicit fallback for sysctls used by OS functions */
 	if (/* malloc() */  strcmp(name, "vm.overcommit") == 0 ||
 	    /* -lpthread */ strcmp(name, "kern.smp.cpus") == 0) {
-		if (-1 == orig_sysctlnametomib(name, mib, &mibs)) {
-			return -1;
-		}
-		return orig_sysctl(mib, mibs, oldp, oldlenp, newp, newlen);
+		Hold<bool> hold{sysctl_fallback, true};
+		return orig(name, oldp, oldlenp, newp, newlen);
 	}
-
-	/* regular */
-	if (-1 == sysctlnametomib(name, mib, &mibs)) {
-		return -1;
-	}
-	return sysctl(mib, mibs, oldp, oldlenp, newp, newlen);
-} catch (std::out_of_range &) {
-	errno = ENOENT;
-	return -1;
+	/* use original function for regular operation, just without
+	 * holding the sysctl_fallback flag */
+	return orig(name, oldp, oldlenp, newp, newlen);
 }
 
 int daemon(int, int) { return sys_results; }
