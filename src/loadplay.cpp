@@ -891,8 +891,8 @@ class Emulator {
 			          << " cpu." << i << ".recload"
 			          << " cpu." << i << ".load";
 		}
-		std::cout << " max(freqs)[MHz] sum(recloads) max(recloads) sum(loads) max(loads)\n"
-		          << std::fixed << std::setprecision(3);
+		std::cout << " max(freqs)[MHz] sum(recloads) max(recloads) sum(loads) max(loads)"
+		          << std::endl << std::fixed << std::setprecision(3);
 	}
 
 	/**
@@ -978,7 +978,7 @@ class Emulator {
 			          << ' ' << statSumRecloads
 			          << ' ' << statMaxRecloads
 			          << ' ' << statSumLoads
-			          << ' ' << statMaxLoads << '\n';
+			          << ' ' << statMaxLoads << std::endl;
 
 			/* sleep */
 			std::this_thread::sleep_until(time += ms{interval});
