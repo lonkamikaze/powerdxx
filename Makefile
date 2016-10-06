@@ -30,4 +30,4 @@ install: install.sh pkg.tbl powerd++
 		CURDIR="${.CURDIR}" OBJDIR="${.OBJDIR}"
 
 clean:
-	rm *.o ${TARGETS}
+	rm -f *.o ${TARGETS}
