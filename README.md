@@ -62,18 +62,29 @@ Building
 Download the repository and run `make`:
 
     > make
-    c++ -O2 -pipe  -std=c++11 -Wall -Werror -c src/powerd++.cpp -o powerd++.o
-    c++ -lutil -O2 -pipe  -std=c++11 -Wall -Werror -o powerd++ powerd++.o
-
-To avoid building directly in the repository folder an `obj` folder can
-be created prior to building.
+    c++ -O2 -pipe -Wall -Werror -pedantic -std=c++11 -Wall -Werror -pedantic -c src/powerd++.cpp -o powerd++.o
+    c++ -lutil -O2 -pipe -Wall -Werror -pedantic -std=c++11 -Wall -Werror -pedantic -o powerd++ powerd++.o
+    c++ -O2 -pipe -Wall -Werror -pedantic -std=c++11 -Wall -Werror -pedantic -c src/loadrec.cpp -o loadrec.o
+    c++ -O2 -pipe -Wall -Werror -pedantic -std=c++11 -Wall -Werror -pedantic -o loadrec loadrec.o
+    c++ -c -O2 -pipe -Wall -Werror -pedantic -std=c++11 -Wall -Werror -pedantic -fPIC -o loadplay.o src/loadplay.cpp
+    c++ -lpthread -shared -O2 -pipe -Wall -Werror -pedantic -std=c++11 -Wall -Werror -pedantic -o libloadplay.so loadplay.o
 
 Documentation
 -------------
 
-The manual page can be read with the following command:
+The manual pages can be read with the following commands:
 
-    > nroff -mdoc powerd++.8 | less -r
+    > man ./powerd++.8 ./loadrec.1 ./loadplay.1
+
+Tooling
+-------
+
+In addition to the `powerd++` daemon this repository also comes with
+the tools `loadrec` and `loadplay`. They can be used to record loads
+and test both `powerd` and `powerd++` under reproducible load conditions.
+
+This is great for tuning, testing, bug reports and creating fancy
+plots.
 
 FAQ
 ---
