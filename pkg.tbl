@@ -7,4 +7,5 @@ MAN:%%CURDIR%%/README.md:%%DOCSDIR%%/README.md
 MAN:%%CURDIR%%/powerd++.8:%%PREFIX%%/man/man8/powerd++.8.gz
 SYMLINK:powerd++.8.gz:%%PREFIX%%/man/man8/powerdxx.8.gz
 MAN:%%CURDIR%%/loadrec.1:%%PREFIX%%/man/man1/loadrec.1.gz
+MAN:%%CURDIR%%/loadplay.1:%%PREFIX%%/man/man1/loadplay.1.gz
 SCRIPT:%%CURDIR%%/powerd++.rc:%%PREFIX%%/etc/rc.d/powerdxx
