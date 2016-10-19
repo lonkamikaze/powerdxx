@@ -1,4 +1,4 @@
-.Dd 1 October, 2016
+.Dd 19 October, 2016
 .Dt powerd++ 8
 .Os
 .Sh NAME
@@ -118,6 +118,16 @@ not applicable to
 .Nm
 and thus ignored.
 .El
+.Sh SERVICE
+The
+.Nm
+daemon can be run as an
+.Xr rc 8
+service. Add the following line to
+.Xr rc.conf 5 :
+.Dl powerdxx_enable="YES"
+Command line arguments can be set via
+.Va powerdxx_flags .
 .Sh IMPLEMENTATION NOTES
 This section describes the operation of
 .Nm .
@@ -206,6 +216,9 @@ are restored to their original values.
 .Pa /var/run/powerd.pid
 Common pidfile with
 .Xr powerd 8 .
+.Pa %%PREFIX%%/etc/rc.d/powerdxx
+Service file, enable in
+.Xr rc.conf 5 .
 .El
 .Sh EXAMPLES
 Run in foreground, minimum clock frequency 800 MHz:
