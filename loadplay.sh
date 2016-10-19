@@ -30,7 +30,8 @@ USAGE
 		shift
 	;;
 	- | -? | --*)
-		echo "loadplay: unknown option: $1"
+		echo "loadplay: unknown option: $1" >&2
+		"$0" --help
 		return 1
 	;;
 	-?*)
@@ -41,7 +42,8 @@ USAGE
 	esac
 done
 if [ -z "$1" ]; then
-	echo "loadplay: command missing"
+	echo "loadplay: command missing" >&2
+	"$0" --help
 	return 1
 fi
 exec /usr/bin/env LD_PRELOAD="$preload" "$@"
