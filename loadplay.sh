@@ -1,6 +1,7 @@
 #!/bin/sh
 set -f
 preload="%%PREFIX%%/lib/libloadplay.so"
+preload="${0%/*}/obj/libloadplay.so" #RM
 while [ "${1#-}" != "$1" ]; do
 	case "$1" in
 	-h | --help)

@@ -17,7 +17,7 @@ sed "${sedprog}" | while read type src tgt; do
 	eval eval "\${BSD_INSTALL_${type}} ${src} ${DESTDIR:+${DESTDIR%/}/}${tgt%.gz}"
 	case ${type} in
 	MAN | SCRIPT)
-		sed -i '' "${sedprog}" "${DESTDIR:+${DESTDIR%/}/}${tgt%.gz}"
+		sed -i '' "/#RM\$/d;${sedprog}" "${DESTDIR:+${DESTDIR%/}/}${tgt%.gz}"
 	;;
 	esac
 	if [ -z "${tgt##*.gz}" ]; then
