@@ -130,6 +130,12 @@ service. Add the following line to
 .Dl powerdxx_enable="YES"
 Command line arguments can be set via
 .Va powerdxx_flags .
+.Sh TOOLS
+The
+.Xr loadrec 1
+and
+.Xr loadplay 1
+tools offer the possibility to record system loads and replay them.
 .Sh IMPLEMENTATION NOTES
 This section describes the operation of
 .Nm .
@@ -252,7 +258,7 @@ So far
 .Nm
 requires ACPI to detect the current power line state.
 .Sh SEE ALSO
-.Xr cpufreq 4 , Xr powerd 8
+.Xr cpufreq 4 , Xr powerd 8 , Xr loadrec 1 , Xr loadplay 1
 .Sh AUTHORS
 Implementation and manual by
 .An Dominic Fandrey Aq kami@freebsd.org
