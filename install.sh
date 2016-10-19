@@ -8,6 +8,10 @@ sed "${sedprog}" | while read type src tgt; do
 	MAN | SCRIPT)
 		sed -i '' "/#RM\$/d${sedprog}" "${DESTDIR:+${DESTDIR%/}/}${tgt%.gz}"
 	;;
+	SYMLINK)
+		mv "${DESTDIR:+${DESTDIR%/}/}${tgt%.gz}" "${DESTDIR:+${DESTDIR%/}/}${tgt}"
+		continue
+	;;
 	esac
 	if [ -z "${tgt##*.gz}" ]; then
 		eval ${GZIP_CMD} "${DESTDIR:+${DESTDIR%/}/}${tgt%.gz}"
