@@ -24,8 +24,10 @@ libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
 loadplay.o:
 	${CXX} -c ${CXXFLAGS} -fPIC -o ${.TARGET} ${.IMPSRC}
 
-install: install.sh pkg.tbl powerd++
-	@${.CURDIR}/install.sh < ${.CURDIR}/pkg.tbl \
+install: ${TARGETS}
+
+install deinstall: ${.TARGET}.sh pkg.tbl
+	@${.CURDIR}/${.TARGET}.sh < ${.CURDIR}/pkg.tbl \
 		DESTDIR="${DESTDIR}" PREFIX="${PREFIX}" DOCSDIR="${DOCSDIR}" \
 		CURDIR="${.CURDIR}" OBJDIR="${.OBJDIR}"
 
