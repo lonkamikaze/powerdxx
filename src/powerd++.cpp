@@ -150,7 +150,7 @@ struct {
 	/**
 	 * The last signal received, used for terminating.
 	 */
-	int signal{0};
+	volatile int signal{0};
 
 	/**
 	 * The number of load samples to take.
