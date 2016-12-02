@@ -95,6 +95,11 @@ struct Core {
 	sys::ctl::SysctlSync<mhz_t, 4> freq{{}};
 
 	/**
+	 * A pointer to the kern.cp_times section for this core.
+	 */
+	cptime_t const * cp_time;
+
+	/**
 	 * The kern.cpu.N.freq value for the current load sample.
 	 *
 	 * This is updated by update_loads().
@@ -105,6 +110,16 @@ struct Core {
 	 * The core that controls the frequency for this core.
 	 */
 	coreid_t controller{-1};
+
+	/**
+	 * The idle ticks count.
+	 */
+	cptime_t idle{0};
+
+	/**
+	 * Count of all ticks.
+	 */
+	cptime_t all{0};
 
 	/**
 	 * For the controlling core this is set to the group loadsum.
@@ -140,6 +155,8 @@ struct Core {
 	 */
 	mhz_t max{FREQ_DEFAULT_MAX};
 };
+
+
 
 /**
  * A collection of all the gloabl, mutable states.
@@ -230,6 +247,11 @@ struct {
 	 * The kern.cp_times sysctl.
 	 */
 	sys::ctl::Sysctl<2> cp_times_ctl{};
+
+	/**
+	 * The kern.cp_times buffer for all cores.
+	 */
+	std::unique_ptr<cptime_t[][CPUSTATES]> cp_times;
 
 	/**
 	 * This buffer is to be allocated with ncpu instances of the
@@ -353,6 +375,14 @@ void init() {
 
 	/* MIB for kern.cp_times */
 	g.cp_times_ctl = {CP_TIMES};
+
+	/* create buffer for system load ticks */
+	g.cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>{
+		new cptime_t[g.ncpu][CPUSTATES]{}};
+	for (coreid_t i = 0; i < g.ncpu; ++i) {
+		auto & core = g.cores[i];
+		core.cp_time = g.cp_times[i];
+	}
 }
 
 /**
@@ -360,24 +390,16 @@ void init() {
  * each core.
  */
 void update_loads() {
-	static size_t cp_times_sample = 0;
-	/* create buffer for system load times */
-	static std::unique_ptr<cptime_t[][CPUSTATES]> cp_times{
-		new cptime_t[2 * g.ncpu][CPUSTATES]{}};
-
+	/* update load ticks */
 	try {
-		g.cp_times_ctl.get(cp_times[cp_times_sample * g.ncpu],
-		                   g.ncpu * sizeof(cp_times[0]));
+		g.cp_times_ctl.get(g.cp_times[0],
+		                   g.ncpu * sizeof(g.cp_times[0]));
 	} catch (sys::sc_error<sys::ctl::error> e) {
 		sysctl_fail(e);
 	}
 
 	mhz_t freq = 0;
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-		auto const & cp_times_new =
-		    cp_times[cp_times_sample * g.ncpu + corei];
-		auto const & cp_times_old =
-		    cp_times[((cp_times_sample + 1) % 2) * g.ncpu + corei];
 		auto & core = g.cores[corei];
 
 		/* reset controling core data */
@@ -387,11 +409,18 @@ void update_loads() {
 			core.group_loadsum = 0;
 		}
 
-		cptime_t all = 0;
+		/* sum of collected ticks */
+		cptime_t all_new = 0;
 		for (size_t i = 0; i < CPUSTATES; ++i) {
-			all += cp_times_new[i] - cp_times_old[i];
+			all_new += core.cp_time[i];
 		}
-		cptime_t idle = cp_times_new[CP_IDLE] - cp_times_old[CP_IDLE];
+		cptime_t const all = all_new - core.all;
+		core.all = all_new;
+
+		/* collected idle ticks */
+		cptime_t idle_new = core.cp_time[CP_IDLE];
+		cptime_t const idle = idle_new - core.idle;
+		core.idle = idle_new;
 
 		/* subtract oldest sample */
 		core.loadsum -= core.loads[g.sample];
@@ -408,7 +437,6 @@ void update_loads() {
 		/* add current sample */
 		core.loadsum += core.loads[g.sample];
 	}
-	cp_times_sample = (cp_times_sample + 1) % 2;
 	g.sample = (g.sample + 1) % g.samples;
 }
 
