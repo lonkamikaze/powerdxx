@@ -19,7 +19,6 @@
 #include <mutex>
 #include <chrono>    /* std::chrono::steady_clock::now() */
 #include <vector>
-#include <atomic>
 
 #include <cstring>   /* strncmp() */
 #include <cassert>   /* assert() */
@@ -776,7 +775,7 @@ class Emulator {
 	/**
 	 * A reference to a bool that tells the emulator to die.
 	 */
-	std::atomic<bool> const & die;
+	bool const & die;
 
 	/**
 	 * The hw.ncpu value.
@@ -825,7 +824,7 @@ class Emulator {
 	 *	If the referenced bool is true, emulation is terminated
 	 *	prematurely
 	 */
-	Emulator(std::atomic<bool> const & die) : die{die} {
+	Emulator(bool const & die) : die{die} {
 		/* get freq and freq_levels sysctls */
 		std::vector<mhz_t> freqLevels{};
 		for (int i = 0; i < this->ncpu; ++i) {
@@ -1010,7 +1009,7 @@ class Main {
 	/**
 	 * Used to request premature death from the emulation thread.
 	 */
-	std::atomic<bool> die{false};
+	bool die{false};
 
 	public:
 	/**
