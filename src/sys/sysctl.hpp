@@ -7,9 +7,6 @@
 
 #include "error.hpp"       /* sys::sc_error */
 
-#include <sys/types.h>     /* sysctl() */
-#include <sys/sysctl.h>    /* sysctl() */
-
 #include <memory>          /* std::unique_ptr */
 
 #include <cassert>         /* assert() */
@@ -28,6 +25,14 @@ namespace sys {
  * The template class Once represents a read once value.
  */
 namespace ctl {
+
+/**
+ * Contains native C interfaces.
+ */
+namespace nat {
+#include <sys/types.h>     /* sysctl() */
+#include <sys/sysctl.h>    /* sysctl() */
+}
 
 /**
  * The domain error type.
@@ -91,7 +96,7 @@ class Sysctl {
 	 */
 	Sysctl(char const * const name) {
 		size_t length = MibDepth;
-		if (::sysctlnametomib(name, this->mib, &length) == -1) {
+		if (nat::sysctlnametomib(name, this->mib, &length) == -1) {
 			throw sc_error<error>{errno};
 		}
 		assert(length == MibDepth && "MIB depth mismatch");
@@ -133,7 +138,7 @@ class Sysctl {
 	 */
 	void get(void * const buf, size_t const bufsize) const {
 		auto len = bufsize;
-		if (::sysctl(this->mib, MibDepth, buf, &len, nullptr, 0)
+		if (nat::sysctl(this->mib, MibDepth, buf, &len, nullptr, 0)
 		    == -1) {
 			throw sc_error<error>{errno};
 		}
@@ -175,7 +180,7 @@ class Sysctl {
 	template <typename T>
 	std::unique_ptr<T[]> get() const {
 		size_t len = 0;
-		if (::sysctl(this->mib, MibDepth, nullptr, &len, nullptr, 0)
+		if (nat::sysctl(this->mib, MibDepth, nullptr, &len, nullptr, 0)
 		    == -1) {
 			throw sc_error<error>{errno};
 		}
@@ -193,7 +198,7 @@ class Sysctl {
 	 *	If the source buffer cannot be stored in the sysctl
 	 */
 	void set(void const * const buf, size_t const bufsize) {
-		if (::sysctl(this->mib, MibDepth, nullptr, nullptr,
+		if (nat::sysctl(this->mib, MibDepth, nullptr, nullptr,
 		             buf, bufsize) == -1) {
 			throw sc_error<error>{errno};
 		}

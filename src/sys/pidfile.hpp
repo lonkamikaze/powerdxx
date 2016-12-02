@@ -7,8 +7,6 @@
 
 #include "error.hpp"    /* sys::sc_error */
 
-#include <libutil.h>    /* pidfile_*() */
-
 namespace sys {
 
 /**
@@ -17,6 +15,13 @@ namespace sys {
  * The class Pidfile implements the RAII pattern for holding a pidfile.
  */
 namespace pid {
+
+/**
+ * Contains native C interfaces.
+ */
+namespace nat {
+#include <libutil.h>    /* pidfile_*() */
+}
 
 /**
  * The domain error type.
@@ -41,7 +46,7 @@ class Pidfile final {
 	 * Thus is allocated by pidfile_open() and assumedly freed by
 	 * pidfile_remove().
 	 */
-	pidfh * pfh;
+	nat::pidfh * pfh;
 
 	public:
 	/**
@@ -55,7 +60,7 @@ class Pidfile final {
 	 *	Throws with the errno of pidfile_open()
 	 */
 	Pidfile(char const * const pfname, mode_t const mode) :
-	    otherpid{0}, pfh{::pidfile_open(pfname, mode, &this->otherpid)} {
+	    otherpid{0}, pfh{nat::pidfile_open(pfname, mode, &this->otherpid)} {
 		if (this->pfh == nullptr) {
 			switch (errno) {
 			case EEXIST:
@@ -70,7 +75,7 @@ class Pidfile final {
 	 * Removes the pidfile.
 	 */
 	~Pidfile() {
-		::pidfile_remove(this->pfh);
+		nat::pidfile_remove(this->pfh);
 	}
 
 	/**
@@ -85,7 +90,7 @@ class Pidfile final {
 	 *	Throws with the errno of pidfile_write()
 	 */
 	void write() {
-		if (::pidfile_write(this->pfh) == -1) {
+		if (nat::pidfile_write(this->pfh) == -1) {
 			throw sc_error<error>{errno};
 		}
 	}
