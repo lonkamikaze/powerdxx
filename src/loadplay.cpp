@@ -774,6 +774,11 @@ class {
 class Emulator {
 	private:
 	/**
+	 * A reference to a bool that tells the emulator to die.
+	 */
+	std::atomic<bool> const & die;
+
+	/**
 	 * The hw.ncpu value.
 	 */
 	int const ncpu = sysctls[{CTL_HW, HW_NCPU}].get<int>();
@@ -815,10 +820,12 @@ class Emulator {
 	 *
 	 * It also prints the column headers on stdout.
 	 *
-	 * @throws std::out_of_range
-	 *	In case one of the required sysctls is missing
+	 * @throws std::out_of_range *	In case one of the required sysctls is missing
+	 * @param die
+	 *	If the referenced bool is true, emulation is terminated
+	 *	prematurely
 	 */
-	Emulator() {
+	Emulator(std::atomic<bool> const & die) : die{die} {
 		/* get freq and freq_levels sysctls */
 		std::vector<mhz_t> freqLevels{};
 		for (int i = 0; i < this->ncpu; ++i) {
@@ -903,16 +910,12 @@ class Emulator {
 	 *
 	 * When it runs out of load changes it terminates emulation
 	 * and sends a SIGINT to the process.
-	 *
-	 * @param die
-	 *	If the referenced bool is true, emulation is terminated
-	 *	prematurely
 	 */
-	void operator ()(std::atomic<bool> const * const die) try {
+	void operator ()() try {
 		double statTime = 0.; /* in seconds */
 		auto time = std::chrono::steady_clock::now();
 		for (uint64_t interval;
-		     !*die && (std::cin >> interval).good();) {
+		     !this->die && (std::cin >> interval).good();) {
 			/* reporting variables */
 			double statSumRecloads = 0.;
 			double statMaxRecloads = 0.;
@@ -1071,7 +1074,7 @@ class Main {
 
 		/* start background thread */
 		try {
-			this->bgthread = std::thread{Emulator{}, &this->die};
+			this->bgthread = std::thread{Emulator{this->die}};
 		} catch (std::out_of_range &) {
 			fail("failed to start emulator thread");
 			return;
