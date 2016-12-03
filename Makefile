@@ -1,12 +1,12 @@
 CXXFLAGS+= -std=c++11 -Wall -Werror -pedantic
-CFLAGS+=   -std=c11 -Wall -Werror -pedantic
 PREFIX?=   /usr/local
 DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
 
 SRCS=      src/powerd++.cpp src/loadrec.cpp
 SOS=       src/loadplay.cpp
 TARGETS=   ${SRCS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/:C/^/lib/}
-TMP!=      cd ${.CURDIR} && mkdep ${SRCS} ${SOS}
+TMP!=      cd ${.CURDIR} && \
+           env MKDEP_CPP_OPTS="-MM -std=c++11" mkdep ${SRCS} ${SOS}
 
 all: ${TARGETS}
 
