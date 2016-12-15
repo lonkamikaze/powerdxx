@@ -10,7 +10,6 @@
 #include "errors.hpp"
 #include "utility.hpp"
 #include "clas.hpp"
-#include "fixme.hpp"
 
 #include "sys/sysctl.hpp"
 
@@ -50,8 +49,6 @@ using utility::sprintf;
 using namespace utility::literals;
 
 using clas::ival;
-
-using fixme::to_string;
 
 using sys::ctl::make_Sysctl;
 using sys::ctl::make_Once;
