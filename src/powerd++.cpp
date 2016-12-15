@@ -4,7 +4,6 @@
 
 #include "Options.hpp"
 
-#include "fixme.hpp"
 #include "types.hpp"
 #include "constants.hpp"
 #include "errors.hpp"
@@ -35,8 +34,6 @@ namespace {
 
 using nih::Option;
 using nih::make_Options;
-
-using fixme::to_string;
 
 using types::cptime_t;
 using types::mhz_t;
@@ -901,14 +898,13 @@ void run_daemon() try {
 		update_freq();
 	}
 
-	verbose("signal "_s + to_string(g.signal) + " received, exiting ...");
+	verbose("signal %d received, exiting ..."_fmt(g.signal));
 } catch (pid_t otherpid) {
 	fail(Exit::ECONFLICT, EEXIST,
-	     "a power daemon is already running under PID: "_s +
-	     to_string(otherpid));
+	     "a power daemon is already running under PID: %d"_fmt(otherpid));
 } catch (sys::sc_error<sys::pid::error> e) {
 	fail(Exit::EPID, e,
-	     "cannot create pidfile "_s + g.pidfilename);
+	     "cannot create pidfile: "_s + g.pidfilename);
 }
 
 } /* namespace */
