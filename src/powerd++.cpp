@@ -493,13 +493,10 @@ void update_freq() {
 		}
 		/* verbose output */
 		if (!g.foreground) { continue; }
-		std::cout << std::right
-		          << "power: " << std::setw(7)
-		          << AcLineStateStr[acline] << ", load: "
-		          << std::setw(4) << (core.group_loadsum / g.samples)
-		          << " MHz, cpu" << corei << ".freq: " << std::setw(4)
-		          << core.sample_freq << " MHz, wanted: "
-		          << std::setw(4) << wantfreq << " MHz\n";
+		std::cout << "power: %7s, load: %4d MHz, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
+		             (AcLineStateStr[acline],
+		              (core.group_loadsum / g.samples),
+		              corei, core.sample_freq, wantfreq);
 	}
 	if (g.foreground) { std::cout << std::flush; }
 }
@@ -755,23 +752,24 @@ void show_settings() {
 		return;
 	}
 	std::cerr << "Terminal Output\n"
-	          << "\tverbose:               yes\n"
-	          << "\tforeground:            " << (g.foreground ? "yes\n" : "no\n")
-	          << "Load Sampling\n"
-	          << "\tload samples:          " << g.samples << '\n'
-	          << "\tpolling interval:      " << g.interval.count() << " ms\n"
-	          << "\tload average over:     " << (g.samples *
-	                                             g.interval.count()) << " ms\n"
-	          << "Frequency Limits\n";
+	             "\tverbose:               yes\n"
+	             "\tforeground:            %s\n"
+	             "Load Sampling\n"
+	             "\tload samples:          %d\n"
+	             "\tpolling interval:      %d ms\n"
+	             "\tload average over:     %d ms\n"
+	             "Frequency Limits\n"_fmt
+	             (g.foreground ? "yes" : "no",
+	              g.samples, g.interval.count(),
+	              g.samples * g.interval.count());
 	for (size_t i = 0; i < countof(g.acstates); ++i) {
-		std::cerr << '\t' << std::left << std::setw(23)
-		          << (""_s + AcLineStateStr[i] + ':')
-		          << '[' << g.acstates[i].freq_min << " MHz, "
-		                 << g.acstates[i].freq_max << " MHz]\n";
+		std::cerr << "\t%-22s [%d MHz, %d MHz]\n"_fmt
+		             ((""_s + AcLineStateStr[i] + ':').c_str(),
+		              g.acstates[i].freq_min, g.acstates[i].freq_max);
 	}
 	std::cerr << "CPU Cores\n"
-	          << "\tCPU cores:             " << g.ncpu << '\n'
-	          << "Core Groups\n";
+	             "\tCPU cores:             %d\n"
+	             "Core Groups\n"_fmt(g.ncpu);
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		if (i == g.cores[i].controller) {
 			if (i > 0) {
@@ -784,18 +782,18 @@ void show_settings() {
 	          << "Core Frequency Limits\n";
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		if (i != g.cores[i].controller) { continue; }
-		std::cerr << '\t' << i << ": [" << g.cores[i].min << " MHz, "
-		          << g.cores[i].max << " MHz]\n";
+		std::cerr << "\t%d: [%d MHz, %d MHz]\n"_fmt
+		             (i, g.cores[i].min, g.cores[i].max);
 	}
 	std::cerr << "Load Targets\n";
 	for (size_t i = 0; i < countof(g.acstates); ++i) {
 		auto const & acstate = g.acstates[i];
-		std::cerr << '\t' << std::left << std::setw(23)
-		          << (""_s + AcLineStateStr[i] + " power target:")
-		          << (acstate.target_load ?
-		              ((acstate.target_load * 100 + 512) / 1024) :
-		              acstate.target_freq)
-		          << (acstate.target_load ? "% load\n" : " MHz\n");
+		std::cerr << "\t%-22s %2d%% load\n"_fmt
+		             ((""_s + AcLineStateStr[i] + " power target:").c_str(),
+		              acstate.target_load
+		              ? (acstate.target_load * 100 + 512) / 1024
+		              : acstate.target_freq,
+		              acstate.target_load);
 	}
 }
 
