@@ -99,7 +99,12 @@ constexpr VT to_value(ET const op) {
  * ~~~ c++
  * std::cout << "%-15.15s %#018p\n"_fmt("Address:", this);
  * ~~~
+ *
+ * @tparam BufSize
+ *	The buffer size for formatting, resulting strings cannot
+ *	grow beyond `BufSize - 1`
  */
+template <size_t BufSize>
 class Formatter {
 	private:
 	/**
@@ -125,11 +130,13 @@ class Formatter {
 	 */
 	template <typename... ArgTs>
 	std::string operator ()(ArgTs const &... args) const {
-		char buf[65536];
+		char buf[BufSize];
 		auto count = sprintf(buf, this->fmt, args...);
-		if (count >= countof(buf)) {
-			return {buf, countof(buf) - 1};
+		if (count >= BufSize) {
+			/* does not fit into buffer */
+			return {buf, BufSize - 1};
 		} else if (count < 0) {
+			/* encoding error */
 			return {};
 		}
 		return {buf, static_cast<size_t>(count)};
@@ -145,7 +152,7 @@ namespace literals {
  * @return
  *	A Formatter instance
  */
-constexpr Formatter operator "" _fmt(char const * const fmt, size_t const) {
+constexpr Formatter<16384> operator "" _fmt(char const * const fmt, size_t const) {
 	return {fmt};
 }
 } /* namespace literals */
