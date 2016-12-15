@@ -2,6 +2,8 @@
  * Implementations in the fixme namespace.
  */
 
+#include <sstream>  /**< std::ostringstream */
+
 #ifndef _POWERDXX_FIXME_HPP_
 #define _POWERDXX_FIXME_HPP_
 /**
