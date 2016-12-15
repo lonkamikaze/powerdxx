@@ -641,9 +641,9 @@ inline void fail(std::string const & msg) {
 }
 
 /**
- * An anonymous class representing the sysctl table for this library.
+ * Singleton class representing the sysctl table for this library.
  */
-class {
+class Sysctls {
 	private:
 	/**
 	 * A simple mutex.
@@ -762,7 +762,7 @@ class {
 		lock_guard const lock{this->mtx};
 		return this->sysctls.at(mib);
 	}
-} sysctls{};
+} sysctls{}; /**< Sole instance of \ref Sysctls. */
 
 /**
  * Instances of this class represent an emulator session.
@@ -997,7 +997,7 @@ class Emulator {
 };
 
 /**
- * Represents the main execution environment.
+ * Singleton class representing the main execution environment.
  */
 class Main {
 	private:
@@ -1089,7 +1089,7 @@ class Main {
 			this->bgthread.join();
 		}
 	}
-} main{};
+} main{}; /**< Sole instance of \ref Main. */
 
 /**
  * Sets a referenced variable to a given value and restores it when
@@ -1141,7 +1141,8 @@ extern "C" {
 /**
  * Intercept calls to sysctl().
  *
- * Uses the local \ref sysctls store.
+ * Uses the local \ref anonymous_namespace{loadplay.cpp}::sysctls
+ * store.
  *
  * Falls back to the original if kern.usrstack is requested or
  * sysctl_fallback is set.

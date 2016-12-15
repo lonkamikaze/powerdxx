@@ -62,14 +62,14 @@ struct {
 	ms interval{25};      /**< Recording sample interval in ms. */
 
 	/**
-	 * The output file stream to use if an \ref outfilename is
-	 * provided on the CLI.
+	 * The output file stream to use if an outfilename is provided
+	 * on the CLI.
 	 */
 	std::ofstream outfile{};
 
 	/**
 	 * A pointer to the stream to use for output, either std::cout
-	 * or \ref outfile.
+	 * or outfile.
 	 */
 	std::ostream * out = &std::cout;
 
