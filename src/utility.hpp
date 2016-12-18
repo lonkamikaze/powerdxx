@@ -148,12 +148,12 @@ class Formatter {
 	std::string operator ()(ArgTs const &... args) const {
 		char buf[BufSize];
 		auto count = sprintf_safe(buf, this->fmt, args...);
-		if (count >= BufSize) {
-			/* does not fit into buffer */
-			return {buf, BufSize - 1};
-		} else if (count < 0) {
+		if (count < 0) {
 			/* encoding error */
 			return {};
+		} else if (static_cast<size_t>(count) >= BufSize) {
+			/* does not fit into buffer */
+			return {buf, BufSize - 1};
 		}
 		return {buf, static_cast<size_t>(count)};
 	}
