@@ -24,6 +24,9 @@ libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
 loadplay.o:
 	${CXX} -c ${CXXFLAGS} -fPIC -o ${.TARGET} ${.IMPSRC}
 
+g++5:
+	cd "${.CURDIR}" && ${MAKE} CXX="g++5" CXXFLAGS="${CXXFLAGS} -fmax-errors=2 -Wold-style-cast -Wl,-rpath=/usr/local/lib/gcc5"
+
 install: ${TARGETS}
 
 install deinstall: ${.TARGET}.sh pkg.tbl
