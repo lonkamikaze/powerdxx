@@ -50,6 +50,22 @@ inline std::string operator "" _s(char const * const op, size_t const size) {
 } /* namespace literals */
 
 /**
+ * This is a safeguard against accidentally using sprintf().
+ *
+ * Using it triggers a static_assert(), preventing compilation.
+ *
+ * @tparam Args
+ *	Catch all arguments
+ */
+template <typename... Args>
+void sprintf(Args...) {
+	/* Assert depends on Args so it can only be determined if
+	 * the function is actually instantiated. */
+	static_assert(sizeof...(Args) && false,
+	              "Use of sprintf() is unsafe, use sprintf_safe() instead");
+}
+
+/**
  * A wrapper around snprintf() that automatically pulls in the
  * destination buffer size.
  *
@@ -68,7 +84,7 @@ inline std::string operator "" _s(char const * const op, size_t const size) {
  *	available space
  */
 template <size_t Size, typename... Args>
-inline int sprintf(char (& dst)[Size], const char * const format,
+inline int sprintf_safe(char (& dst)[Size], const char * const format,
                    Args const... args) {
 	return snprintf(dst, Size, format, args...);
 }
@@ -131,7 +147,7 @@ class Formatter {
 	template <typename... ArgTs>
 	std::string operator ()(ArgTs const &... args) const {
 		char buf[BufSize];
-		auto count = sprintf(buf, this->fmt, args...);
+		auto count = sprintf_safe(buf, this->fmt, args...);
 		if (count >= BufSize) {
 			/* does not fit into buffer */
 			return {buf, BufSize - 1};

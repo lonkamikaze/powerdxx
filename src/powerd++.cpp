@@ -50,7 +50,7 @@ using clas::ival;
 using clas::samples;
 
 using utility::countof;
-using utility::sprintf;
+using utility::sprintf_safe;
 using utility::to_value;
 using namespace utility::literals;
 
@@ -310,7 +310,7 @@ void init() {
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
 		/* get the frequency handler */
 		char name[40];
-		sprintf(name, FREQ, core);
+		sprintf_safe(name, FREQ, core);
 		try {
 			g.cores[core].freq = {{name}};
 			controller = core;
@@ -346,7 +346,7 @@ void init() {
 		auto & core = g.cores[i];
 		if (core.controller != i) { continue; }
 		char name[40];
-		sprintf(name, FREQ_LEVELS, i);
+		sprintf_safe(name, FREQ_LEVELS, i);
 		try {
 			sys::ctl::Sysctl<4> const ctl{name};
 			auto levels = ctl.get<char>();

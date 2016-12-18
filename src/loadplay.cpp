@@ -46,7 +46,7 @@ using constants::ACLINE;
 using constants::FREQ;
 using constants::FREQ_LEVELS;
 
-using utility::sprintf;
+using utility::sprintf_safe;
 using namespace utility::literals;
 
 using types::ms;
@@ -830,7 +830,7 @@ class Emulator {
 		for (int i = 0; i < this->ncpu; ++i) {
 			/* get freqency handler */
 			char name[40];
-			sprintf(name, FREQ, i);
+			sprintf_safe(name, FREQ, i);
 			try {
 				this->freqs[i] = &sysctls[sysctls.getMib(name)];
 			} catch (std::out_of_range &) {
@@ -847,7 +847,7 @@ class Emulator {
 			this->freqRefs[i] = this->freqs[i]->get<mhz_t>();
 
 			/* get freq_levels */
-			sprintf(name, FREQ_LEVELS, i);
+			sprintf_safe(name, FREQ_LEVELS, i);
 			try {
 				auto levels = sysctls[sysctls.getMib(name)]
 				              .get<std::string>();
@@ -1041,7 +1041,7 @@ class Main {
 
 		/* check for dev.cpu.0.freq */
 		char name[40];
-		sprintf(name, FREQ, 0);
+		sprintf_safe(name, FREQ, 0);
 		try {
 			sysctls.getMib(name);
 		} catch (std::out_of_range &) {
@@ -1050,7 +1050,7 @@ class Main {
 		}
 
 		/* check for dev.cpu.0.freq_levels */
-		sprintf(name, FREQ_LEVELS, 0);
+		sprintf_safe(name, FREQ_LEVELS, 0);
 		try {
 			sysctls.getMib(name);
 		} catch (std::out_of_range &) {

@@ -45,7 +45,7 @@ using errors::Exception;
 using errors::fail;
 
 using utility::to_value;
-using utility::sprintf;
+using utility::sprintf_safe;
 using namespace utility::literals;
 
 using clas::ival;
@@ -209,7 +209,7 @@ void print_sysctls() {
 
 	char mibname[40];
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
-		sprintf(mibname, FREQ, i);
+		sprintf_safe(mibname, FREQ, i);
 		try {
 			sys::ctl::Sysctl<4> ctl{mibname};
 			*g.out << mibname << '='
@@ -221,7 +221,7 @@ void print_sysctls() {
 				     "at least the first CPU core must support frequency updates");
 			}
 		}
-		sprintf(mibname, FREQ_LEVELS, i);
+		sprintf_safe(mibname, FREQ_LEVELS, i);
 		try {
 			sys::ctl::Sysctl<4> ctl{mibname};
 			*g.out << mibname << '='
