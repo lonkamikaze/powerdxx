@@ -84,7 +84,7 @@ void sprintf(Args...) {
  *	available space
  */
 template <size_t Size, typename... Args>
-inline int sprintf_safe(char (& dst)[Size], const char * const format,
+inline int sprintf_safe(char (& dst)[Size], char const * const format,
                    Args const... args) {
 	return snprintf(dst, Size, format, args...);
 }
