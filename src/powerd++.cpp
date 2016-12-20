@@ -17,15 +17,15 @@
 #include <locale>    /**< std::tolower() */
 #include <memory>    /**< std::unique_ptr */
 #include <chrono>    /**< std::chrono::steady_clock::now() */
-#include <thread>    /**< std::this_thread::sleep_until(), std::thread */
+#include <thread>    /**< std::this_thread::sleep_until() */
 #include <algorithm> /**< std::min(), std::max() */
 
 #include <cstdlib>   /**< atof(), atoi(), strtol() */
 #include <cstdint>   /**< uint64_t */
+#include <csignal>   /**< signal(), sig_atomic_t */
 
 #include <sys/resource.h>  /**< CPUSTATES */
 
-#include <signal.h>  /**< signal() */
 
 /**
  * File local scope.
@@ -164,7 +164,7 @@ struct {
 	/**
 	 * The last signal received, used for terminating.
 	 */
-	volatile int signal{0};
+	volatile sig_atomic_t signal{0};
 
 	/**
 	 * The number of load samples to take.
@@ -855,7 +855,7 @@ class FreqGuard final {
  * @param signal
  *	The signal number received
  */
-void signal_recv(int const signal) {
+void signal_recv(int signal) {
 	g.signal = signal;
 }
 
