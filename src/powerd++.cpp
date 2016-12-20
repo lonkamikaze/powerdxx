@@ -12,6 +12,7 @@
 
 #include "sys/sysctl.hpp"
 #include "sys/pidfile.hpp"
+#include "sys/signal.hpp"
 
 #include <iostream>  /**< std::cout, std::cerr */
 #include <locale>    /**< std::tolower() */
@@ -22,7 +23,6 @@
 
 #include <cstdlib>   /**< atof(), atoi(), strtol() */
 #include <cstdint>   /**< uint64_t */
-#include <csignal>   /**< signal(), sig_atomic_t */
 
 #include <sys/resource.h>  /**< CPUSTATES */
 
@@ -65,8 +65,6 @@ using constants::FREQ_UNSET;
 using constants::POWERD_PIDFILE;
 using constants::ADP;
 using constants::HADP;
-
-using sys::ctl::make_Once;
 
 /**
  * The available AC line states.
@@ -876,14 +874,10 @@ void run_daemon() try {
 		fail(Exit::EDAEMON, errno, "detaching the process failed");
 	}
 
-	/* Setup SIGHUP */
-	if (g.foreground) {
-		/* Terminate in foreground */
-		signal(SIGHUP, signal_recv);
-	} else {
-		/* Ignore in daemon mode */
-		signal(SIGHUP, SIG_IGN);
-	}
+	/* setup signal handlers */
+	sys::sig::Signal sigint{SIGINT, signal_recv};
+	sys::sig::Signal sigterm{SIGTERM, signal_recv};
+	sys::sig::Signal sighup{SIGHUP, (g.foreground ? signal_recv : SIG_IGN)};
 
 	/* write pid */
 	try {
@@ -907,6 +901,9 @@ void run_daemon() try {
 } catch (sys::sc_error<sys::pid::error> e) {
 	fail(Exit::EPID, e,
 	     "cannot create pidfile: "_s + g.pidfilename);
+} catch (sys::sc_error<sys::sig::error> e) {
+	fail(Exit::ESIGNAL, e,
+	     "failed to register signal handler: "_s + e.c_str());
 }
 
 } /* namespace */
@@ -922,8 +919,6 @@ void run_daemon() try {
  */
 int main(int argc, char * argv[]) {
 	try {
-		signal(SIGINT, signal_recv);
-		signal(SIGTERM, signal_recv);
 		read_args(argc, argv);
 		init();
 		show_settings();
@@ -939,6 +934,9 @@ int main(int argc, char * argv[]) {
 		throw;
 	} catch (sys::sc_error<sys::pid::error> e) {
 		std::cerr << "powerd++: untreated pidfile failure: " << e.c_str() << '\n';
+		throw;
+	} catch (sys::sc_error<sys::sig::error> e) {
+		std::cerr << "powerd++: untreated signal setup failure: " << e.c_str() << '\n';
 		throw;
 	} catch (...) {
 		std::cerr << "powerd++: untreated failure\n";
