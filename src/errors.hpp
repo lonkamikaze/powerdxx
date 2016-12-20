@@ -33,6 +33,7 @@ enum class Exit : int {
 	EFORBIDDEN,  /**< Insufficient privileges to change sysctl */
 	EDAEMON,     /**< Unable to detach from terminal */
 	EWOPEN,      /**< Could not open file for writing */
+	ESIGNAL,     /**< Failed to install signal handler */
 	LENGTH       /**< Enum length */
 };
 
@@ -42,7 +43,7 @@ enum class Exit : int {
 const char * const ExitStr[]{
 	"OK", "ECLARG", "EOUTOFRANGE", "ELOAD", "EFREQ", "EMODE", "EIVAL",
 	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
-	"EDAEMON", "EWOPEN"
+	"EDAEMON", "EWOPEN", "ESIGNAL"
 };
 
 static_assert(utility::to_value(Exit::LENGTH) == utility::countof(ExitStr),
