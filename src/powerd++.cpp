@@ -219,9 +219,9 @@ struct {
 	};
 
 	/**
-	 * The hw.acpi.acline sysctl.
+	 * The hw.acpi.acline handle.
 	 */
-	sys::ctl::Sysctl<3> acline_ctl{};
+	sys::ctl::SysctlSync<AcLineState, 3> acline;
 
 	/**
 	 * Verbose mode.
@@ -296,7 +296,7 @@ void sysctl_fail(sys::sc_error<sys::ctl::error> const err) {
 void init() {
 	/* get AC line state MIB */
 	try {
-		g.acline_ctl = {ACLINE};
+		g.acline = {{ACLINE}};
 	} catch (sys::sc_error<sys::ctl::error>) {
 		verbose("cannot read "_s + ACLINE);
 	}
@@ -459,8 +459,7 @@ void update_freq() {
 	update_group_loads();
 
 	/* get AC line status */
-	auto const acline = to_value<AcLineState>(
-	    make_Once(AcLineState::UNKNOWN, g.acline_ctl));
+	auto const acline = to_value<AcLineState>(g.acline);
 	auto const & acstate = g.acstates[acline];
 
 	assert(acstate.target_load <= 1024 &&
@@ -510,8 +509,7 @@ void init_loads() {
 	update_loads();
 
 	/* get AC line status */
-	auto const acline = to_value<AcLineState>(
-	    make_Once(AcLineState::UNKNOWN, g.acline_ctl));
+	auto const acline = to_value<AcLineState>(g.acline);
 	auto const & acstate = g.acstates[acline];
 
 	/* fill the load buffer for each core */
