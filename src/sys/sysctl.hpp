@@ -259,6 +259,15 @@ class Sync {
 
 	public:
 	/**
+	 * The default constructor.
+	 *
+	 * This is available to defer initialisation to a later moment.
+	 * This might be useful when initialising global or static
+	 * instances by a character string repesented name.
+	 */
+	constexpr Sync() {}
+
+	/**
 	 * The constructor copies the given Sysctl instance.
 	 *
 	 * @param sysctl
