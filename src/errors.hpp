@@ -32,7 +32,8 @@ enum class Exit : int {
 	EPID,        /**< A pidfile could not be created */
 	EFORBIDDEN,  /**< Insufficient privileges to change sysctl */
 	EDAEMON,     /**< Unable to detach from terminal */
-	EWOPEN       /**< Could not open file for writing */
+	EWOPEN,      /**< Could not open file for writing */
+	LENGTH       /**< Enum length */
 };
 
 /**
@@ -43,6 +44,9 @@ const char * const ExitStr[]{
 	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
 	"EDAEMON", "EWOPEN"
 };
+
+static_assert(utility::to_value(Exit::LENGTH) == utility::countof(ExitStr),
+              "Every Exit code must have a string representation");
 
 /**
  * Exceptions bundle an exit code, errno value and message.
@@ -76,8 +80,6 @@ struct Exception {
  */
 [[noreturn]] inline void
 fail(Exit const exitcode, int const err, std::string const & msg) {
-	assert(size_t(static_cast<int>(exitcode)) < utility::countof(ExitStr) &&
-	       "Enum member must have a corresponding string");
 	throw Exception{exitcode, err, "("_s +
 	                               ExitStr[utility::to_value(exitcode)] +
 	                               ") " + msg};

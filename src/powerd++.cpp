@@ -74,13 +74,17 @@ using sys::ctl::make_Once;
 enum class AcLineState : unsigned int {
 	BATTERY, /**< Battery is power source */
 	ONLINE,  /**< External power source */
-	UNKNOWN  /**< Unknown power source */
+	UNKNOWN, /**< Unknown power source */
+	LENGTH   /**< Enum length */
 };
 
 /**
  * String descriptions for the AC line states.
  */
 char const * const AcLineStateStr[]{"battery", "online", "unknown"};
+
+static_assert(to_value(AcLineState::LENGTH) == countof(AcLineStateStr),
+              "Every AcLineState must have a string representation");
 
 /**
  * Contains the management information for a single CPU core.
@@ -258,7 +262,7 @@ struct {
 	std::unique_ptr<Core[]> cores;
 } g;
 
-static_assert(countof(g.acstates) == countof(AcLineStateStr),
+static_assert(countof(g.acstates) == to_value(AcLineState::LENGTH),
               "There must be a configuration tuple for each state");
 
 /**
