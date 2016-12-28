@@ -34,13 +34,13 @@ loadplay.o:
 #       linked in, e.g. head/r310361 is affected by this.
 
 powerd++: ${.TARGET}.o
-	${CXX} -lpthread -lutil ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
+	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC} -lpthread -lutil
 
 loadrec: ${.TARGET}.o
-	${CXX} -lpthread ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
+	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC} -lpthread
 
 libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
-	${CXX} -lpthread -shared ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
+	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC} -lpthread -shared
 
 # Combinable build targets
 .ifmake(debug)
