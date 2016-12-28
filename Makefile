@@ -18,6 +18,21 @@ all: ${TARGETS}
 
 .sinclude ".depend"
 
+# Building
+loadplay.o:
+	${CXX} -c ${CXXFLAGS} -fPIC -o ${.TARGET} ${.IMPSRC}
+
+# Linking
+#
+# | Flag      | Targets           | Why                                    |
+# |-----------|-------------------|----------------------------------------|
+# | -lutil    | powerd++          | Required for pidfile_open() etc.       |
+# | -lpthread | powerd++, loadrec | FreeBSD 12 userland bug workaround[^1] |
+# | -lpthread | libloadplay.so    | Uses std::thread                       |
+#
+# [^1]: Signals get lost en route to the process if pthread is not
+#       linked in, e.g. head/r310361 is affected by this.
+
 powerd++: ${.TARGET}.o
 	${CXX} -lpthread -lutil ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
 
@@ -26,9 +41,6 @@ loadrec: ${.TARGET}.o
 
 libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
 	${CXX} -lpthread -shared ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
-
-loadplay.o:
-	${CXX} -c ${CXXFLAGS} -fPIC -o ${.TARGET} ${.IMPSRC}
 
 # Combinable build targets
 .ifmake(debug)
