@@ -19,10 +19,10 @@ all: ${TARGETS}
 .sinclude ".depend"
 
 powerd++: ${.TARGET}.o
-	${CXX} -lutil ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
+	${CXX} -lpthread -lutil ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
 
 loadrec: ${.TARGET}.o
-	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
+	${CXX} -lpthread ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
 
 libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
 	${CXX} -lpthread -shared ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC}
