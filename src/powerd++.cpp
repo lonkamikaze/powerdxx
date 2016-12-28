@@ -769,16 +769,13 @@ void show_settings() {
 	std::cerr << "CPU Cores\n"
 	             "\tCPU cores:             %d\n"
 	             "Core Groups\n"_fmt(g.ncpu);
-	for (coreid_t i = 0; i < g.ncpu; ++i) {
-		if (i == g.cores[i].controller) {
-			if (i > 0) {
-				std::cerr << (i - 1) << "]\n";
-			}
-			std::cerr << '\t' << i << ": [" << i << ", ";
+	for (coreid_t b = 0, e = 1; e <= g.ncpu; ++e) {
+		if (e == g.ncpu || e == g.cores[e].controller) {
+			std::cerr << "\t%d: [%d, %d]\n"_fmt(b, b, e - 1);
+			b = e;
 		}
 	}
-	std::cerr << (g.ncpu - 1) << "]\n"
-	          << "Core Frequency Limits\n";
+	std::cerr << "Core Frequency Limits\n";
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		if (i != g.cores[i].controller) { continue; }
 		std::cerr << "\t%d: [%d MHz, %d MHz]\n"_fmt
