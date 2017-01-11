@@ -68,3 +68,13 @@ install deinstall: ${.TARGET}.sh pkg.tbl
 # Clean
 clean:
 	rm -f *.o ${TARGETS}
+
+# Documentation
+doc::
+	cd "${.CURDIR}" && doxygen doxy/doxygen.conf
+
+doc/latex/refman.pdf: doc
+	cd "${.CURDIR}" && cd "${.TARGET:H}" && ${MAKE}
+
+doc/refman.pdf: doc/latex/refman.pdf
+	cd "${.CURDIR}" && cp "${.ALLSRC}" "${.TARGET}"
