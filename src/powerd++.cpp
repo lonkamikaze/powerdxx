@@ -15,15 +15,15 @@
 #include "sys/pidfile.hpp"
 #include "sys/signal.hpp"
 
-#include <iostream>  /**< std::cout, std::cerr */
-#include <locale>    /**< std::tolower() */
-#include <memory>    /**< std::unique_ptr */
-#include <algorithm> /**< std::min(), std::max() */
+#include <iostream>  /* std::cout, std::cerr */
+#include <locale>    /* std::tolower() */
+#include <memory>    /* std::unique_ptr */
+#include <algorithm> /* std::min(), std::max() */
 
-#include <cstdlib>   /**< atof(), atoi(), strtol() */
-#include <cstdint>   /**< uint64_t */
+#include <cstdlib>   /* atof(), atoi(), strtol() */
+#include <cstdint>   /* uint64_t */
 
-#include <sys/resource.h>  /**< CPUSTATES */
+#include <sys/resource.h>  /* CPUSTATES */
 
 
 /**
