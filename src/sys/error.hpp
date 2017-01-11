@@ -14,7 +14,7 @@
 namespace sys {
 
 /**
- * Can be thrown by syscall fanction wrappers if the function returned
+ * Can be thrown by syscall function wrappers if the function returned
  * with an error.
  *
  * This is its own type for easy catching, but implicitly casts to
