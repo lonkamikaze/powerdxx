@@ -20,7 +20,7 @@ all: ${TARGETS}
 
 # Building
 loadplay.o:
-	${CXX} -c ${CXXFLAGS} -fPIC -o ${.TARGET} ${.IMPSRC}
+	${CXX} ${CXXFLAGS} -fPIC -c ${.IMPSRC} -o ${.TARGET}
 
 # Linking
 #
@@ -34,13 +34,13 @@ loadplay.o:
 #       linked in, e.g. head/r310361 is affected by this.
 
 powerd++: ${.TARGET}.o
-	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC} -lpthread -lutil
+	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -lutil -o ${.TARGET}
 
 loadrec: ${.TARGET}.o
-	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC} -lpthread
+	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -o ${.TARGET}
 
 libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
-	${CXX} ${CXXFLAGS} -o ${.TARGET} ${.ALLSRC} -lpthread -shared
+	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -shared -o ${.TARGET}
 
 # Combinable build targets
 .ifmake(debug)
