@@ -6,6 +6,10 @@
  * about the hijacked process on std::cout.
  */
 
+#include "utility.hpp"
+#include "constants.hpp"
+#include "fixme.hpp"
+
 #include <iostream>  /* std::cin, std::cout, std::cerr */
 #include <iomanip>   /* std::fixed, std::setprecision */
 #include <unordered_map>
@@ -22,6 +26,7 @@
 
 #include <cstring>   /* strncmp() */
 #include <cassert>   /* assert() */
+#include <csignal>   /* raise() */
 
 #include <sys/types.h>
 #include <sys/sysctl.h>
@@ -30,11 +35,6 @@
 
 #include <dlfcn.h>         /* dlfung() */
 #include <unistd.h>        /* getpid() */
-#include <signal.h>        /* kill() */
-
-#include "utility.hpp"
-#include "constants.hpp"
-#include "fixme.hpp"
 
 /**
  * File local scope.
@@ -990,7 +990,7 @@ class Emulator {
 		}
 
 		/* tell process to die */
-		kill(getpid(), SIGINT);
+		raise(SIGINT);
 	} catch (std::out_of_range &) {
 		fail("incomplete emulation setup, please check your load record for complete initialisation");
 	}
