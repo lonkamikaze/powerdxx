@@ -3,6 +3,7 @@
  */
 
 #include "Options.hpp"
+#include "Cycle.hpp"
 
 #include "types.hpp"
 #include "constants.hpp"
@@ -17,8 +18,6 @@
 #include <iostream>  /**< std::cout, std::cerr */
 #include <locale>    /**< std::tolower() */
 #include <memory>    /**< std::unique_ptr */
-#include <chrono>    /**< std::chrono::steady_clock::now() */
-#include <thread>    /**< std::this_thread::sleep_until() */
 #include <algorithm> /**< std::min(), std::max() */
 
 #include <cstdlib>   /**< atof(), atoi(), strtol() */
@@ -887,9 +886,8 @@ void run_daemon() try {
 	}
 
 	/* the main loop */
-	auto time = std::chrono::steady_clock::now();
-	while (g.signal == 0) {
-		std::this_thread::sleep_until(time += g.interval);
+	timing::Cycle sleep;
+	while (!g.signal && sleep(g.interval)) {
 		update_freq();
 	}
 
