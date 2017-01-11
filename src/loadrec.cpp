@@ -131,7 +131,7 @@ Option<OE> const OPTIONS[]{
  */
 inline void verbose(std::string const & msg) {
 	if (g.verbose) {
-		std::cerr << "powerd++: " << msg << '\n';
+		std::cerr << "loadrec: " << msg << '\n';
 	}
 }
 
