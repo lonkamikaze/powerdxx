@@ -472,24 +472,29 @@ void update_freq() {
 		if (core.controller != corei) { continue; }
 
 		/* determine target frequency */
-		mhz_t wantfreq = 0;
+		mhz_t wantfreq, newfreq;
+		auto const max = std::min(core.max, acstate.freq_max);
+		auto const min = std::max(core.min, acstate.freq_min);
 		if (acstate.target_load) {
 			/* adaptive frequency mode */
 			wantfreq = core.group_loadsum / g.samples *
 			           1024 / acstate.target_load;
+			newfreq = std::min(std::max(wantfreq, min), max);
 		} else {
 			/* fixed frequency mode */
-			wantfreq = acstate.target_freq;
+			/*
+			 * Do not distinguish between newfreq and
+			 * wantfreq in this mode, because users might
+			 * be disturbed by seeing a 1THz target.
+			 */
+			wantfreq = std::min(std::max(acstate.target_freq, min), max);
+			newfreq = wantfreq;
 		}
-		/* apply limits */
-		auto const max = std::min(core.max, acstate.freq_max);
-		auto const min = std::max(core.min, acstate.freq_min);
-		mhz_t newfreq = std::min(std::max(wantfreq, min), max);
 		/* update CPU frequency */
 		if (core.sample_freq != newfreq) {
 			core.freq = newfreq;
 		}
-		/* verbose output */
+		/* foreground output */
 		if (!g.foreground) { continue; }
 		std::cout << "power: %7s, load: %4d MHz, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
 		             (AcLineStateStr[acline],
