@@ -1,0 +1,7 @@
+<map id="anonymous_namespace{loadplay.cpp}::Sysctls" name="anonymous_namespace{loadplay.cpp}::Sysctls">
+<area shape="rect" id="node3" href="$structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html" title="Represents MIB, but wraps it to provide the necessary operators to use it as an std::map key..." alt="" coords="533,65,696,107"/>
+<area shape="rect" id="node4" title="STL class. " alt="" coords="269,42,349,69"/>
+<area shape="rect" id="node7" href="$classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html" title="Instances of this class represents a specific sysctl value. " alt="" coords="524,131,705,172"/>
+<area shape="rect" id="node5" title="STL class. " alt="" coords="5,35,132,76"/>
+<area shape="rect" id="node8" href="$classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html" title="anonymous_namespace\l\{loadplay.cpp\}::Callback\l\&lt; anonymous_namespace\{loadplay.cpp\}\l::SysctlValue &amp;\&gt;" alt="" coords="181,116,437,187"/>
+</map>

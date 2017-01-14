@@ -1,0 +1,7 @@
+<map id="types.hpp" name="types.hpp">
+<area shape="rect" id="node2" href="$clas_8hpp.html" title="Implements functions to process command line arguments. " alt="" coords="207,80,277,107"/>
+<area shape="rect" id="node3" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings..." alt="" coords="124,155,213,181"/>
+<area shape="rect" id="node4" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd. " alt="" coords="237,155,343,181"/>
+<area shape="rect" id="node5" href="$constants_8hpp.html" title="Defines a collection of constants. " alt="" coords="27,80,131,107"/>
+<area shape="rect" id="node6" href="$loadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD. " alt="" coords="5,155,100,181"/>
+</map>
