@@ -71,10 +71,12 @@ clean:
 
 # Documentation
 doc::
+	rm -rf ${.TARGET}/*
 	cd "${.CURDIR}" && doxygen doxy/doxygen.conf
 
 doc/latex/refman.pdf: doc
 	cd "${.CURDIR}" && cd "${.TARGET:H}" && ${MAKE}
 
-doc/refman.pdf: doc/latex/refman.pdf
-	cd "${.CURDIR}" && cp "${.ALLSRC}" "${.TARGET}"
+gh-pages: doc doc/latex/refman.pdf
+	rm -rf ${.TARGET}/*
+	cp -R ${.CURDIR}/doc/html/* ${.CURDIR}/doc/latex/refman.pdf ${.TARGET}/
