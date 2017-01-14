@@ -1,0 +1,4 @@
+[submodule "gh-pages"]
+	path = gh-pages
+	url = ../powerdxx.git
+	branch = gh-pages
