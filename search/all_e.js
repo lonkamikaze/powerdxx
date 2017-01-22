@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['powerd_2b_2b_288_29',['powerd++(8)',['../man__2usr_2home_2kamikaze_2stark_2freebsd_2powerdxx_8git_2powerd_09_09_88.html',1,'']]],
   ['percent',['PERCENT',['../namespaceclas.html#a69fce1042a54c26aa41af7851425f602a6865d19576ae60f95fd4e61333404352',1,'clas']]],
   ['pfh',['pfh',['../classsys_1_1pid_1_1Pidfile.html#a3676a12932adc48080107003497e5aa0',1,'sys::pid::Pidfile']]],
   ['pidfile',['Pidfile',['../classsys_1_1pid_1_1Pidfile.html',1,'sys::pid']]],

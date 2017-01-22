@@ -62,16 +62,7 @@ $(function() {
 <div class="title">powerd++ Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><hr/>
- <pre class="fragment">                                      /\  __
-   __ __ ___  ___  __ _____  ___  ___/ /_/ /_
-  /_//_//   \/   \/ // / _ \/ __\/    /_   _/__
- __ __ / // / // /    / ___/ /  / // /  /_/_/ /_
-/_//_// ___/\___/\_/_/\___/_/   \___/     /_  _/
-     / /                                   /_/
-     \/ multi-core CPU clock daemon for FreeBSD®
-</pre><hr/>
-<p>The <code>powerd++</code> daemon is a drop-in replacement for FreeBSD's native <code>powerd(8)</code>. It monitors the system load and adjusts the CPU clock accordingly, avoiding some of the pitfalls of <code>powerd</code>.</p>
+<div class="textblock"><div class="fragment"><div class="line">                                      /\  __</div><div class="line">   __ __ ___  ___  __ _____  ___  ___/ /_/ /_</div><div class="line">  /_//_//   \/   \/ // / _ \/ __\/    /_   _/__</div><div class="line"> __ __ / // / // /    / ___/ /  / // /  /_/_/ /_</div><div class="line">/_//_// ___/\___/\_/_/\___/_/   \___/     /_  _/</div><div class="line">     / /                                   /_/</div><div class="line">     \/ multi-core CPU clock daemon for FreeBSD®</div></div><!-- fragment --><p>The <code>powerd++</code> daemon is a drop-in replacement for FreeBSD's native <code>powerd(8)</code>. It monitors the system load and adjusts the CPU clock accordingly, avoiding some of the pitfalls of <code>powerd</code>.</p>
 <h2>What Pitfalls? </h2>
 <p>At the time <code>powerd++</code> was first created (February 2016), <code>powerd</code> exhibited some unhealthy behaviours on multi-core machines.</p>
 <p>In order to make sure that single core loads do not suffer from the use of <code>powerd</code> it was designed to use the sum load of all cores as the current load rating. A side effect of this is that it causes <code>powerd</code> to never clock down on systems with even moderate numbers of cores. E.g. on a quad-core system with hyper threading a background load of 12.5% per core suffices to score a 100% load rating.</p>
