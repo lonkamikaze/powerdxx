@@ -56,7 +56,7 @@ or
 at which the turbo mode is activated. E.g. an
 .Nm Intel(R) Core(TM) i7-4500U CPU
 supports the following frequency settings:
-.Bd -literal -offset indent
+.Bd -literal -offset 4m
 > sysctl dev.cpu.0.freq_levels
 dev.cpu.0.freq_levels: 2401/15000 2400/15000 2300/14088 2200/13340 2000/11888 1900/11184 1800/10495 1700/9680 1500/8372 1400/7738 1300/7119 1200/6511 1100/5789 900/4643 800/4090 768/3550
 .Ed
@@ -71,7 +71,7 @@ same performance (given similar thermal conditions).
 So in order to produce a usable measurement for this CPU the clock
 needs to be set to 1700 MHz or lower (higher is better to be able
 to record a wider range of loads):
-.Bd -literal -offset indent
+.Bd -literal -offset 4m
 # service powerd++ stop
 Stopping powerdxx.
 Waiting for PIDS: 63574.
@@ -82,7 +82,7 @@ dev.cpu.0.freq: 2401 -> 1700
 Run
 .Nm
 for a brief time to test it:
-.Bd -literal -offset indent
+.Bd -literal -offset 4m
 > loadrec -d.25s
 hw.machine=amd64
 hw.model=Intel(R) Core(TM) i7-4500U CPU @ 1.80GHz
@@ -106,7 +106,7 @@ dev.cpu.0.freq_levels=2401/15000 2400/15000 2300/14088 2200/13340 2000/11888 190
 Printing the load creates significant load itself, so for the actual
 measurement the output should be written to a file. Create your workload
 and start your measurement:
-.Bd -literal -offset indent
+.Bd -literal -offset 4m
 > loadrec -o video-session.load
 .Ed
 .Pp
