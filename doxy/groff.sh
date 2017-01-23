@@ -1,7 +1,8 @@
 #!/bin/sh
 name="${1##*/}"
 name="${name%.*}"
-echo "\\page man_$1 $name(${1##*.})
+sane="$(echo "$name" | tr '+' 'x')"
+echo "\\page man_${1##*.}_$sane $name(${1##*.})
 
 \\brief Manual page for \`$name(${1##*.})\`.
 
