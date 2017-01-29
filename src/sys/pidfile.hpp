@@ -52,7 +52,8 @@ class Pidfile final {
 	 * @param pfname,mode
 	 *	Arguments to pidfile_open()
 	 * @throws pid_t
-	 *	Throws the PID of the other process already holding *	the requested pidfile
+	 *	Throws the PID of the other process already holding
+	 *	the requested pidfile
 	 * @throws sys::sc_error<error>
 	 *	Throws with the errno of pidfile_open()
 	 */
