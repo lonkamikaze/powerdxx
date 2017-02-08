@@ -27,17 +27,13 @@ loadplay.o:
 # | Flag      | Targets           | Why                                    |
 # |-----------|-------------------|----------------------------------------|
 # | -lutil    | powerd++          | Required for pidfile_open() etc.       |
-# | -lpthread | powerd++, loadrec | FreeBSD 12 userland bug workaround[^1] |
 # | -lpthread | libloadplay.so    | Uses std::thread                       |
-#
-# [^1]: Signals get lost en route to the process if pthread is not
-#       linked in, e.g. head/r310361 is affected by this.
 
 powerd++: ${.TARGET}.o
-	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -lutil -o ${.TARGET}
+	${CXX} ${CXXFLAGS} ${.ALLSRC} -lutil -o ${.TARGET}
 
 loadrec: ${.TARGET}.o
-	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -o ${.TARGET}
+	${CXX} ${CXXFLAGS} ${.ALLSRC} -o ${.TARGET}
 
 libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -shared -o ${.TARGET}
