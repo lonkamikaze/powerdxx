@@ -13,6 +13,7 @@
 
 #include <string>    /* std::string */
 #include <locale>    /* std::tolower() */
+#include <utility>   /* std::pair() */
 
 /**
  * A collection of functions to process command line arguments.
@@ -229,6 +230,35 @@ size_t samples(char const * const str) {
 		             "sample count must be in the range [1, 1000]: "_s + str);
 	}
 	return size_t(cnt);
+}
+
+/**
+ * Takes a string encoded range of values and returns them.
+ *
+ * A range has the format `from:to`.
+ *
+ * @tparam T
+ *	The return type of the conversion function
+ * @parma str
+ *	The string containing the range
+ * @param func
+ *	The function that converts the values from the string
+ * @return
+ *	A pair with the `from` and `to` values
+ */
+template <typename T>
+std::pair<T, T> range(char const * const str, T (* func)(char const * const)) {
+	std::pair<T, T> result;
+	std::string first{str};
+	auto const sep = first.find(':');
+	if (sep == std::string::npos) {
+		errors::fail(errors::Exit::ERANGEFMT, 0,
+		             "missing colon separator in range: "_s + str);
+	}
+	first.erase(sep);
+	result.first = func(first.c_str());
+	result.second = func(str + sep + 1);
+	return result;
 }
 
 } /* namespace clas */
