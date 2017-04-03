@@ -239,8 +239,7 @@ size_t argCount(Option<Enum> const & def) {
 template <class Enum, size_t DefCount>
 class Options {
 	static_assert(enum_has_members<Enum>::value,
-	              "The enum must have the members OPT_UNKNOWN, OPT_NOOPT, "
-	              "OPT_DASH, OPT_LDASH and OPT_DONE");
+	              "The enum must have the members OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH and OPT_DONE");
 	private:
 	/**
 	 * The number of command line arguments.
