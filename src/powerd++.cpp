@@ -47,6 +47,7 @@ using clas::load;
 using clas::freq;
 using clas::ival;
 using clas::samples;
+using clas::range;
 
 using utility::countof;
 using utility::sprintf_safe;
@@ -640,6 +641,9 @@ enum class OE {
 	FREQ_MAX_AC,     /**< Set maximum clock frequency on AC power */
 	FREQ_MIN_BATT,   /**< Set minimum clock frequency on battery power */
 	FREQ_MAX_BATT,   /**< Set maximum clock frequency on battery power */
+	FREQ_RANGE,      /**< Set clock frequency range */
+	FREQ_RANGE_AC,   /**< Set clock frequency range on AC power */
+	FREQ_RANGE_BATT, /**< Set clock frequency range on battery power */
 	MODE_UNKNOWN,    /**< Set unknown power source mode */
 	IVAL_POLL,       /**< Set polling interval */
 	FILE_PID,        /**< Set pidfile */
@@ -657,29 +661,32 @@ enum class OE {
 /**
  * The short usage string.
  */
-char const * const USAGE = "[-hvf] [-abn mode] [-mM freq] [-p ival] [-s cnt] [-P file]";
+char const * const USAGE = "[-hvf] [-abn mode] [-mM freq] [-FAB freq:freq] [-p ival] [-s cnt] [-P file]";
 
 /**
  * Definitions of command line options.
  */
 Option<OE> const OPTIONS[]{
-	{OE::USAGE,           'h', "help",       "",     "Show usage and exit"},
-	{OE::FLAG_VERBOSE,    'v', "verbose",    "",     "Be verbose"},
-	{OE::FLAG_FOREGROUND, 'f', "foreground", "",     "Stay in foreground"},
-	{OE::MODE_AC,         'a', "ac",         "mode", "Select the mode while on AC power"},
-	{OE::MODE_BATT,       'b', "batt",       "mode", "Select the mode while on battery power"},
-	{OE::MODE_UNKNOWN,    'n', "unknown",    "mode", "Select the mode while power source is unknown"},
-	{OE::FREQ_MIN,        'm', "min",        "freq", "The minimum CPU frequency"},
-	{OE::FREQ_MAX,        'M', "max",        "freq", "The maximum CPU frequency"},
-	{OE::FREQ_MIN_AC,      0 , "min-ac",     "freq", "The minimum CPU frequency on AC power"},
-	{OE::FREQ_MAX_AC,      0 , "max-ac",     "freq", "The maximum CPU frequency on AC power"},
-	{OE::FREQ_MIN_BATT,    0 , "min-batt",   "freq", "The minimum CPU frequency on battery power"},
-	{OE::FREQ_MAX_BATT,    0 , "max-batt",   "freq", "The maximum CPU frequency on battery power"},
-	{OE::IVAL_POLL,       'p', "poll",       "ival", "The polling interval"},
-	{OE::CNT_SAMPLES,     's', "samples",    "cnt",  "The number of samples to use"},
-	{OE::FILE_PID,        'P', "pid",        "file", "Alternative PID file"},
-	{OE::IGNORE,          'i', "",           "load", "Ignored"},
-	{OE::IGNORE,          'r', "",           "load", "Ignored"}
+	{OE::USAGE,           'h', "help",            "",          "Show usage and exit"},
+	{OE::FLAG_VERBOSE,    'v', "verbose",         "",          "Be verbose"},
+	{OE::FLAG_FOREGROUND, 'f', "foreground",      "",          "Stay in foreground"},
+	{OE::MODE_AC,         'a', "ac",              "mode",      "Mode while on AC power"},
+	{OE::MODE_BATT,       'b', "batt",            "mode",      "Mode while on battery power"},
+	{OE::MODE_UNKNOWN,    'n', "unknown",         "mode",      "Mode while power source is unknown"},
+	{OE::FREQ_MIN,        'm', "min",             "freq",      "Minimum CPU frequency"},
+	{OE::FREQ_MAX,        'M', "max",             "freq",      "Maximum CPU frequency"},
+	{OE::FREQ_MIN_AC,      0 , "min-ac",          "freq",      "Minimum CPU frequency on AC power"},
+	{OE::FREQ_MAX_AC,      0 , "max-ac",          "freq",      "Maximum CPU frequency on AC power"},
+	{OE::FREQ_MIN_BATT,    0 , "min-batt",        "freq",      "Minimum CPU frequency on battery power"},
+	{OE::FREQ_MAX_BATT,    0 , "max-batt",        "freq",      "Maximum CPU frequency on battery power"},
+	{OE::FREQ_RANGE,      'F', "freq-range",      "freq:freq", "CPU frequency range (min:max)"},
+	{OE::FREQ_RANGE_AC,   'A', "freq-range-ac",   "freq:freq", "CPU frequency range on AC power"},
+	{OE::FREQ_RANGE_BATT, 'B', "freq-range-batt", "freq:freq", "CPU frequency range on battery power"},
+	{OE::IVAL_POLL,       'p', "poll",            "ival",      "The polling interval"},
+	{OE::CNT_SAMPLES,     's', "samples",         "cnt",       "The number of samples to use"},
+	{OE::FILE_PID,        'P', "pid",             "file",      "Alternative PID file"},
+	{OE::IGNORE,          'i', "",                "load",      "Ignored"},
+	{OE::IGNORE,          'r', "",                "load",      "Ignored"}
 };
 
 /**
@@ -690,6 +697,10 @@ Option<OE> const OPTIONS[]{
  */
 void read_args(int const argc, char const * const argv[]) {
 	auto getopt = make_Options(argc, argv, USAGE, OPTIONS);
+
+	auto & ac_on = g.acstates[to_value(AcLineState::ONLINE)];
+	auto & ac_batt = g.acstates[to_value(AcLineState::BATTERY)];
+	auto & ac_unknown = g.acstates[to_value(AcLineState::UNKNOWN)];
 
 	while (true) switch (getopt()) {
 	case OE::USAGE:
@@ -711,28 +722,34 @@ void read_args(int const argc, char const * const argv[]) {
 		set_mode(AcLineState::UNKNOWN, getopt[1]);
 		break;
 	case OE::FREQ_MIN:
-		g.acstates[to_value(AcLineState::UNKNOWN)]
-		    .freq_min = freq(getopt[1]);
+		ac_unknown.freq_min = freq(getopt[1]);
 		break;
 	case OE::FREQ_MAX:
-		g.acstates[to_value(AcLineState::UNKNOWN)]
-		    .freq_max = freq(getopt[1]);
+		ac_unknown.freq_max = freq(getopt[1]);
 		break;
 	case OE::FREQ_MIN_AC:
-		g.acstates[to_value(AcLineState::ONLINE)]
-		    .freq_min = freq(getopt[1]);
+		ac_on.freq_min = freq(getopt[1]);
 		break;
 	case OE::FREQ_MAX_AC:
-		g.acstates[to_value(AcLineState::ONLINE)]
-		    .freq_max = freq(getopt[1]);
+		ac_on.freq_max = freq(getopt[1]);
 		break;
 	case OE::FREQ_MIN_BATT:
-		g.acstates[to_value(AcLineState::BATTERY)]
-		    .freq_min = freq(getopt[1]);
+		ac_batt.freq_min = freq(getopt[1]);
 		break;
 	case OE::FREQ_MAX_BATT:
-		g.acstates[to_value(AcLineState::BATTERY)]
-		    .freq_max = freq(getopt[1]);
+		ac_batt.freq_max = freq(getopt[1]);
+		break;
+	case OE::FREQ_RANGE:
+		std::tie(ac_unknown.freq_min, ac_unknown.freq_max) =
+		    range(getopt[1], freq);
+		break;
+	case OE::FREQ_RANGE_AC:
+		std::tie(ac_on.freq_min, ac_on.freq_max) =
+		    range(getopt[1], freq);
+		break;
+	case OE::FREQ_RANGE_BATT:
+		std::tie(ac_batt.freq_min, ac_batt.freq_max) =
+		    range(getopt[1], freq);
 		break;
 	case OE::IVAL_POLL:
 		g.interval = ival(getopt[1]);
