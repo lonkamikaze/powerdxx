@@ -342,6 +342,16 @@ void init() {
 		}
 	}
 
+	/* check user frequency boundaries */
+	for (size_t i = 0; i < countof(g.acstates); ++i) {
+		auto const & state = g.acstates[i];
+		if (state.freq_min < state.freq_max) { continue; }
+		fail(Exit::EOUTOFRANGE, 0,
+		     "frequency limits 'min < max' violation:\n"
+		     "\t%s [%d MHz, %d MHz]"_fmt
+		     (AcLineStateStr[i], state.freq_min, state.freq_max));
+	}
+
 	/* set per core min/max frequency boundaries */
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		auto & core = g.cores[i];
