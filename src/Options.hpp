@@ -543,7 +543,7 @@ class Options {
 		/* assemble all the definitions into the string with propper
 		 * column widths */
 		for (size_t i = 0; i < DefCount; ++i) {
-			result << '\t' << std::setw(options_max) << options[i]
+			result << "  " << std::setw(options_max) << options[i]
 			       << "  " << std::setw(arguments_max)
 			                 << arguments[i]
 			       << "  " << this->defs[i].usage << '\n';
