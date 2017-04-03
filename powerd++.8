@@ -14,6 +14,9 @@
 .Op Fl n Ar mode
 .Op Fl m Ar freq
 .Op Fl M Ar freq
+.Op Fl F Ar freq:freq
+.Op Fl A Ar freq:freq
+.Op Fl B Ar freq:freq
 .Op Fl p Ar ival
 .Op Fl s Ar cnt
 .Op Fl P Ar file
@@ -99,6 +102,15 @@ The highest CPU clock frequency to use on AC power.
 The lowest CPU clock frequency to use on battery power.
 .It Fl -max-batt Ar freq
 The highest CPU clock frequency to use on battery power.
+.It Fl F , -freq-range Ar freq:freq
+A pair of frequency values representing the minimum and maximum CPU
+clock frequency.
+.It Fl A , -freq-range-ac Ar freq:freq
+A pair of frequency values representing the minimum and maximum CPU
+clock frequency on AC power.
+.It Fl B , -freq-range-batt Ar freq:freq
+A pair of frequency values representing the minimum and maximum CPU
+clock frequency on battery power.
 .It Fl p , -poll Ar ival
 The polling interval that is used to take load samples and update the
 CPU clock (default 0.5s).
@@ -245,6 +257,9 @@ Use the same load sampling
 .Xr powerd 8
 does:
 .Dl powerd++ -s2 -p.25s
+.Pp
+Limit CPU clock frequencies to a range from 800 MHz to 1.8 GHz:
+.Dl powerd++ -F800:1.8ghz
 .Sh DIAGNOSTICS
 The
 .Nm
