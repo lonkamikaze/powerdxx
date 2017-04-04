@@ -38,6 +38,7 @@ using types::cptime_t;
 using types::mhz_t;
 using types::coreid_t;
 using types::ms;
+using types::celsius_t;
 
 using errors::Exit;
 using errors::Exception;
@@ -47,6 +48,7 @@ using clas::load;
 using clas::freq;
 using clas::ival;
 using clas::samples;
+using clas::temperature;
 using clas::range;
 
 using utility::countof;
@@ -153,6 +155,11 @@ struct Core {
 	 * The maximum core clock rate.
 	 */
 	mhz_t max{FREQ_DEFAULT_MAX};
+
+	/**
+	 * The core temperature.
+	 */
+	celsius_t temperature{0};
 };
 
 
@@ -234,6 +241,22 @@ struct {
 	 * Foreground mode.
 	 */
 	bool foreground{false};
+
+	/**
+	 * Temperature throttling mode.
+	 */
+	bool temperature_throttling{false};
+
+	/**
+	 * High temperature when throttling starts.
+	 */
+	celsius_t temperature_high{0};
+
+	/**
+	 * Critical temperature that should not be reached under
+	 * any circumstances.
+	 */
+	celsius_t temperature_crit{0};
 
 	/**
 	 * Name of an alternative pidfile.
@@ -380,6 +403,15 @@ void init() {
 		} catch (sys::sc_error<sys::ctl::error>) {
 			verbose("cannot access sysctl: "_s + name);
 		}
+	}
+
+	/* check temperature throttling boundaries */
+	if (g.temperature_throttling &&
+	    g.temperature_high >= g.temperature_crit) {
+		fail(Exit::EOUTOFRANGE, 0,
+		     "temperature throttling 'high < critical' violation:\n"
+		     "\t[%d °C, %d °C]"_fmt
+		     (g.temperature_high, g.temperature_crit));
 	}
 
 	/* MIB for kern.cp_times */
@@ -634,6 +666,7 @@ enum class OE {
 	FREQ_RANGE,      /**< Set clock frequency range */
 	FREQ_RANGE_AC,   /**< Set clock frequency range on AC power */
 	FREQ_RANGE_BATT, /**< Set clock frequency range on battery power */
+	HITEMP_RANGE,    /**< Set a high temperature range */
 	MODE_UNKNOWN,    /**< Set unknown power source mode */
 	IVAL_POLL,       /**< Set polling interval */
 	FILE_PID,        /**< Set pidfile */
@@ -651,7 +684,7 @@ enum class OE {
 /**
  * The short usage string.
  */
-char const * const USAGE = "[-hvf] [-abn mode] [-mM freq] [-FAB freq:freq] [-p ival] [-s cnt] [-P file]";
+char const * const USAGE = "[-hvf] [-abn mode] [-mM freq] [-FAB freq:freq] [-H temp:temp] [-p ival] [-s cnt] [-P file]";
 
 /**
  * Definitions of command line options.
@@ -672,6 +705,7 @@ Option<OE> const OPTIONS[]{
 	{OE::FREQ_RANGE,      'F', "freq-range",      "freq:freq", "CPU frequency range (min:max)"},
 	{OE::FREQ_RANGE_AC,   'A', "freq-range-ac",   "freq:freq", "CPU frequency range on AC power"},
 	{OE::FREQ_RANGE_BATT, 'B', "freq-range-batt", "freq:freq", "CPU frequency range on battery power"},
+	{OE::HITEMP_RANGE,    'H', "hitemp-range",    "temp:temp", "High temperature range (high:critical)"},
 	{OE::IVAL_POLL,       'p', "poll",            "ival",      "The polling interval"},
 	{OE::CNT_SAMPLES,     's', "samples",         "cnt",       "The number of samples to use"},
 	{OE::FILE_PID,        'P', "pid",             "file",      "Alternative PID file"},
@@ -740,6 +774,11 @@ void read_args(int const argc, char const * const argv[]) {
 	case OE::FREQ_RANGE_BATT:
 		std::tie(ac_batt.freq_min, ac_batt.freq_max) =
 		    range(getopt[1], freq);
+		break;
+	case OE::HITEMP_RANGE:
+		g.temperature_throttling = true;
+		std::tie(g.temperature_high, g.temperature_crit) =
+		    range(getopt[1], temperature);
 		break;
 	case OE::IVAL_POLL:
 		g.interval = ival(getopt[1]);
@@ -811,6 +850,15 @@ void show_settings() {
 		              ? (acstate.target_load * 100 + 512) / 1024
 		              : acstate.target_freq,
 		              acstate.target_load);
+	}
+	std::cerr << "Temperature Throttling\n";
+	if (g.temperature_throttling) {
+		std::cerr << "\tactive:                yes\n"
+		             "\thigh:                  %d °C\n"
+		             "\tcritical:              %d °C\n"_fmt
+		             (g.temperature_high, g.temperature_crit);
+	} else {
+		std::cerr << "\tactive:                no\n";
 	}
 }
 

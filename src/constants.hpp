@@ -36,6 +36,11 @@ char const * const FREQ = "dev.cpu.%d.freq";
  */
 char const * const FREQ_LEVELS = "dev.cpu.%d.freq_levels";
 
+/**
+ * The MIB name for CPU temperatures.
+ */
+char const * const TEMPERATURE = "dev.cpu.%d.temperature";
+
 /*
  * Default values.
  */
