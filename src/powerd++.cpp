@@ -123,7 +123,7 @@ struct Core {
 	/**
 	 * For the controlling core this is set to the group loadsum.
 	 *
-	 * This is reset by update_loads() and set by update_group_loads().
+	 * This is updated by update_loads().
 	 */
 	mhz_t group_loadsum{0};
 
@@ -445,30 +445,20 @@ void update_loads() {
 		}
 		/* add current sample */
 		core.loadsum += core.loads[g.sample];
-	}
-	g.sample = (g.sample + 1) % g.samples;
-}
 
-/**
- * Sets the load time of each clock controlling core to the maximum load
- * in the group.
- */
-void update_group_loads() {
-	update_loads();
-
-	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-		auto const & core = g.cores[corei];
+		/* update group load */
 		auto & controller = g.cores[core.controller];
 		controller.group_loadsum = std::max(controller.group_loadsum,
 		                                    core.loadsum);
 	}
+	g.sample = (g.sample + 1) % g.samples;
 }
 
 /**
  * Update the CPU clocks depending on the AC line state and targets.
  */
 void update_freq() {
-	update_group_loads();
+	update_loads();
 
 	/* get AC line status */
 	auto const acline = to_value<AcLineState>(
