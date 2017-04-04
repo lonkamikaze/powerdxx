@@ -57,7 +57,7 @@ char const * const UnitStr[]{
  *	A unit
  */
 Unit unit(std::string const & str) {
-	size_t pos = 0;
+	size_t pos = str[0] == '+' || str[0] == '-' ? 1 : 0;
 	for (; pos < str.length() && ((str[pos] >= '0' && str[pos] <= '9') ||
 	                              str[pos] == '.'); ++pos);
 	auto const unitstr = str.substr(pos);
