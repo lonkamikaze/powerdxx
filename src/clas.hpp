@@ -38,6 +38,10 @@ enum class Unit : size_t {
 	MHZ,         /**< mhz */
 	GHZ,         /**< ghz */
 	THZ,         /**< thz */
+	CELSIUS,     /**< C */
+	KELVIN,      /**< K */
+	FAHRENHEIT,  /**< F */
+	RANKINE,     /**< R */
 	UNKNOWN      /**< Unknown unit */
 };
 
@@ -45,7 +49,7 @@ enum class Unit : size_t {
  * The unit strings on the command line, for the respective Unit instances.
  */
 char const * const UnitStr[]{
-	"", "%", "s", "ms", "hz", "khz", "mhz", "ghz", "thz"
+	"", "%", "s", "ms", "hz", "khz", "mhz", "ghz", "thz", "C", "K", "F", "R"
 };
 
 /**
@@ -230,6 +234,51 @@ size_t samples(char const * const str) {
 		             "sample count must be in the range [1, 1000]: "_s + str);
 	}
 	return size_t(cnt);
+}
+
+/**
+ * Convert string to temperature in °C.
+ *
+ * The given string must have the following format:
+ *
+ * \verbatim
+ * temperature = <float>, [ "C" | "K" | "F" | "R" ];
+ * \endverbatim
+ *
+ * In absence of a unit °C is assumed.
+ *
+ * @param str
+ *	A string encoded temperature
+ * @return
+ *	The temperature given by str
+ */
+types::celsius_t temperature(char const * const str) {
+	std::string tempstr{str};
+	for (char & ch : tempstr) { ch = std::toupper(ch); }
+
+	auto value = atof(str);
+	switch (unit(tempstr)) {
+	case Unit::SCALAR:
+	case Unit::CELSIUS:
+		break;
+	case Unit::KELVIN:
+		value -= 273.15;
+		break;
+	case Unit::FAHRENHEIT:
+		value = (value - 32.) * 5. / 9.;
+		break;
+	case Unit::RANKINE:
+		value = (value - 491.67) * 5. / 9.;
+		break;
+	default:
+		errors::fail(errors::Exit::ETEMPERATURE, 0,
+		             "temperature value not recognised: "_s + str);
+	}
+	if (value < - 273.15) {
+		errors::fail(errors::Exit::EOUTOFRANGE, 0,
+		             "temperature must be above absolute zero (-273.15°C): "_s + str);
+	}
+	return types::celsius_t(value);
 }
 
 /**

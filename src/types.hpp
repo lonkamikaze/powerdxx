@@ -37,6 +37,11 @@ typedef unsigned long cptime_t;
  */
 typedef unsigned int mhz_t;
 
+/**
+ * Type for temperatures in °C.
+ */
+typedef int celsius_t;
+
 } /* namespace types */
 
 #endif /* _POWERDXX_TYPES_HPP_ */

@@ -18,24 +18,25 @@ using namespace utility::literals;
  * Exit codes.
  */
 enum class Exit : int {
-	OK,          /**< Regular termination */
-	ECLARG,      /**< Unexpected command line argument */
-	EOUTOFRANGE, /**< A user provided value is out of range */
-	ELOAD,       /**< The provided value is not a valid load */
-	EFREQ,       /**< The provided value is not a valid frequency */
-	EMODE,       /**< The provided value is not a valid mode */
-	EIVAL,       /**< The provided value is not a valid interval */
-	ESAMPLES,    /**< The provided value is not a valid sample count */
-	ESYSCTL,     /**< A sysctl operation failed */
-	ENOFREQ,     /**< System does not support changing core frequencies */
-	ECONFLICT,   /**< Another frequency daemon instance is running */
-	EPID,        /**< A pidfile could not be created */
-	EFORBIDDEN,  /**< Insufficient privileges to change sysctl */
-	EDAEMON,     /**< Unable to detach from terminal */
-	EWOPEN,      /**< Could not open file for writing */
-	ESIGNAL,     /**< Failed to install signal handler */
-	ERANGEFMT,   /**< A user provided range is missing the separator */
-	LENGTH       /**< Enum length */
+	OK,           /**< Regular termination */
+	ECLARG,       /**< Unexpected command line argument */
+	EOUTOFRANGE,  /**< A user provided value is out of range */
+	ELOAD,        /**< The provided value is not a valid load */
+	EFREQ,        /**< The provided value is not a valid frequency */
+	EMODE,        /**< The provided value is not a valid mode */
+	EIVAL,        /**< The provided value is not a valid interval */
+	ESAMPLES,     /**< The provided value is not a valid sample count */
+	ESYSCTL,      /**< A sysctl operation failed */
+	ENOFREQ,      /**< System does not support changing core frequencies */
+	ECONFLICT,    /**< Another frequency daemon instance is running */
+	EPID,         /**< A pidfile could not be created */
+	EFORBIDDEN,   /**< Insufficient privileges to change sysctl */
+	EDAEMON,      /**< Unable to detach from terminal */
+	EWOPEN,       /**< Could not open file for writing */
+	ESIGNAL,      /**< Failed to install signal handler */
+	ERANGEFMT,    /**< A user provided range is missing the separator */
+	ETEMPERATURE, /**< The provided value is not a valid temperature */
+	LENGTH        /**< Enum length */
 };
 
 /**
@@ -44,7 +45,7 @@ enum class Exit : int {
 const char * const ExitStr[]{
 	"OK", "ECLARG", "EOUTOFRANGE", "ELOAD", "EFREQ", "EMODE", "EIVAL",
 	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
-	"EDAEMON", "EWOPEN", "ESIGNAL", "ERANGEFMT"
+	"EDAEMON", "EWOPEN", "ESIGNAL", "ERANGEFMT", "ETEMPERATURE"
 };
 
 static_assert(utility::to_value(Exit::LENGTH) == utility::countof(ExitStr),
