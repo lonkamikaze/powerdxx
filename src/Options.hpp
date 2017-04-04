@@ -94,7 +94,7 @@
  *
  * The `getopt[1]` calls return the first argument following the option. It
  * is possible to retrieve more arguments than were defined in the options
- * definition. The `[]` opterator always returns a valid, termindated string
+ * definition. The `[]` opterator always returns a valid, terminated string
  * (provided the command line arguments are valid, terminated strings). So
  * it is always safe to dereference the pointer, even when reading beyond the
  * end of command line arguments.
