@@ -196,7 +196,7 @@ void read_args(int const argc, char const * const argv[]) {
  * Print the sysctls
  */
 void print_sysctls() {
-	sys::ctl::Sysctl<3> hw_acpi_acline;
+	sys::ctl::Sysctl<> hw_acpi_acline;
 	try {
 		hw_acpi_acline = {ACLINE};
 	} catch (sys::sc_error<sys::ctl::error>) {
@@ -211,7 +211,7 @@ void print_sysctls() {
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		sprintf_safe(mibname, FREQ, i);
 		try {
-			sys::ctl::Sysctl<4> ctl{mibname};
+			sys::ctl::Sysctl<> ctl{mibname};
 			*g.out << mibname << '='
 			       << make_Once(0, ctl) << '\n';
 		} catch (sys::sc_error<sys::ctl::error> e) {
@@ -223,7 +223,7 @@ void print_sysctls() {
 		}
 		sprintf_safe(mibname, FREQ_LEVELS, i);
 		try {
-			sys::ctl::Sysctl<4> ctl{mibname};
+			sys::ctl::Sysctl<> ctl{mibname};
 			*g.out << mibname << '='
 			       << ctl.get<char>().get() << '\n';
 		} catch (sys::sc_error<sys::ctl::error>) {
@@ -239,7 +239,7 @@ void print_sysctls() {
  * growth as a space separated list.
  */
 void run() try {
-	sys::ctl::Sysctl<2> const cp_times_ctl = {CP_TIMES};
+	sys::ctl::Sysctl<> const cp_times_ctl = {CP_TIMES};
 
 	auto cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
 	    new cptime_t[2 * g.ncpu][CPUSTATES]{});

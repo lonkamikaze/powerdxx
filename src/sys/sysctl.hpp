@@ -40,6 +40,63 @@ struct error {};
 typedef int mib_t;
 
 /**
+ * A wrapper around the sysctl() function.
+ *
+ * All it does is throw an exception if sysctl() fails.
+ *
+ * @param name,namelen
+ *	The MIB buffer and its length
+ * @param oldp,oldlenp
+ *	Pointers to the return buffer and its length
+ * @param newp,newlen
+ *	A pointer to the buffer with the new value and the buffer length
+ * @throws sys::sc_error<error>
+ *	Throws if sysctl() fails for any reason
+ */
+inline void sysctl_raw(mib_t const * name, u_int const namelen,
+                       void * const oldp, size_t * const oldlenp,
+                       void const * const newp, size_t const newlen) {
+	if (sysctl(name, namelen, oldp, oldlenp, newp, newlen) == -1) {
+		throw sc_error<error>{errno};
+	}
+}
+
+/**
+ * Returns a sysctl() value to a buffer.
+ *
+ * @tparam MibDepth
+ *	The length of the MIB buffer
+ * @param mib
+ *	The MIB buffer
+ * @param oldp,oldlen
+ *	A pointers to the return buffer and a reference to its length
+ * @throws sys::sc_error<error>
+ *	Throws if sysctl() fails for any reason
+ */
+template <size_t MibDepth>
+void sysctl_get(mib_t const (& mib)[MibDepth], void * const oldp, size_t & oldlen) {
+	sysctl_raw(mib, MibDepth, oldp, &oldlen, nullptr, 0);
+}
+
+/**
+ * Sets a sysctl() value.
+ *
+ * @tparam MibDepth
+ *	The length of the MIB buffer
+ * @param mib
+ *	The MIB buffer
+ * @param newp,newlen
+ *	A pointer to the buffer with the new value and the buffer length
+ * @throws sys::sc_error<error>
+ *	Throws if sysctl() fails for any reason
+ */
+template <size_t MibDepth>
+void sysctl_set(mib_t const (& mib)[MibDepth], void const * const newp,
+                size_t const newlen) {
+	sysctl_raw(mib, MibDepth, nullptr, nullptr, newp, newlen);
+}
+
+/**
  * Represents a sysctl MIB address.
  *
  * It offers set() and get() methods to access these sysctls.
@@ -51,18 +108,20 @@ typedef int mib_t;
  * `/usr/include/sys/sysctl.h` for predefined MIBs.
  *
  * For all other sysctls, symbolic names must be used. E.g.
- * `Sysctl<4>{"dev.cpu.0.freq"}`. Creating a Sysctl from a symbolic
+ * `Sysctl<>{"dev.cpu.0.freq"}`. Creating a Sysctl from a symbolic
  * name may throw.
  *
- * A Sysctl instance created with the default constructor is unitialised,
- * initialisation can be deferred to a later moment by using copy assignment.
- * This can be used to create globals but construct them inline where
- * exceptions can be handled.
+ * Fixed address sysctls may be created using the make_Sysctl() function,
+ * e.g. `make_Sysctl(CTL_HW, HW_NCPU)`.
+ *
+ * Instances created from symbolic names must use the Sysctl<0>
+ * specialisation, this can be done by omitting the template argument
+ * `Sysctl<>`.
  *
  * @tparam MibDepth
  *	The MIB level, e.g. "hw.ncpu" is two levels deep
  */
-template <size_t MibDepth>
+template <size_t MibDepth = 0>
 class Sysctl {
 	private:
 	/**
@@ -71,32 +130,6 @@ class Sysctl {
 	mib_t mib[MibDepth];
 
 	public:
-	/**
-	 * The default constructor.
-	 *
-	 * This is available to defer initialisation to a later moment.
-	 * This might be useful when initialising global or static
-	 * instances by a character string repesented name.
-	 */
-	constexpr Sysctl() : mib{} {}
-
-	/**
-	 * Initialise the MIB address from a character string.
-	 *
-	 * @param name
-	 *	The symbolic name of the sysctl
-	 * @throws sys::sc_error<error>
-	 *	May throw an exception if the addressed sysct does
-	 *	not exist or if the address is too long to store
-	 */
-	Sysctl(char const * const name) {
-		size_t length = MibDepth;
-		if (sysctlnametomib(name, this->mib, &length) == -1) {
-			throw sc_error<error>{errno};
-		}
-		assert(length == MibDepth && "MIB depth mismatch");
-	}
-
 	/**
 	 * Initialise the MIB address directly.
 	 *
@@ -133,10 +166,7 @@ class Sysctl {
 	 */
 	void get(void * const buf, size_t const bufsize) const {
 		auto len = bufsize;
-		if (sysctl(this->mib, MibDepth, buf, &len, nullptr, 0)
-		    == -1) {
-			throw sc_error<error>{errno};
-		}
+		sysctl_get(this->mib, buf, len);
 	}
 
 	/**
@@ -175,10 +205,7 @@ class Sysctl {
 	template <typename T>
 	std::unique_ptr<T[]> get() const {
 		size_t len = 0;
-		if (sysctl(this->mib, MibDepth, nullptr, &len, nullptr, 0)
-		    == -1) {
-			throw sc_error<error>{errno};
-		}
+		sysctl_get(this->mib, nullptr, len);
 		auto result = std::unique_ptr<T[]>(new T[len / sizeof(T)]);
 		get(result.get(), len);
 		return result;
@@ -193,10 +220,7 @@ class Sysctl {
 	 *	If the source buffer cannot be stored in the sysctl
 	 */
 	void set(void const * const buf, size_t const bufsize) {
-		if (sysctl(this->mib, MibDepth, nullptr, nullptr,
-		             buf, bufsize) == -1) {
-			throw sc_error<error>{errno};
-		}
+		sysctl_set(this->mib, buf, bufsize);
 	}
 
 	/**
@@ -206,6 +230,95 @@ class Sysctl {
 	 *	The value type
 	 * @param value
 	 *	The value to set the sysctl to
+	 */
+	template <typename T>
+	void set(T const & value) {
+		set(&value, sizeof(T));
+	}
+};
+
+/**
+ * This is a specialisation of Sysctl for sysctls using symbolic names.
+ *
+ * A Sysctl instance created with the default constructor is unitialised,
+ * initialisation can be deferred to a later moment by using copy assignment.
+ * This can be used to create globals but construct them inline where
+ * exceptions can be handled.
+ */
+template <>
+class Sysctl<0> {
+	private:
+	/**
+	 * Stores the MIB address.
+	 */
+	mib_t mib[CTL_MAXNAME];
+
+	/**
+	 * The MIB depth.
+	 */
+	size_t depth;
+
+	public:
+	/**
+	 * The default constructor.
+	 *
+	 * This is available to defer initialisation to a later moment.
+	 */
+	constexpr Sysctl() : mib{}, depth{0} {}
+
+	/**
+	 * Initialise the MIB address from a character string.
+	 *
+	 * @param name
+	 *	The symbolic name of the sysctl
+	 * @throws sys::sc_error<error>
+	 *	May throw an exception if the addressed sysct does
+	 *	not exist or if the address is too long to store
+	 */
+	Sysctl(char const * const name) : depth{CTL_MAXNAME} {
+		if (sysctlnametomib(name, this->mib, &this->depth) == -1) {
+			throw sc_error<error>{errno};
+		}
+		assert(this->depth <= CTL_MAXNAME && "MIB depth exceeds limit");
+	}
+
+	/**
+	 * @copydoc Sysctl::get(void * const, size_t const) const
+	 */
+	void get(void * const buf, size_t const bufsize) const {
+		auto len = bufsize;
+		sysctl_raw(this->mib, this->depth, buf, &len, nullptr, 0);
+	}
+
+	/**
+	 * @copydoc Sysctl::get(T &) const
+	 */
+	template <typename T>
+	void get(T & value) const {
+		get(&value, sizeof(T));
+	}
+
+	/**
+	 * @copydoc Sysctl::get() const
+	 */
+	template <typename T>
+	std::unique_ptr<T[]> get() const {
+		size_t len = 0;
+		sysctl_raw(this->mib, this->depth, nullptr, &len, nullptr, 0);
+		auto result = std::unique_ptr<T[]>(new T[len / sizeof(T)]);
+		get(result.get(), len);
+		return result;
+	}
+
+	/**
+	 * @copydoc Sysctl::set(void const * const, size_t const)
+	 */
+	void set(void const * const buf, size_t const bufsize) {
+		sysctl_raw(this->mib, this->depth, nullptr, nullptr, buf, bufsize);
+	}
+
+	/**
+	 * @copydoc Sysctl::set(T const &)
 	 */
 	template <typename T>
 	void set(T const & value) {

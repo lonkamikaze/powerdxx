@@ -97,7 +97,7 @@ struct Core {
 	/**
 	 * The sysctl kern.cpu.N.freq, if present.
 	 */
-	sys::ctl::SysctlSync<mhz_t, 4> freq{{}};
+	sys::ctl::SysctlSync<mhz_t, 0> freq{{}};
 
 	/**
 	 * A pointer to the kern.cp_times section for this core.
@@ -244,7 +244,7 @@ struct {
 	/**
 	 * The hw.acpi.acline ctl.
 	 */
-	sys::ctl::Sysctl<3> acline_ctl;
+	sys::ctl::Sysctl<> acline_ctl;
 
 	/**
 	 * Verbose mode.
@@ -271,7 +271,7 @@ struct {
 	/**
 	 * The kern.cp_times sysctl.
 	 */
-	sys::ctl::Sysctl<2> cp_times_ctl{};
+	sys::ctl::Sysctl<> cp_times_ctl{};
 
 	/**
 	 * The kern.cp_times buffer for all cores.
@@ -385,7 +385,7 @@ void init() {
 		char name[40];
 		sprintf_safe(name, FREQ_LEVELS, i);
 		try {
-			sys::ctl::Sysctl<4> const ctl{name};
+			sys::ctl::Sysctl<> const ctl{name};
 			auto levels = ctl.get<char>();
 			/* the maximum should at least be the minimum
 			 * and vice versa */
@@ -436,7 +436,7 @@ void init() {
 					core.temp_crit =
 					    sys::ctl::make_Once
 					        (core.temp_crit,
-					         sys::ctl::Sysctl<5>{name});
+					         sys::ctl::Sysctl<>{name});
 					g.temp_throttling = true;
 					core.temp_high =
 					    core.temp_crit - HITEMP_OFFSET;
