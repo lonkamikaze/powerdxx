@@ -7,11 +7,12 @@ GXX5FLAGS= -Wl,-rpath=/usr/local/lib/gcc5
 PREFIX?=   /usr/local
 DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
 
-SRCS=      src/powerd++.cpp src/loadrec.cpp
+BINS=      src/powerd++.cpp src/loadrec.cpp
 SOS=       src/loadplay.cpp
-TARGETS=   ${SRCS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/:C/^/lib/}
+SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
+TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/:C/^/lib/}
 TMP!=      cd ${.CURDIR} && \
-           env MKDEP_CPP_OPTS="-MM -std=c++11" mkdep ${SRCS} ${SOS}
+           env MKDEP_CPP_OPTS="-MM -std=c++11" mkdep ${SRCS}
 
 # Build
 all: ${TARGETS}
@@ -29,10 +30,10 @@ loadplay.o:
 # | -lutil    | powerd++          | Required for pidfile_open() etc.       |
 # | -lpthread | libloadplay.so    | Uses std::thread                       |
 
-powerd++: ${.TARGET}.o
+powerd++: ${.TARGET}.o clas.o
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -lutil -o ${.TARGET}
 
-loadrec: ${.TARGET}.o
+loadrec: ${.TARGET}.o clas.o
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -o ${.TARGET}
 
 libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
