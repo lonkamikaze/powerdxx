@@ -127,7 +127,7 @@ inline int celsius(types::decikelvin_t const val) {
  *
  * @tparam T
  *	The return type of the conversion function
- * @parma str
+ * @param str
  *	The string containing the range
  * @param func
  *	The function that converts the values from the string
