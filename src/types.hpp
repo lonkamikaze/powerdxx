@@ -38,9 +38,9 @@ typedef unsigned long cptime_t;
 typedef unsigned int mhz_t;
 
 /**
- * Type for temperatures in °C.
+ * Type for temperatures in dK.
  */
-typedef int celsius_t;
+typedef int decikelvin_t;
 
 } /* namespace types */
 

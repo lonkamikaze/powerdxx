@@ -237,7 +237,7 @@ size_t samples(char const * const str) {
 }
 
 /**
- * Convert string to temperature in °C.
+ * Convert string to temperature in dK.
  *
  * The given string must have the following format:
  *
@@ -252,7 +252,7 @@ size_t samples(char const * const str) {
  * @return
  *	The temperature given by str
  */
-types::celsius_t temperature(char const * const str) {
+types::decikelvin_t temperature(char const * const str) {
 	std::string tempstr{str};
 	for (char & ch : tempstr) { ch = std::toupper(ch); }
 
@@ -260,25 +260,35 @@ types::celsius_t temperature(char const * const str) {
 	switch (unit(tempstr)) {
 	case Unit::SCALAR:
 	case Unit::CELSIUS:
-		break;
+		value += 273.15;
 	case Unit::KELVIN:
-		value -= 273.15;
 		break;
 	case Unit::FAHRENHEIT:
-		value = (value - 32.) * 5. / 9.;
-		break;
+		value += 459.67;
 	case Unit::RANKINE:
-		value = (value - 491.67) * 5. / 9.;
+		value *= 5. / 9.;
 		break;
 	default:
 		errors::fail(errors::Exit::ETEMPERATURE, 0,
 		             "temperature value not recognised: "_s + str);
 	}
-	if (value < - 273.15) {
+	if (value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
 		             "temperature must be above absolute zero (-273.15°C): "_s + str);
 	}
-	return types::celsius_t(value);
+	return types::decikelvin_t(value * 10);
+}
+
+/**
+ * Converts dK into °C for display purposes.
+ *
+ * @param val
+ *	A temperature in dK
+ * @return
+ *	The temperature in °C
+ */
+inline int celsius(types::decikelvin_t const val) {
+	return (val - 2731) / 10;
 }
 
 /**

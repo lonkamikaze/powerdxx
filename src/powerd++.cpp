@@ -38,7 +38,7 @@ using types::cptime_t;
 using types::mhz_t;
 using types::coreid_t;
 using types::ms;
-using types::celsius_t;
+using types::decikelvin_t;
 
 using errors::Exit;
 using errors::Exception;
@@ -49,6 +49,7 @@ using clas::freq;
 using clas::ival;
 using clas::samples;
 using clas::temperature;
+using clas::celsius;
 using clas::range;
 
 using utility::countof;
@@ -155,11 +156,6 @@ struct Core {
 	 * The maximum core clock rate.
 	 */
 	mhz_t max{FREQ_DEFAULT_MAX};
-
-	/**
-	 * The core temperature.
-	 */
-	celsius_t temperature{0};
 };
 
 
@@ -245,18 +241,18 @@ struct {
 	/**
 	 * Temperature throttling mode.
 	 */
-	bool temperature_throttling{false};
+	bool temp_throttling{false};
 
 	/**
 	 * High temperature when throttling starts.
 	 */
-	celsius_t temperature_high{0};
+	decikelvin_t temp_high{0};
 
 	/**
 	 * Critical temperature that should not be reached under
 	 * any circumstances.
 	 */
-	celsius_t temperature_crit{0};
+	decikelvin_t temp_crit{0};
 
 	/**
 	 * Name of an alternative pidfile.
@@ -405,13 +401,17 @@ void init() {
 		}
 	}
 
-	/* check temperature throttling boundaries */
-	if (g.temperature_throttling &&
-	    g.temperature_high >= g.temperature_crit) {
-		fail(Exit::EOUTOFRANGE, 0,
-		     "temperature throttling 'high < critical' violation:\n"
-		     "\t[%d °C, %d °C]"_fmt
-		     (g.temperature_high, g.temperature_crit));
+	/* setup temperature throttling */
+	if (g.temp_throttling) {
+		/* user provided throttling values */
+
+		/* check temperature throttling boundaries */
+		if (g.temp_high >= g.temp_crit) {
+			fail(Exit::EOUTOFRANGE, 0,
+			     "temperature throttling 'high < critical' violation:\n"
+			     "\t[%d °C, %d °C]"_fmt
+			     (celsius(g.temp_high), celsius(g.temp_crit)));
+		}
 	}
 
 	/* MIB for kern.cp_times */
@@ -776,8 +776,8 @@ void read_args(int const argc, char const * const argv[]) {
 		    range(getopt[1], freq);
 		break;
 	case OE::HITEMP_RANGE:
-		g.temperature_throttling = true;
-		std::tie(g.temperature_high, g.temperature_crit) =
+		g.temp_throttling = true;
+		std::tie(g.temp_high, g.temp_crit) =
 		    range(getopt[1], temperature);
 		break;
 	case OE::IVAL_POLL:
@@ -852,11 +852,11 @@ void show_settings() {
 		              acstate.target_load);
 	}
 	std::cerr << "Temperature Throttling\n";
-	if (g.temperature_throttling) {
+	if (g.temp_throttling) {
 		std::cerr << "\tactive:                yes\n"
 		             "\thigh:                  %d °C\n"
 		             "\tcritical:              %d °C\n"_fmt
-		             (g.temperature_high, g.temperature_crit);
+		             (g.temp_high, g.temp_crit);
 	} else {
 		std::cerr << "\tactive:                no\n";
 	}
