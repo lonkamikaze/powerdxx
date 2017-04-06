@@ -1,6 +1,6 @@
 #include "clas.hpp"
 
-#include <cstdlib>   /* atof() */
+#include <cstdlib>   /* strtod(), strtol() */
 
 #include <locale>    /* std::tolower() */
 
@@ -61,7 +61,7 @@ types::cptime_t clas::load(char const * const str) {
 	std::string load{str};
 	for (char & ch : load) { ch = std::tolower(ch); }
 
-	auto value = atof(str);
+	auto value = strtod(str, nullptr);
 	switch (unit(load)) {
 	case Unit::SCALAR:
 		if (value > 1. || value < 0) {
@@ -89,7 +89,7 @@ types::mhz_t clas::freq(char const * const str) {
 	std::string freqstr{str};
 	for (char & ch : freqstr) { ch = std::tolower(ch); }
 
-	auto value = atof(str);
+	auto value = strtod(str, nullptr);
 	switch (unit(freqstr)) {
 	case Unit::HZ:
 		value /= 1000000.;
@@ -121,7 +121,7 @@ types::ms clas::ival(char const * const str) {
 	std::string interval{str};
 	for (char & ch : interval) { ch = std::tolower(ch); }
 
-	auto value = atof(str);
+	auto value = strtod(str, nullptr);
 	if (value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
 		     "interval must be positive: "_s + str);
@@ -144,8 +144,8 @@ size_t clas::samples(char const * const str) {
 		errors::fail(errors::Exit::ESAMPLES, 0,
 		             "sample count must be a scalar integer: "_s + str);
 	}
-	auto const cnt = atoi(str);
-	auto const cntf = atof(str);
+	auto const cnt = strtol(str, nullptr, 0);
+	auto const cntf = strtod(str, nullptr);
 	if (cntf != cnt) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
 		             "sample count must be an integer: "_s + str);
@@ -161,7 +161,7 @@ types::decikelvin_t clas::temperature(char const * const str) {
 	std::string tempstr{str};
 	for (char & ch : tempstr) { ch = std::toupper(ch); }
 
-	auto value = atof(str);
+	auto value = strtod(str, nullptr);
 	switch (unit(tempstr)) {
 	case Unit::SCALAR:
 	case Unit::CELSIUS:

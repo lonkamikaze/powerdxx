@@ -21,7 +21,7 @@
 #include <algorithm> /* std::min(), std::max() */
 #include <limits>    /* std::numeric_limits */
 
-#include <cstdlib>   /* atof(), atoi(), strtol() */
+#include <cstdlib>   /* strtol() */
 #include <cstdint>   /* uint64_t */
 
 #include <sys/resource.h>  /* CPUSTATES */
