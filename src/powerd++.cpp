@@ -19,6 +19,7 @@
 #include <locale>    /* std::tolower() */
 #include <memory>    /* std::unique_ptr */
 #include <algorithm> /* std::min(), std::max() */
+#include <limits>    /* std::numeric_limits */
 
 #include <cstdlib>   /* atof(), atoi(), strtol() */
 #include <cstdint>   /* uint64_t */
@@ -61,6 +62,7 @@ using constants::CP_TIMES;
 using constants::ACLINE;
 using constants::FREQ;
 using constants::FREQ_LEVELS;
+using constants::TJMAX_SOURCES;
 
 using constants::FREQ_DEFAULT_MAX;
 using constants::FREQ_DEFAULT_MIN;
@@ -68,6 +70,7 @@ using constants::FREQ_UNSET;
 using constants::POWERD_PIDFILE;
 using constants::ADP;
 using constants::HADP;
+using constants::HITEMP_OFFSET;
 
 /**
  * The available AC line states.
@@ -156,6 +159,21 @@ struct Core {
 	 * The maximum core clock rate.
 	 */
 	mhz_t max{FREQ_DEFAULT_MAX};
+
+	/**
+	 * The core temperature in dK.
+	 */
+	decikelvin_t temp{0};
+
+	/**
+	 * Critical core temperature in dK.
+	 */
+	decikelvin_t temp_crit{std::numeric_limits<int>::max()};
+
+	/**
+	 * High core temperature in dK.
+	 */
+	decikelvin_t temp_high{std::numeric_limits<int>::max()};
 };
 
 
@@ -244,17 +262,6 @@ struct {
 	bool temp_throttling{false};
 
 	/**
-	 * High temperature when throttling starts.
-	 */
-	decikelvin_t temp_high{0};
-
-	/**
-	 * Critical temperature that should not be reached under
-	 * any circumstances.
-	 */
-	decikelvin_t temp_crit{0};
-
-	/**
 	 * Name of an alternative pidfile.
 	 *
 	 * If not given pidfile_open() uses a default name.
@@ -276,7 +283,7 @@ struct {
 	 * Core struct to store the management information of every
 	 * core.
 	 */
-	std::unique_ptr<Core[]> cores;
+	std::unique_ptr<Core[]> cores{new Core[this->ncpu]};
 } g;
 
 static_assert(countof(g.acstates) == to_value(AcLineState::LENGTH),
@@ -326,7 +333,6 @@ void init() {
 	 * Get the frequency controlling core for each core.
 	 * Basically acts as if the kernel supported local frequency changes.
 	 */
-	g.cores = std::unique_ptr<Core[]>(new Core[g.ncpu]);
 	coreid_t controller = -1;
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
 		/* get the frequency handler */
@@ -406,12 +412,49 @@ void init() {
 		/* user provided throttling values */
 
 		/* check temperature throttling boundaries */
-		if (g.temp_high >= g.temp_crit) {
+		if (g.cores[0].temp_high >= g.cores[0].temp_crit) {
 			fail(Exit::EOUTOFRANGE, 0,
 			     "temperature throttling 'high < critical' violation:\n"
 			     "\t[%d °C, %d °C]"_fmt
-			     (celsius(g.temp_high), celsius(g.temp_crit)));
+			     (celsius(g.cores[0].temp_high),
+			      celsius(g.cores[0].temp_crit)));
 		}
+
+		/* propagate limits to all cores */
+		for (coreid_t i = 1; i < g.ncpu; ++i) {
+			g.cores[i].temp_high = g.cores[0].temp_high;
+			g.cores[i].temp_crit = g.cores[0].temp_crit;
+		}
+	} else {
+		/* try to determine tjmax */
+		for (coreid_t i = 0; i < g.ncpu; ++i) {
+			auto & core = g.cores[i];
+			for (auto const source : TJMAX_SOURCES) {
+				char name[40];
+				sprintf_safe(name, source, i);
+				try {
+					core.temp_crit =
+					    sys::ctl::make_Once
+					        (core.temp_crit,
+					         sys::ctl::Sysctl<5>{name});
+					g.temp_throttling = true;
+					core.temp_high =
+					    core.temp_crit - HITEMP_OFFSET;
+					break;
+				} catch (sys::sc_error<sys::ctl::error>) {
+					/* do nada */
+				}
+			}
+			auto & controller = g.cores[core.controller];
+			controller.temp_high =
+			    std::min(controller.temp_high, core.temp_high);
+			controller.temp_crit =
+			    std::min(controller.temp_crit, core.temp_crit);
+		}
+	}
+	if (!g.temp_throttling) {
+		verbose("could not determine critical temperature\n"
+		        "\ttemperature throttling: off");
 	}
 
 	/* MIB for kern.cp_times */
@@ -777,7 +820,7 @@ void read_args(int const argc, char const * const argv[]) {
 		break;
 	case OE::HITEMP_RANGE:
 		g.temp_throttling = true;
-		std::tie(g.temp_high, g.temp_crit) =
+		std::tie(g.cores[0].temp_high, g.cores[0].temp_crit) =
 		    range(getopt[1], temperature);
 		break;
 	case OE::IVAL_POLL:
@@ -831,14 +874,14 @@ void show_settings() {
 	             "Core Groups\n"_fmt(g.ncpu);
 	for (coreid_t b = 0, e = 1; e <= g.ncpu; ++e) {
 		if (e == g.ncpu || e == g.cores[e].controller) {
-			std::cerr << "\t%d: [%d, %d]\n"_fmt(b, b, e - 1);
+			std::cerr << "\t%3d:                   [%d, %d]\n"_fmt(b, b, e - 1);
 			b = e;
 		}
 	}
 	std::cerr << "Core Frequency Limits\n";
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		if (i != g.cores[i].controller) { continue; }
-		std::cerr << "\t%d: [%d MHz, %d MHz]\n"_fmt
+		std::cerr << "\t%3d:                   [%d MHz, %d MHz]\n"_fmt
 		             (i, g.cores[i].min, g.cores[i].max);
 	}
 	std::cerr << "Load Targets\n";
@@ -853,10 +896,14 @@ void show_settings() {
 	}
 	std::cerr << "Temperature Throttling\n";
 	if (g.temp_throttling) {
-		std::cerr << "\tactive:                yes\n"
-		             "\thigh:                  %d °C\n"
-		             "\tcritical:              %d °C\n"_fmt
-		             (g.temp_high, g.temp_crit);
+		std::cerr << "\tactive:                yes\n";
+		for (coreid_t i = 0; i < g.ncpu; ++i) {
+			auto const & core = g.cores[i];
+			if (i != core.controller) { continue; }
+			std::cerr << "\t%3d:                   [%d °C, %d °C]\n"_fmt
+			             (i, celsius(core.temp_high),
+			              celsius(core.temp_crit));
+		}
 	} else {
 		std::cerr << "\tactive:                no\n";
 	}

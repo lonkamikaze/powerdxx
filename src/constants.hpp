@@ -41,6 +41,13 @@ char const * const FREQ_LEVELS = "dev.cpu.%d.freq_levels";
  */
 char const * const TEMPERATURE = "dev.cpu.%d.temperature";
 
+/**
+ * An array of maximum temperature sources.
+ */
+char const * const TJMAX_SOURCES[] = {
+	"dev.cpu.%d.coretemp.tjmax"
+};
+
 /*
  * Default values.
  */
@@ -74,6 +81,11 @@ types::cptime_t const ADP{512};
  * The load target for hiadaptive mode, equals 37.5% load.
  */
 types::cptime_t const HADP{384};
+
+/**
+ * The default temperautre offset between high and critical temperature.
+ */
+types::decikelvin_t const HITEMP_OFFSET{100};
 
 } /* namespace constants */
 
