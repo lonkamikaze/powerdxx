@@ -58,7 +58,7 @@ inline std::string operator "" _s(char const * const op, size_t const size) {
  *	Catch all arguments
  */
 template <typename... Args>
-void sprintf(Args...) {
+inline void sprintf(Args...) {
 	/* Assert depends on Args so it can only be determined if
 	 * the function is actually instantiated. */
 	static_assert(sizeof...(Args) && false,
