@@ -1,4 +1,4 @@
-~~~
+```
                                       /\  __
    __ __ ___  ___  __ _____  ___  ___/ /_/ /_
   /_//_//   \/   \/ // / _ \/ __\/    /_   _/__
@@ -6,11 +6,11 @@
 /_//_// ___/\___/\_/_/\___/_/   \___/     /_  _/
      / /                                   /_/
      \/ multi-core CPU clock daemon for FreeBSD®
-~~~
+```
 
 The `powerd++` daemon is a drop-in replacement for FreeBSD's native
-`powerd(8)`. It monitors the system load and adjusts the CPU clock
-accordingly, avoiding some of the pitfalls of `powerd`.
+`powerd(8)`. It monitors CPU load and core temperatures to adjusts
+the CPU clock, avoiding some of the pitfalls of `powerd`.
 
 What Pitfalls?
 --------------
@@ -54,6 +54,7 @@ The `powerd++` implementation addresses this issue and more:
   cause additional runtime cost!
 - `powerd++` parses command line arguments as floating point numbers,
   allowing expressive commands like `powerd++ --batt 1.2ghz`.
+- `powerd++` supports temperature based throttling.
 
 Building
 --------

@@ -17,6 +17,7 @@
 .Op Fl F Ar freq:freq
 .Op Fl A Ar freq:freq
 .Op Fl B Ar freq:freq
+.Op Fl H Ar temp:temp
 .Op Fl p Ar ival
 .Op Fl s Ar cnt
 .Op Fl P Ar file
@@ -61,6 +62,12 @@ The unit is not case sensitive, if omitted
 .Li MHz
 are assumed for compatibility with
 .Xr powerd 8 .
+.It Ar temp
+A temperature consisting of a number and a temperature unit. Supported
+units are:
+.D1 Li C , Li K , Li F , Li R
+These units stand for deg. Celsius, Kelvin, deg. Fahrenheit and
+deg. Rankine. A value without a unit is treated as deg. Celsius.
 .It Ar ival
 A time interval can be given in seconds or milliseconds.
 .D1 Li s , Li ms
@@ -111,6 +118,9 @@ clock frequency on AC power.
 .It Fl B , -freq-range-batt Ar freq:freq
 A pair of frequency values representing the minimum and maximum CPU
 clock frequency on battery power.
+.It Fl H , -hitemp-range Ar temp:temp
+Set the high to critical temperature range, enables temperature based
+throttling.
 .It Fl p , -poll Ar ival
 The polling interval that is used to take load samples and update the
 CPU clock (default 0.5s).
@@ -185,6 +195,18 @@ group are determined to set appropriate lower and upper boundaries. This
 is a purely cosmetic measure and used to avoid unnecessary frequency
 updates. The controlling algorithm does not require this information, so
 failure to do so will only be reported (non-fatally) in verbose mode.
+.Pp
+Unless the
+.Fl H
+option is given, the initialisation checks for a critical temperature
+source. If one is found temperature throttling is implicitly turned
+on, causing throttling to start 10 deg. Celsius below the critical
+temperature.
+.Pp
+So far the
+.Xr sysctl 3
+.Li dev.cpu.%d.coretemp.tjmax
+is the only supported critical temperature source.
 .Ss Detaching From the Terminal
 After the initialisation phase
 .Nm
@@ -222,6 +244,12 @@ The
 daemon steers the clock frequency to match a load target, e.g. if there was
 a 25% load on 2 GHz and the load target was 50%, the frequency would be set
 to 1 GHz.
+.Ss Temperature Based Throttling
+If temperature based throttling is active and the temperature is above
+the high temperature boundary (the critical temperature minus 10
+deg. Celsius by default), the core clock is limited to a value below
+the permitted maximum. The limit depends on the remaining distance
+to the critical temperature.
 .Ss Termination and Signals
 The signals
 .Li HUP
