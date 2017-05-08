@@ -4,6 +4,9 @@
 
 #include <locale>    /* std::tolower() */
 
+/**
+ * File local scope.
+ */
 namespace {
 /**
  * Command line argument units.
