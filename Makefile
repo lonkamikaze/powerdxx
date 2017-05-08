@@ -1,4 +1,4 @@
-FLAGS=     -std=c++11 -Wall -Werror -pedantic
+FLAGS=     -std=c++14 -Wall -Werror -pedantic
 DBGFLAGS=  -O0 -g -DEBUG
 PFLAGS=    -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error
 GXX5=      g++5
@@ -12,7 +12,7 @@ SOS=       src/loadplay.cpp
 SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
 TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/:C/^/lib/}
 TMP!=      cd ${.CURDIR} && \
-           env MKDEP_CPP_OPTS="-MM -std=c++11" mkdep ${SRCS}
+           env MKDEP_CPP_OPTS="-MM -std=c++14" mkdep ${SRCS}
 
 # Build
 all: ${TARGETS}

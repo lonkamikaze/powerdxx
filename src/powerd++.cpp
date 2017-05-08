@@ -190,7 +190,7 @@ struct Core {
  *
  * This is mostly for semantic clarity.
  */
-struct {
+struct Global {
 	/**
 	 * The last signal received, used for terminating.
 	 */
@@ -219,7 +219,7 @@ struct {
 	/**
 	 * Per AC line state settings.
 	 */
-	struct {
+	struct ACSet {
 		/**
 		 * Lowest frequency to set in MHz.
 		 */
@@ -242,11 +242,19 @@ struct {
 		 * Fixed clock frequencies to use if the target load is set to 0.
 		 */
 		mhz_t target_freq;
+
+		/**
+		 * The string representation of this state.
+		 */
+		char const * const name;
 	} acstates[3] {
-		{FREQ_UNSET,       FREQ_UNSET,       ADP,  0},
-		{FREQ_UNSET,       FREQ_UNSET,       HADP, 0},
-		{FREQ_DEFAULT_MIN, FREQ_DEFAULT_MAX, HADP, 0}
-	};
+		{FREQ_UNSET,       FREQ_UNSET,       ADP,  0,
+		 AcLineStateStr[to_value(AcLineState::BATTERY)]},
+		{FREQ_UNSET,       FREQ_UNSET,       HADP, 0,
+		 AcLineStateStr[to_value(AcLineState::ONLINE)]},
+		{FREQ_DEFAULT_MIN, FREQ_DEFAULT_MAX, HADP, 0,
+		 AcLineStateStr[to_value(AcLineState::UNKNOWN)]}
+	}; /**< The power states. */
 
 	/**
 	 * The hw.acpi.acline ctl.
@@ -291,7 +299,7 @@ struct {
 	 * core.
 	 */
 	std::unique_ptr<Core[]> cores{new Core[this->ncpu]};
-} g;
+} g; /**< The gobal state. */
 
 static_assert(countof(g.acstates) == to_value(AcLineState::LENGTH),
               "There must be a configuration tuple for each state");
@@ -488,7 +496,11 @@ void init() {
 /**
  * Updates the cp_times ring buffer and computes the load average for
  * each core.
+ *
+ * @tparam Temperature
+ *	Determines whether `group_maxtemp` is updated
  */
+template <bool Temperature>
 void update_loads() {
 	/* update load ticks */
 	try {
@@ -502,7 +514,7 @@ void update_loads() {
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto & core = g.cores[corei];
 
-		/* reset controling core data */
+		/* reset controlling core data */
 		if (core.controller == corei) {
 			core.sample_freq = core.freq;
 			freq = core.sample_freq;
@@ -544,7 +556,7 @@ void update_loads() {
 		                                    core.loadsum);
 
 		/* update group temperature */
-		if (g.temp_throttling) try {
+		if (Temperature) try {
 			controller.group_maxtemp =
 			    std::max<decikelvin_t>(controller.group_maxtemp, core.temp);
 		} catch (sys::sc_error<sys::ctl::error> e) {
@@ -559,18 +571,32 @@ void update_loads() {
 }
 
 /**
- * Update the CPU clocks depending on the AC line state and targets.
+ * Dispatch update_loads<>().
  */
-void update_freq() {
-	update_loads();
+void update_loads() {
+	if (g.temp_throttling) {
+		return update_loads<1>();
+	}
+	return update_loads<0>();
+}
 
-	/* get AC line status */
-	auto const acline = to_value<AcLineState>(
-	    sys::ctl::make_Once(AcLineState::UNKNOWN, g.acline_ctl));
-	auto const & acstate = g.acstates[acline];
-
-	assert(acstate.target_load <= 1024 &&
-	       "load target must be in the range [0, 1024]");
+/**
+ * Update the CPU clocks depending on the AC line state and targets.
+ *
+ * @tparam Foreground
+ *	Set for foreground operation (reporting on std::cout)
+ * @tparam Temperature
+ *	Set for temperature based throttling
+ * @tparam Fixed
+ *	Set for fixed frequency mode
+ * @param acstate
+ *	The set of acline dependent variables
+ */
+template <bool Foreground, bool Temperature, bool Fixed>
+void update_freq(Global::ACSet const & acstate) {
+	if (!Fixed || Foreground) {
+		update_loads<Temperature>();
+	}
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto & core = g.cores[corei];
@@ -580,7 +606,7 @@ void update_freq() {
 		mhz_t wantfreq, newfreq;
 		auto const max = std::min(core.max, acstate.freq_max);
 		auto const min = std::max(core.min, acstate.freq_min);
-		if (acstate.target_load) {
+		if (!Fixed) {
 			/* adaptive frequency mode */
 			wantfreq = core.group_loadsum / g.samples *
 			           1024 / acstate.target_load;
@@ -596,7 +622,7 @@ void update_freq() {
 			newfreq = wantfreq;
 		}
 		/* apply temperature throttling */
-		if (g.temp_throttling) {
+		if (Temperature) {
 			if (core.group_maxtemp >= core.temp_crit) {
 				newfreq = min;
 			} else if (core.group_maxtemp > core.temp_high) {
@@ -612,22 +638,56 @@ void update_freq() {
 			core.freq = newfreq;
 		}
 		/* foreground output */
-		if (!g.foreground) { continue; }
-		if (g.temp_throttling) {
+		if (Foreground && Temperature) {
 			std::cout << "power: %7s, load: %4d MHz, %3d °C, cpu%d.freq: %4d MHz, wanted: %4d MHz, %3d °C\n"_fmt
-			             (AcLineStateStr[acline],
+			             (acstate.name,
 			              (core.group_loadsum / g.samples),
 			              celsius(core.group_maxtemp),
 			              corei, core.sample_freq, wantfreq,
 			              celsius(core.temp_high));
-		} else {
+		} else if (Foreground) {
 			std::cout << "power: %7s, load: %4d MHz, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
-			             (AcLineStateStr[acline],
+			             (acstate.name,
 			              (core.group_loadsum / g.samples),
 			              corei, core.sample_freq, wantfreq);
 		}
 	}
-	if (g.foreground) { std::cout << std::flush; }
+	if (Foreground) { std::cout << std::flush; }
+}
+
+/**
+ * Dispatch update_freq<>().
+ */
+void update_freq() {
+	/* get AC line status */
+	auto const acline = to_value<AcLineState>(
+	    sys::ctl::make_Once(AcLineState::UNKNOWN, g.acline_ctl));
+	auto const & acstate = g.acstates[acline];
+
+	assert(acstate.target_load <= 1024 &&
+	       "load target must be in the range [0, 1024]");
+
+	switch ((g.foreground << 2) | (g.temp_throttling << 1) |
+	        (acstate.target_load == 0)) {
+	case 0b000:
+		return update_freq<0, 0, 0>(acstate);
+	case 0b001:
+		return update_freq<0, 0, 1>(acstate);
+	case 0b010:
+		return update_freq<0, 1, 0>(acstate);
+	case 0b011:
+		return update_freq<0, 1, 1>(acstate);
+	case 0b100:
+		return update_freq<1, 0, 0>(acstate);
+	case 0b101:
+		return update_freq<1, 0, 1>(acstate);
+	case 0b110:
+		return update_freq<1, 1, 0>(acstate);
+	case 0b111:
+		return update_freq<1, 1, 1>(acstate);
+	}
+
+	assert(false && "update_freq<>() was not dispatched");
 }
 
 /**
