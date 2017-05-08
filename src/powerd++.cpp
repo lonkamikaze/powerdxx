@@ -62,6 +62,7 @@ using constants::CP_TIMES;
 using constants::ACLINE;
 using constants::FREQ;
 using constants::FREQ_LEVELS;
+using constants::TEMPERATURE;
 using constants::TJMAX_SOURCES;
 
 using constants::FREQ_DEFAULT_MAX;
@@ -161,9 +162,9 @@ struct Core {
 	mhz_t max{FREQ_DEFAULT_MAX};
 
 	/**
-	 * The core temperature in dK.
+	 * The dev.cpu.%d.temperature sysctl, if present.
 	 */
-	decikelvin_t temp{0};
+	sys::ctl::SysctlSync<decikelvin_t, 0> temp{{}};
 
 	/**
 	 * Critical core temperature in dK.
@@ -174,6 +175,12 @@ struct Core {
 	 * High core temperature in dK.
 	 */
 	decikelvin_t temp_high{std::numeric_limits<int>::max()};
+
+	/**
+	 * For the controlling core this is set to the maximum temperature
+	 * measurement taken in the group.
+	 */
+	decikelvin_t group_maxtemp{0};
 };
 
 
@@ -455,6 +462,15 @@ void init() {
 	if (!g.temp_throttling) {
 		verbose("could not determine critical temperature\n"
 		        "\ttemperature throttling: off");
+	} else for (coreid_t i = 0; i < g.ncpu; ++i) {
+		char name[40];
+		sprintf_safe(name, TEMPERATURE, i);
+		try {
+			g.cores[i].temp = {{name}};
+			assert(g.cores[i].temp >= 0);
+		} catch (sys::sc_error<sys::ctl::error>) {
+			verbose("core temperature not accessible: %s"_fmt(name));
+		}
 	}
 
 	/* MIB for kern.cp_times */
@@ -491,6 +507,7 @@ void update_loads() {
 			core.sample_freq = core.freq;
 			freq = core.sample_freq;
 			core.group_loadsum = 0;
+			core.group_maxtemp = 0;
 		}
 
 		/* sum of collected ticks */
@@ -525,6 +542,12 @@ void update_loads() {
 		auto & controller = g.cores[core.controller];
 		controller.group_loadsum = std::max(controller.group_loadsum,
 		                                    core.loadsum);
+
+		/* update group temperature */
+		if (g.temp_throttling) {
+			controller.group_maxtemp =
+			    std::max<decikelvin_t>(controller.group_maxtemp, core.temp);
+		}
 	}
 	g.sample = (g.sample + 1) % g.samples;
 }
@@ -566,16 +589,37 @@ void update_freq() {
 			wantfreq = std::min(std::max(acstate.target_freq, min), max);
 			newfreq = wantfreq;
 		}
+		/* apply temperature throttling */
+		if (g.temp_throttling) {
+			if (core.group_maxtemp >= core.temp_crit) {
+				newfreq = min;
+			} else if (core.group_maxtemp > core.temp_high) {
+				auto const freqrange = max - min;
+				auto const tempdiff  = core.temp_crit - core.group_maxtemp;
+				auto const temprange = core.temp_crit - core.temp_high;
+				mhz_t const tempfreq = freqrange * tempdiff / temprange + min;
+				newfreq = std::min(newfreq, tempfreq);
+			}
+		}
 		/* update CPU frequency */
 		if (core.sample_freq != newfreq) {
 			core.freq = newfreq;
 		}
 		/* foreground output */
 		if (!g.foreground) { continue; }
-		std::cout << "power: %7s, load: %4d MHz, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
-		             (AcLineStateStr[acline],
-		              (core.group_loadsum / g.samples),
-		              corei, core.sample_freq, wantfreq);
+		if (g.temp_throttling) {
+			std::cout << "power: %7s, load: %4d MHz, %3d °C, cpu%d.freq: %4d MHz, wanted: %4d MHz, %3d °C\n"_fmt
+			             (AcLineStateStr[acline],
+			              (core.group_loadsum / g.samples),
+			              celsius(core.group_maxtemp),
+			              corei, core.sample_freq, wantfreq,
+			              celsius(core.temp_high));
+		} else {
+			std::cout << "power: %7s, load: %4d MHz, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
+			             (AcLineStateStr[acline],
+			              (core.group_loadsum / g.samples),
+			              corei, core.sample_freq, wantfreq);
+		}
 	}
 	if (g.foreground) { std::cout << std::flush; }
 }
