@@ -62,12 +62,13 @@ Building
 Download the repository and run `make`:
 
     > make
-    c++ -O2 -pipe  -std=c++11 -Wall -Werror -pedantic -c src/powerd++.cpp -o powerd++.o
-    c++ -O2 -pipe  -std=c++11 -Wall -Werror -pedantic powerd++.o -lutil -o powerd++
-    c++ -O2 -pipe  -std=c++11 -Wall -Werror -pedantic -c src/loadrec.cpp -o loadrec.o
-    c++ -O2 -pipe  -std=c++11 -Wall -Werror -pedantic loadrec.o -o loadrec
-    c++ -O2 -pipe  -std=c++11 -Wall -Werror -pedantic -fPIC -c src/loadplay.cpp -o loadplay.o
-    c++ -O2 -pipe  -std=c++11 -Wall -Werror -pedantic loadplay.o -lpthread -shared -o libloadplay.so
+    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic -c src/powerd++.cpp -o powerd++.o
+    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic -c src/clas.cpp -o clas.o
+    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic powerd++.o clas.o -lutil -o powerd++
+    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic -c src/loadrec.cpp -o loadrec.o
+    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic loadrec.o clas.o -o loadrec
+    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic -fPIC -c src/loadplay.cpp -o loadplay.o
+    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic loadplay.o -lpthread -shared -o libloadplay.so
 
 Documentation
 -------------
