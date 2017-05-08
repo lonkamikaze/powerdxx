@@ -937,12 +937,11 @@ void show_settings() {
 	std::cerr << "Load Targets\n";
 	for (size_t i = 0; i < countof(g.acstates); ++i) {
 		auto const & acstate = g.acstates[i];
-		std::cerr << "\t%-22s %2d%% load\n"_fmt
-		             ((""_s + AcLineStateStr[i] + " power target:").c_str(),
-		              acstate.target_load
-		              ? (acstate.target_load * 100 + 512) / 1024
-		              : acstate.target_freq,
-		              acstate.target_load);
+		std::cerr << "\t%-22s"_fmt
+		             ((""_s + AcLineStateStr[i] + " power target:").c_str())
+		          << (acstate.target_load
+		              ? "%2d%% load\n"_fmt((acstate.target_load * 100 + 512) / 1024)
+		              : "%4d MHz\n"_fmt(acstate.target_freq));
 	}
 	std::cerr << "Temperature Throttling\n";
 	if (g.temp_throttling) {
