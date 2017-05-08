@@ -544,9 +544,15 @@ void update_loads() {
 		                                    core.loadsum);
 
 		/* update group temperature */
-		if (g.temp_throttling) {
+		if (g.temp_throttling) try {
 			controller.group_maxtemp =
 			    std::max<decikelvin_t>(controller.group_maxtemp, core.temp);
+		} catch (sys::sc_error<sys::ctl::error> e) {
+			verbose("access to core %d temperature failed"_fmt(corei));
+			if (g.temp_throttling) {
+				verbose("turn off temperature based throttling");
+				g.temp_throttling = false;
+			}
 		}
 	}
 	g.sample = (g.sample + 1) % g.samples;
