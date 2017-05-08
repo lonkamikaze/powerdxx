@@ -430,7 +430,7 @@ void init() {
 		if (g.cores[0].temp_high >= g.cores[0].temp_crit) {
 			fail(Exit::EOUTOFRANGE, 0,
 			     "temperature throttling 'high < critical' violation:\n"
-			     "\t[%d °C, %d °C]"_fmt
+			     "\t[%d C, %d C]"_fmt
 			     (celsius(g.cores[0].temp_high),
 			      celsius(g.cores[0].temp_crit)));
 		}
@@ -639,7 +639,7 @@ void update_freq(Global::ACSet const & acstate) {
 		}
 		/* foreground output */
 		if (Foreground && Temperature) {
-			std::cout << "power: %7s, load: %4d MHz, %3d °C, cpu%d.freq: %4d MHz, wanted: %4d MHz, %3d °C\n"_fmt
+			std::cout << "power: %7s, load: %4d MHz, %3d C, cpu%d.freq: %4d MHz, wanted: %4d MHz, %3d C\n"_fmt
 			             (acstate.name,
 			              (core.group_loadsum / g.samples),
 			              celsius(core.group_maxtemp),
@@ -1009,7 +1009,7 @@ void show_settings() {
 		for (coreid_t i = 0; i < g.ncpu; ++i) {
 			auto const & core = g.cores[i];
 			if (i != core.controller) { continue; }
-			std::cerr << "\t%3d:                   [%d °C, %d °C]\n"_fmt
+			std::cerr << "\t%3d:                   [%d C, %d C]\n"_fmt
 			             (i, celsius(core.temp_high),
 			              celsius(core.temp_crit));
 		}
