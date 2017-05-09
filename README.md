@@ -9,7 +9,7 @@
 ```
 
 The `powerd++` daemon is a drop-in replacement for FreeBSD's native
-`powerd(8)`. It monitors CPU load and core temperatures to adjusts
+`powerd(8)`. It monitors CPU load and core temperatures to adjust
 the CPU clock, avoiding some of the pitfalls of `powerd`.
 
 What Pitfalls?
