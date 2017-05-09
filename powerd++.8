@@ -250,6 +250,15 @@ the high temperature boundary (the critical temperature minus 10
 deg. Celsius by default), the core clock is limited to a value below
 the permitted maximum. The limit depends on the remaining distance
 to the critical temperature.
+.Pp
+Thermal throttling ignores user-defined frequency limits, i.e. when using
+.Fl F , B , A
+or
+.Fl m
+to prevent the clock from going unreasonably low, sufficient thermal
+load may cause
+.Nm
+to select a clock frequency below the user provided minimum.
 .Ss Termination and Signals
 The signals
 .Li HUP

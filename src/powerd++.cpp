@@ -624,12 +624,12 @@ void update_freq(Global::ACSet const & acstate) {
 		/* apply temperature throttling */
 		if (Temperature) {
 			if (core.group_maxtemp >= core.temp_crit) {
-				newfreq = min;
+				newfreq = core.min;
 			} else if (core.group_maxtemp > core.temp_high) {
-				auto const freqrange = max - min;
+				auto const freqrange = core.max - core.min;
 				auto const tempdiff  = core.temp_crit - core.group_maxtemp;
 				auto const temprange = core.temp_crit - core.temp_high;
-				mhz_t const tempfreq = freqrange * tempdiff / temprange + min;
+				mhz_t const tempfreq = freqrange * tempdiff / temprange + core.min;
 				newfreq = std::min(newfreq, tempfreq);
 			}
 		}
@@ -1167,4 +1167,3 @@ int main(int argc, char * argv[]) {
 	}
 	return 0;
 }
-
