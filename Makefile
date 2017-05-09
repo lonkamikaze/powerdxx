@@ -13,6 +13,7 @@ SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
 TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/:C/^/lib/}
 TMP!=      cd ${.CURDIR} && \
            env MKDEP_CPP_OPTS="-MM -std=c++14" mkdep ${SRCS}
+RELEASE!=  git tag 2>&- | tail -n1 || :
 
 # Build
 all: ${TARGETS}
@@ -69,7 +70,8 @@ clean:
 # Documentation
 doc::
 	rm -rf ${.TARGET}/*
-	cd "${.CURDIR}" && doxygen doxy/doxygen.conf
+	cd "${.CURDIR}" && (cat doxy/doxygen.conf; \
+		echo PROJECT_NUMBER='"${RELEASE}"') | doxygen -
 
 doc/latex/refman.pdf: doc
 	cd "${.CURDIR}" && cd "${.TARGET:H}" && ${MAKE}
