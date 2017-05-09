@@ -429,9 +429,9 @@ class Sync {
  * @tparam T
  *	The type to represent the sysctl as
  * @tparam MibDepth
- *	The maximum allowed MIB depth
+ *	The MIB depth, provide only for compile time initialisation
  */
-template <typename T, size_t MibDepth>
+template <typename T, size_t MibDepth = 0>
 using SysctlSync = Sync<T, Sysctl<MibDepth>>;
 
 /**

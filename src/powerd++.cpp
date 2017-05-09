@@ -98,7 +98,7 @@ struct Core {
 	/**
 	 * The sysctl kern.cpu.N.freq, if present.
 	 */
-	sys::ctl::SysctlSync<mhz_t, 0> freq{{}};
+	sys::ctl::SysctlSync<mhz_t> freq{{}};
 
 	/**
 	 * A pointer to the kern.cp_times section for this core.
@@ -164,7 +164,7 @@ struct Core {
 	/**
 	 * The dev.cpu.%d.temperature sysctl, if present.
 	 */
-	sys::ctl::SysctlSync<decikelvin_t, 0> temp{{}};
+	sys::ctl::SysctlSync<decikelvin_t> temp{{}};
 
 	/**
 	 * Critical core temperature in dK.
