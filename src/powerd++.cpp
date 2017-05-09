@@ -639,12 +639,11 @@ void update_freq(Global::ACSet const & acstate) {
 		}
 		/* foreground output */
 		if (Foreground && Temperature) {
-			std::cout << "power: %7s, load: %4d MHz, %3d C, cpu%d.freq: %4d MHz, wanted: %4d MHz, %3d C\n"_fmt
+			std::cout << "power: %7s, load: %4d MHz, %3d C, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
 			             (acstate.name,
 			              (core.group_loadsum / g.samples),
 			              celsius(core.group_maxtemp),
-			              corei, core.sample_freq, wantfreq,
-			              celsius(core.temp_high));
+			              corei, core.sample_freq, wantfreq);
 		} else if (Foreground) {
 			std::cout << "power: %7s, load: %4d MHz, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
 			             (acstate.name,
