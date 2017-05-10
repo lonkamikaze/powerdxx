@@ -348,7 +348,7 @@ constexpr Sysctl<sizeof...(Args)> make_Sysctl(Args const... args) {
  * use of a sysctl.
  *
  * ~~~ c++
- * Sync<int, Sysctl<3>> sndUnit{{"hw.snd.default_unit"}};
+ * Sync<int, Sysctl<>> sndUnit{{"hw.snd.default_unit"}};
  * if (sndUnit != 3) {    // read from sysctl
  *	sndUnit = 3;      // assign to sysctl
  * }
@@ -419,8 +419,8 @@ class Sync {
  * A convenience alias around Sync.
  *
  * ~~~ c++
- * // Sync<int, Sysctl<3>> sndUnit{{"hw.snd.default_unit"}};
- * SysctlSync<int, 3> sndUnit{{"hw.snd.default_unit"}};
+ * // Sync<int, Sysctl<>> sndUnit{{"hw.snd.default_unit"}};
+ * SysctlSync<int> sndUnit{{"hw.snd.default_unit"}};
  * if (sndUnit != 3) {    // read from sysctl
  *	sndUnit = 3;      // assign to sysctl
  * }
