@@ -84,14 +84,6 @@ enum class AcLineState : unsigned int {
 };
 
 /**
- * String descriptions for the AC line states.
- */
-char const * const AcLineStateStr[]{"battery", "online", "unknown"};
-
-static_assert(to_value(AcLineState::LENGTH) == countof(AcLineStateStr),
-              "Every AcLineState must have a string representation");
-
-/**
  * Contains the management information for a single CPU core.
  */
 struct Core {
@@ -248,12 +240,9 @@ struct Global {
 		 */
 		char const * const name;
 	} acstates[3] {
-		{FREQ_UNSET,       FREQ_UNSET,       ADP,  0,
-		 AcLineStateStr[to_value(AcLineState::BATTERY)]},
-		{FREQ_UNSET,       FREQ_UNSET,       HADP, 0,
-		 AcLineStateStr[to_value(AcLineState::ONLINE)]},
-		{FREQ_DEFAULT_MIN, FREQ_DEFAULT_MAX, HADP, 0,
-		 AcLineStateStr[to_value(AcLineState::UNKNOWN)]}
+		{FREQ_UNSET,       FREQ_UNSET,       ADP,  0, "battery"},
+		{FREQ_UNSET,       FREQ_UNSET,       HADP, 0, "online"},
+		{FREQ_DEFAULT_MIN, FREQ_DEFAULT_MAX, HADP, 0, "unknown"}
 	}; /**< The power states. */
 
 	/**
@@ -373,24 +362,20 @@ void init() {
 	}
 
 	/* set user frequency boundaries */
-	auto const line_unknown = to_value(AcLineState::UNKNOWN);
+	auto const & line_unknown = g.acstates[to_value(AcLineState::UNKNOWN)];
 	for (auto & state : g.acstates) {
 		if (state.freq_min == FREQ_UNSET) {
-			state.freq_min = g.acstates[line_unknown].freq_min;
+			state.freq_min = line_unknown.freq_min;
 		}
 		if (state.freq_max == FREQ_UNSET) {
-			state.freq_max = g.acstates[line_unknown].freq_max;
+			state.freq_max = line_unknown.freq_max;
 		}
-	}
-
-	/* check user frequency boundaries */
-	for (size_t i = 0; i < countof(g.acstates); ++i) {
-		auto const & state = g.acstates[i];
+		/* check user frequency boundaries */
 		if (state.freq_min < state.freq_max) { continue; }
 		fail(Exit::EOUTOFRANGE, 0,
 		     "frequency limits 'min < max' violation:\n"
 		     "\t%s [%d MHz, %d MHz]"_fmt
-		     (AcLineStateStr[i], state.freq_min, state.freq_max));
+		     (state.name, state.freq_min, state.freq_max));
 	}
 
 	/* set per core min/max frequency boundaries */
@@ -973,10 +958,10 @@ void show_settings() {
 	             (g.foreground ? "yes" : "no",
 	              g.samples, g.interval.count(),
 	              g.samples * g.interval.count());
-	for (size_t i = 0; i < countof(g.acstates); ++i) {
+	for (auto const & acstate : g.acstates) {
 		std::cerr << "\t%-22s [%d MHz, %d MHz]\n"_fmt
-		             ((""_s + AcLineStateStr[i] + ':').c_str(),
-		              g.acstates[i].freq_min, g.acstates[i].freq_max);
+		             ((""_s + acstate.name + ':').c_str(),
+		              acstate.freq_min, acstate.freq_max);
 	}
 	std::cerr << "CPU Cores\n"
 	             "\tCPU cores:             %d\n"
@@ -994,10 +979,9 @@ void show_settings() {
 		             (i, g.cores[i].min, g.cores[i].max);
 	}
 	std::cerr << "Load Targets\n";
-	for (size_t i = 0; i < countof(g.acstates); ++i) {
-		auto const & acstate = g.acstates[i];
+	for (auto const & acstate : g.acstates) {
 		std::cerr << "\t%-22s"_fmt
-		             ((""_s + AcLineStateStr[i] + " power target:").c_str())
+		             ((""_s + acstate.name + " power target:").c_str())
 		          << (acstate.target_load
 		              ? "%2d%% load\n"_fmt((acstate.target_load * 100 + 512) / 1024)
 		              : "%4d MHz\n"_fmt(acstate.target_freq));
