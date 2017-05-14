@@ -378,35 +378,6 @@ void init() {
 		     (state.name, state.freq_min, state.freq_max));
 	}
 
-	/* set per core min/max frequency boundaries */
-	for (coreid_t i = 0; i < g.ncpu; ++i) {
-		auto & core = g.cores[i];
-		if (core.controller != i) { continue; }
-		char name[40];
-		sprintf_safe(name, FREQ_LEVELS, i);
-		try {
-			sys::ctl::Sysctl<> const ctl{name};
-			auto levels = ctl.get<char>();
-			/* the maximum should at least be the minimum
-			 * and vice versa */
-			core.max = FREQ_DEFAULT_MIN;
-			core.min = FREQ_DEFAULT_MAX;
-			for (auto pch = levels.get(); *pch; ++pch) {
-				mhz_t freq = strtol(pch, &pch, 10);
-				if (pch[0] != '/') { break; }
-				core.max = std::max(core.max, freq);
-				core.min = std::min(core.min, freq);
-				strtol(++pch, &pch, 10);
-				/* no idea what that value means */
-				if (pch[0] != ' ') { break; }
-			}
-			assert(core.min <= core.max &&
-			       "minimum must not be greater than maximum");
-		} catch (sys::sc_error<sys::ctl::error>) {
-			verbose("cannot access sysctl: "_s + name);
-		}
-	}
-
 	/* setup temperature throttling */
 	if (g.temp_throttling) {
 		/* user provided throttling values */
@@ -463,6 +434,41 @@ void init() {
 			assert(g.cores[i].temp >= 0);
 		} catch (sys::sc_error<sys::ctl::error>) {
 			verbose("core temperature not accessible: %s"_fmt(name));
+		}
+	}
+
+	/* set per core min/max frequency boundaries */
+	for (coreid_t i = 0; i < g.ncpu; ++i) {
+		auto & core = g.cores[i];
+		if (core.controller != i) { continue; }
+		char name[40];
+		sprintf_safe(name, FREQ_LEVELS, i);
+		try {
+			sys::ctl::Sysctl<> const ctl{name};
+			auto levels = ctl.get<char>();
+			/* the maximum should at least be the minimum
+			 * and vice versa */
+			core.max = FREQ_DEFAULT_MIN;
+			core.min = FREQ_DEFAULT_MAX;
+			for (auto pch = levels.get(); *pch; ++pch) {
+				mhz_t freq = strtol(pch, &pch, 10);
+				if (pch[0] != '/') { break; }
+				core.max = std::max(core.max, freq);
+				core.min = std::min(core.min, freq);
+				strtol(++pch, &pch, 10);
+				/* no idea what that value means */
+				if (pch[0] != ' ') { break; }
+			}
+			assert(core.min < core.max &&
+			       "minimum must be less than maximum");
+		} catch (sys::sc_error<sys::ctl::error>) {
+			if (g.temp_throttling) {
+				verbose("cannot access sysctl: "_s + name +
+				        "\n\ttemperature throttling: off");
+				g.temp_throttling = false;
+			} else {
+				verbose("cannot access sysctl: "_s + name);
+			}
 		}
 	}
 
