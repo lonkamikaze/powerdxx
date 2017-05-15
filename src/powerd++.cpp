@@ -26,7 +26,6 @@
 
 #include <sys/resource.h>  /* CPUSTATES */
 
-
 /**
  * File local scope.
  */
@@ -488,63 +487,71 @@ void init() {
  * Updates the cp_times ring buffer and computes the load average for
  * each core.
  *
+ * @tparam Load
+ *	Determines whether `group_loadsum` is updated
  * @tparam Temperature
  *	Determines whether `group_maxtemp` is updated
  */
-template <bool Temperature>
+template <bool Load = 1, bool Temperature = 0>
 void update_loads() {
 	/* update load ticks */
-	try {
+	if (Load) try {
 		g.cp_times_ctl.get(g.cp_times[0],
 		                   g.ncpu * sizeof(g.cp_times[0]));
 	} catch (sys::sc_error<sys::ctl::error> e) {
 		sysctl_fail(e);
 	}
 
-	mhz_t freq = 0;
+	mhz_t freq;
+	Load && (freq = 0);
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto & core = g.cores[corei];
+		auto & controller = g.cores[core.controller];
 
 		/* reset controlling core data */
-		if (core.controller == corei) {
-			core.sample_freq = core.freq;
-			freq = core.sample_freq;
-			core.group_loadsum = 0;
-			core.group_maxtemp = 0;
+		if (&core == &controller) {
+			if (Load) {
+				core.sample_freq = core.freq;
+				freq = core.sample_freq;
+				core.group_loadsum = 0;
+			}
+			Temperature && (core.group_maxtemp = 0);
 		}
 
-		/* sum of collected ticks */
-		cptime_t all_new = 0;
-		for (size_t i = 0; i < CPUSTATES; ++i) {
-			all_new += core.cp_time[i];
+		/* update load */
+		if (Load) {
+			/* sum of collected ticks */
+			cptime_t all_new = 0;
+			for (size_t i = 0; i < CPUSTATES; ++i) {
+				all_new += core.cp_time[i];
+			}
+			cptime_t const all = all_new - core.all;
+			core.all = all_new;
+
+			/* collected idle ticks */
+			cptime_t idle_new = core.cp_time[CP_IDLE];
+			cptime_t const idle = idle_new - core.idle;
+			core.idle = idle_new;
+
+			/* subtract oldest sample */
+			core.loadsum -= core.loads[g.sample];
+			/* update current sample */
+			if (all) {
+				/* measurement succeeded */
+				core.loads[g.sample] = freq - (freq * idle) / all;
+			} else {
+				/* no samples since last sampling,
+				 * reuse the previous load */
+				core.loads[g.sample] =
+				    core.loads[(g.sample + g.samples - 1) % g.samples];
+			}
+			/* add current sample */
+			core.loadsum += core.loads[g.sample];
+
+			/* update group load */
+			controller.group_loadsum = std::max(controller.group_loadsum,
+			                                    core.loadsum);
 		}
-		cptime_t const all = all_new - core.all;
-		core.all = all_new;
-
-		/* collected idle ticks */
-		cptime_t idle_new = core.cp_time[CP_IDLE];
-		cptime_t const idle = idle_new - core.idle;
-		core.idle = idle_new;
-
-		/* subtract oldest sample */
-		core.loadsum -= core.loads[g.sample];
-		/* update current sample */
-		if (all) {
-			/* measurement succeeded */
-			core.loads[g.sample] = freq - (freq * idle) / all;
-		} else {
-			/* no samples since last sampling, reuse the previous
-			 * load */
-			core.loads[g.sample] =
-			    core.loads[(g.sample + g.samples - 1) % g.samples];
-		}
-		/* add current sample */
-		core.loadsum += core.loads[g.sample];
-
-		/* update group load */
-		auto & controller = g.cores[core.controller];
-		controller.group_loadsum = std::max(controller.group_loadsum,
-		                                    core.loadsum);
 
 		/* update group temperature */
 		if (Temperature) try {
@@ -558,18 +565,13 @@ void update_loads() {
 			}
 		}
 	}
-	g.sample = (g.sample + 1) % g.samples;
+	Load && (g.sample = (g.sample + 1) % g.samples);
 }
 
 /**
- * Dispatch update_loads<>().
+ * Do nada if neither load nor temperature are to be updated.
  */
-void update_loads() {
-	if (g.temp_throttling) {
-		return update_loads<1>();
-	}
-	return update_loads<0>();
-}
+template <> void update_loads<0, 0>() {}
 
 /**
  * Update the CPU clocks depending on the AC line state and targets.
@@ -585,9 +587,7 @@ void update_loads() {
  */
 template <bool Foreground, bool Temperature, bool Fixed>
 void update_freq(Global::ACSet const & acstate) {
-	if (!Fixed || Foreground) {
-		update_loads<Temperature>();
-	}
+	update_loads<(!Fixed || Foreground), Temperature>();
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto & core = g.cores[corei];
