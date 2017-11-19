@@ -13,7 +13,7 @@ SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
 TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/:C/^/lib/}
 TMP!=      cd ${.CURDIR} && \
            env MKDEP_CPP_OPTS="-MM -std=c++14" mkdep ${SRCS}
-RELEASE!=  git tag 2>&- | tail -n1 || :
+RELEASE!=  git tag -l --sort=committerdate 2>&- | tail -n1 || :
 
 # Build
 all: ${TARGETS}
