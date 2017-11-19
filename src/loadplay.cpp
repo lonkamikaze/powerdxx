@@ -819,7 +819,8 @@ class Emulator {
 	 *
 	 * It also prints the column headers on stdout.
 	 *
-	 * @throws std::out_of_range *	In case one of the required sysctls is missing
+	 * @throws std::out_of_range
+	 *	In case one of the required sysctls is missing
 	 * @param die
 	 *	If the referenced bool is true, emulation is terminated
 	 *	prematurely
