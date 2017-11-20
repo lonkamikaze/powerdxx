@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['once',['Once',['../classsys_1_1ctl_1_1Once.html',1,'sys::ctl']]],
-  ['once_3c_20coreid_5ft_2c_202_20_3e',['Once&lt; coreid_t, 2 &gt;',['../classsys_1_1ctl_1_1Once.html',1,'sys::ctl']]],
-  ['option',['Option',['../namespacenih.html#structnih_1_1Option',1,'nih']]],
-  ['options',['Options',['../classnih_1_1Options.html',1,'nih']]]
+  ['main',['Main',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html',1,'anonymous_namespace{loadplay.cpp}']]],
+  ['mib_5ft',['mib_t',['../structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html',1,'anonymous_namespace{loadplay.cpp}']]]
 ];

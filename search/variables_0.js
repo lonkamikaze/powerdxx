@@ -1,7 +1,7 @@
 var searchData=
 [
   ['acline',['ACLINE',['../namespaceconstants.html#a381601cea9975e5cc8cf0f3992f00628',1,'constants']]],
-  ['aclinestatestr',['AcLineStateStr',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#adfb55ab9ed5c3a9be2e56aa5c439f688',1,'anonymous_namespace{powerd++.cpp}']]],
+  ['acline_5fctl',['acline_ctl',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a88858d86d277aa069bdddfd02cfbbbd7',1,'anonymous_namespace{powerd++.cpp}::Global']]],
   ['adp',['ADP',['../namespaceconstants.html#ae0f24212aa57bd0cc1593f635b4f286f',1,'constants']]],
   ['all',['all',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#aa4e7c73d190b8b86d539d234fb4d6647',1,'anonymous_namespace{powerd++.cpp}::Core']]],
   ['argc',['argc',['../classnih_1_1Options.html#ad2b04fbd5eae6aba943f9db6b00b574a',1,'nih::Options']]],

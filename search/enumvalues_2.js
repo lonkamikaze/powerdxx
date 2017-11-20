@@ -11,8 +11,10 @@ var searchData=
   ['enofreq',['ENOFREQ',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaaa12e32c52b8420fd367bc012e2e8931c',1,'errors']]],
   ['eoutofrange',['EOUTOFRANGE',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaa5e370b82769f000c6f9d151943e971d5',1,'errors']]],
   ['epid',['EPID',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaa4b04d5f2cff624b3e2a5c4b37745763b',1,'errors']]],
+  ['erangefmt',['ERANGEFMT',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaaf81de44f6f20be7b49716d5fecd94067',1,'errors']]],
   ['esamples',['ESAMPLES',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaa940d0ce99a4398ad880f9f165c523685',1,'errors']]],
   ['esignal',['ESIGNAL',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaacbe9884e3c71a108d2a5c58feff10d7a',1,'errors']]],
   ['esysctl',['ESYSCTL',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaa2d7d65ddb7cc48fed86848db54077ebf',1,'errors']]],
+  ['etemperature',['ETEMPERATURE',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaaf4f94e1dbdb2aaf4dc622e9465fb1003',1,'errors']]],
   ['ewopen',['EWOPEN',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaa0e1a7378ff5d8aefdd9a8236d99e8948',1,'errors']]]
 ];

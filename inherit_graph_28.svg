@@ -12,9 +12,9 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="classsys_1_1pid_1_1Pidfile.html" target="_top" xlink:title="A wrapper around the pidfile_* family of commands implementing the RAII pattern. ">
+<g id="a_node1"><a xlink:href="classsys_1_1sig_1_1Signal.html" target="_top" xlink:title="Sets up a given signal handler and restores the old handler when going out of scope. ">
 <polygon fill="#ffffff" stroke="#000000" points="0,-.5 0,-19.5 84,-19.5 84,-.5 0,-.5"/>
-<text text-anchor="middle" x="42" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::pid::Pidfile</text>
+<text text-anchor="middle" x="42" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::sig::Signal</text>
 </a>
 </g>
 </g>

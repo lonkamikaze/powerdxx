@@ -1,3 +1,4 @@
 <map id="anonymous_namespace{powerd++.cpp}::Core" name="anonymous_namespace{powerd++.cpp}::Core">
-<area shape="rect" id="node6" href="$classsys_1_1ctl_1_1Sync.html" title="sys::ctl::Sync\&lt; mhz\l_t, 4 \&gt;" alt="" coords="513,111,653,152"/>
+<area shape="rect" id="node4" href="$classsys_1_1ctl_1_1Sync.html" title="sys::ctl::Sync\&lt; mhz_t \&gt;" alt="" coords="177,220,339,247"/>
+<area shape="rect" id="node9" href="$classsys_1_1ctl_1_1Sync.html" title="sys::ctl::Sync\&lt; decikelvin_t \&gt;" alt="" coords="160,271,356,297"/>
 </map>

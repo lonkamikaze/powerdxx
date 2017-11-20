@@ -2,8 +2,7 @@ var searchData=
 [
   ['oe',['OE',['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a6aa15f8d333f87502d486d530bf032fe',1,'anonymous_namespace{loadrec.cpp}::OE()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fc',1,'anonymous_namespace{powerd++.cpp}::OE()']]],
   ['ok',['OK',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaae0aa021e21dddbd6d8cecec71e9cf564',1,'errors']]],
-  ['once',['Once',['../classsys_1_1ctl_1_1Once.html',1,'sys::ctl']]],
-  ['once',['Once',['../classsys_1_1ctl_1_1Once.html#a25000c2a0354764eacb796f3370c4cef',1,'sys::ctl::Once']]],
+  ['once',['Once',['../classsys_1_1ctl_1_1Once.html',1,'sys::ctl::Once&lt; T, SysctlT &gt;'],['../classsys_1_1ctl_1_1Once.html#a25000c2a0354764eacb796f3370c4cef',1,'sys::ctl::Once::Once()']]],
   ['once_3c_20coreid_5ft_2c_202_20_3e',['Once&lt; coreid_t, 2 &gt;',['../classsys_1_1ctl_1_1Once.html',1,'sys::ctl']]],
   ['online',['ONLINE',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a7cb3a220e40ec33be3ae0fcc22275929a86d1debf3f3aa9b77c0d976a4fa33862',1,'anonymous_namespace{powerd++.cpp}']]],
   ['onset',['onSet',['../classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html#a498679f5c0b83dae61c8f09ef1ec4363',1,'anonymous_namespace{loadplay.cpp}::SysctlValue']]],
@@ -26,8 +25,7 @@ var searchData=
   ['opt_5fnoopt',['OPT_NOOPT',['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a6aa15f8d333f87502d486d530bf032feaef477e0fc504e9175bd3459e206a67cd',1,'anonymous_namespace{loadrec.cpp}::OPT_NOOPT()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fcaef477e0fc504e9175bd3459e206a67cd',1,'anonymous_namespace{powerd++.cpp}::OPT_NOOPT()']]],
   ['opt_5funknown',['OPT_UNKNOWN',['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a6aa15f8d333f87502d486d530bf032fea9854a8e7f5bc0b2ac8fbda3bacb9c093',1,'anonymous_namespace{loadrec.cpp}::OPT_UNKNOWN()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fca9854a8e7f5bc0b2ac8fbda3bacb9c093',1,'anonymous_namespace{powerd++.cpp}::OPT_UNKNOWN()']]],
   ['option',['Option',['../namespacenih.html#structnih_1_1Option',1,'nih']]],
-  ['options',['Options',['../classnih_1_1Options.html',1,'nih']]],
-  ['options',['Options',['../classnih_1_1Options.html#a9e1e8076fe7e4f449bea3c04821f633e',1,'nih::Options::Options()'],['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a8b1c10a12d1632f1993eea8513cf058f',1,'anonymous_namespace{loadrec.cpp}::OPTIONS()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a3d2b0f28efcc2b39fe33bab26cbbe768',1,'anonymous_namespace{powerd++.cpp}::OPTIONS()']]],
+  ['options',['Options',['../classnih_1_1Options.html',1,'nih::Options&lt; Enum, DefCount &gt;'],['../classnih_1_1Options.html#a9e1e8076fe7e4f449bea3c04821f633e',1,'nih::Options::Options()'],['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a8b1c10a12d1632f1993eea8513cf058f',1,'anonymous_namespace{loadrec.cpp}::OPTIONS()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a3d2b0f28efcc2b39fe33bab26cbbe768',1,'anonymous_namespace{powerd++.cpp}::OPTIONS()']]],
   ['options_2ehpp',['Options.hpp',['../Options_8hpp.html',1,'']]],
   ['other',['other',['../classsys_1_1pid_1_1Pidfile.html#a05c14ff6cd164ce6a86be9298de7a98b',1,'sys::pid::Pidfile']]],
   ['otherpid',['otherpid',['../classsys_1_1pid_1_1Pidfile.html#a1ed6e7559b88251b3a8d3c987d3feafc',1,'sys::pid::Pidfile']]]
