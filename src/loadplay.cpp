@@ -745,9 +745,21 @@ class Sysctls {
 	 * @return
 	 *	The MIB
 	 */
-	mib_t const & getMib(std::string const & name) const {
+	mib_t const & getMib(char const * const name) const {
 		lock_guard const lock{this->mtx};
 		return this->mibs.at(name);
+	}
+
+	/**
+	 * Returns a reference to a sysctl value container.
+	 *
+	 * @param name
+	 *	The MIB name to return the reference for
+	 * @return
+	 *	A SysctlValue reference
+	 */
+	SysctlValue & operator [](char const * const name) {
+		return (*this)[getMib(name)];
 	}
 
 	/**
@@ -795,7 +807,7 @@ class Emulator {
 	/**
 	 * The kern.cp_times sysctl handler.
 	 */
-	SysctlValue & cp_times = sysctls[sysctls.getMib(CP_TIMES)];
+	SysctlValue & cp_times = sysctls[CP_TIMES];
 
 	/**
 	 * The current kern.cp_times values.
@@ -833,7 +845,7 @@ class Emulator {
 			char name[40];
 			sprintf_safe(name, FREQ, i);
 			try {
-				this->freqs[i] = &sysctls[sysctls.getMib(name)];
+				this->freqs[i] = &sysctls[name];
 			} catch (std::out_of_range &) {
 				if (i == 0) {
 					/* should never be reached */
@@ -850,7 +862,7 @@ class Emulator {
 			/* get freq_levels */
 			sprintf_safe(name, FREQ_LEVELS, i);
 			try {
-				auto levels = sysctls[sysctls.getMib(name)]
+				auto levels = sysctls[name]
 				              .get<std::string>();
 				levels = std::regex_replace(levels, "/[0-9]*"_r, "");
 				std::istringstream levelstream{levels};
