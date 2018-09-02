@@ -790,9 +790,15 @@ class Emulator {
 	bool const & die;
 
 	/**
-	 * The hw.ncpu value.
+	 * The size of the kern.cp_times buffer.
 	 */
-	int const ncpu = sysctls[{CTL_HW, HW_NCPU}].get<int>();
+	size_t const size = sysctls[CP_TIMES].size();
+
+	/**
+	 * The number of CPUs in kern.cp_times, may be greater than
+	 * the hw.ncpu value (e.g. if hyperthreading was turned off).
+	 */
+	int const ncpu = this->size / sizeof(cptime_t[CPUSTATES]);
 
 	/**
 	 * Pointers to the dev.cpu.%d.freq handlers.
@@ -818,11 +824,6 @@ class Emulator {
 	 * The load points to carry over to the next frame.
 	 */
 	std::unique_ptr<cptime_t[]> carry{new cptime_t[ncpu]{}};
-
-	/**
-	 * The size of the kern.cp_times buffer.
-	 */
-	size_t const size = CPUSTATES * ncpu * sizeof(cptime_t);
 
 	public:
 	/**
@@ -894,13 +895,6 @@ class Emulator {
 
 		/* initialise kern.cp_times buffer */
 		auto size = this->size;
-		try {
-			if (size != cp_times.size()) {
-				fail("hw.ncpu does not fit the encountered kern.cp_times columns");
-			}
-		} catch (int) {
-			fail("kern.cp_times not initialised");
-		}
 		cp_times.get(sum.get(), size);
 
 		/* output headers */
