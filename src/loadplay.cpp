@@ -1163,15 +1163,20 @@ extern "C" {
  */
 int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
            const void * newp, size_t newlen) try {
-	static auto const orig = (decltype(&sysctl))dlfunc(RTLD_NEXT, "sysctl");
-	#ifdef EBUG
-	fprintf(stderr, "sysctl(%d, %d) fallback = %d\n", name[0], name[1], int{sysctl_fallback});
-	#endif /* EBUG */
+	static auto const orig =
+	    (decltype(&sysctl))dlfunc(RTLD_NEXT, "sysctl");
 	if (sysctl_fallback ||
 	    /* hard-coded fallback for kern.usrstack, required by -lpthread */
 	    (namelen == 2 && name[0] == CTL_KERN && name[1] == KERN_USRSTACK)) {
 		return orig(name, namelen, oldp, oldlenp, newp, newlen);
 	}
+	#ifdef EBUG
+	/* must not print the special/fallback cases, because writing
+	 * to a stream in one of them causes a SEGFAULT (even when
+	 * using sprintf() and fwrite() with a stack buffer) */
+	fprintf(stderr, "sysctl(%d, %d) fallback = %d\n",
+	        name[0], name[1], int{sysctl_fallback});
+	#endif /* EBUG */
 
 	mib_t mib{name, namelen};
 
@@ -1210,14 +1215,17 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
  *	The call failed
  */
 int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
-	static auto const orig = (decltype(&sysctlnametomib))
-	    dlfunc(RTLD_NEXT, "sysctlnametomib");
-	#ifdef EBUG
-	fprintf(stderr, "sysctlnametomib(%s) fallback = %d\n", name, int{sysctl_fallback});
-	#endif /* EBUG */
+	static auto const orig =
+	    (decltype(&sysctlnametomib)) dlfunc(RTLD_NEXT, "sysctlnametomib");
 	if (sysctl_fallback) {
 		return orig(name, mibp, sizep);
 	}
+	#ifdef EBUG
+	/* must not print the special/fallback cases, because writing
+	 * to a stream in one of them causes a SEGFAULT (even when
+	 * using sprintf() and fwrite() with a stack buffer) */
+	fprintf(stderr, "sysctlnametomib(%s) fallback = %d\n", name, int{sysctl_fallback});
+	#endif /* EBUG */
 	auto const & mib = sysctls.getMib(name);
 	for (size_t i = 0; i < *sizep && i < CTL_MAXNAME; ++i) {
 		mibp[i] = mib[i];
@@ -1247,17 +1255,20 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
  */
 int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
                  const void * newp, size_t newlen) {
-	static auto const orig = (decltype(&sysctlbyname))
-	    dlfunc(RTLD_NEXT, "sysctlbyname");
-	#ifdef EBUG
-	fprintf(stderr, "sysctlbyname(%s)\n", name);
-	#endif /* EBUG */
+	static auto const orig =
+	    (decltype(&sysctlbyname)) dlfunc(RTLD_NEXT, "sysctlbyname");
 	/* explicit fallback for sysctls used by OS functions */
 	if (/* malloc() */  strcmp(name, "vm.overcommit") == 0 ||
 	    /* -lpthread */ strcmp(name, "kern.smp.cpus") == 0) {
 		Hold<bool> hold{sysctl_fallback, true};
 		return orig(name, oldp, oldlenp, newp, newlen);
 	}
+	#ifdef EBUG
+	/* must not print the special/fallback cases, because writing
+	 * to a stream in one of them causes a SEGFAULT (even when
+	 * using sprintf() and fwrite() with a stack buffer) */
+	fprintf(stderr, "sysctlbyname(%s)\n", name);
+	#endif /* EBUG */
 	/* use original function for regular operation, just without
 	 * holding the sysctl_fallback flag */
 	return orig(name, oldp, oldlenp, newp, newlen);
