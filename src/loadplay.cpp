@@ -1185,8 +1185,7 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 	/* must not print the special/fallback cases, because writing
 	 * to a stream in one of them causes a SEGFAULT (even when
 	 * using sprintf() and fwrite() with a stack buffer) */
-	fprintf(stderr, "sysctl(%d, %d) fallback = %d\n",
-	        name[0], name[1], int{sysctl_fallback});
+	fprintf(stderr, "sysctl(%d, %d)\n", name[0], name[1]);
 	#endif /* EBUG */
 
 	mib_t mib{name, namelen};
@@ -1235,7 +1234,7 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
 	/* must not print the special/fallback cases, because writing
 	 * to a stream in one of them causes a SEGFAULT (even when
 	 * using sprintf() and fwrite() with a stack buffer) */
-	fprintf(stderr, "sysctlnametomib(%s) fallback = %d\n", name, int{sysctl_fallback});
+	fprintf(stderr, "sysctlnametomib(%s)\n", name);
 	#endif /* EBUG */
 	auto const & mib = sysctls.getMib(name);
 	for (size_t i = 0; i < *sizep && i < CTL_MAXNAME; ++i) {
