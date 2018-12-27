@@ -1151,8 +1151,11 @@ extern "C" {
  * Uses the local \ref anonymous_namespace{loadplay.cpp}::sysctls
  * store.
  *
- * Falls back to the original if kern.usrstack is requested or
- * sysctl_fallback is set.
+ * Falls back to the original under the following conditions:
+ *
+ * - sysctl_fallback is set
+ * - kern.usrstack is requested
+ * - vm.* is requested
  *
  * The call may fail for 3 reasons:
  *
@@ -1173,7 +1176,9 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 	    (decltype(&sysctl))dlfunc(RTLD_NEXT, "sysctl");
 	if (sysctl_fallback ||
 	    /* hard-coded fallback for kern.usrstack, required by -lpthread */
-	    (namelen == 2 && name[0] == CTL_KERN && name[1] == KERN_USRSTACK)) {
+	    (namelen == 2 && name[0] == CTL_KERN && name[1] == KERN_USRSTACK) ||
+	    /* hard-coded fallback, stay away from the memory subsystem */
+	    (namelen >= 1 && name[0] == CTL_VM)) {
 		return orig(name, namelen, oldp, oldlenp, newp, newlen);
 	}
 	#ifdef EBUG
@@ -1247,7 +1252,6 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
  *
  * Falls back on the original sysctlbyname() for the following names:
  *
- * - vm.overcommit
  * - kern.smp.cpus
  *
  * May fail for the same reasons as sysctl().
@@ -1264,8 +1268,7 @@ int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
 	static auto const orig =
 	    (decltype(&sysctlbyname)) dlfunc(RTLD_NEXT, "sysctlbyname");
 	/* explicit fallback for sysctls used by OS functions */
-	if (/* malloc() */  strcmp(name, "vm.overcommit") == 0 ||
-	    /* -lpthread */ strcmp(name, "kern.smp.cpus") == 0) {
+	if (/* -lpthread */ strcmp(name, "kern.smp.cpus") == 0) {
 		Hold<bool> hold{sysctl_fallback, true};
 		return orig(name, oldp, oldlenp, newp, newlen);
 	}
