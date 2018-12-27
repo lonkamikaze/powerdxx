@@ -154,6 +154,19 @@ class Sysctl {
 	}
 
 	/**
+	 * The size of the sysctl.
+	 *
+	 * @return
+	 *	The size in characters
+	 */
+	size_t size() const
+	{
+		size_t len = 0;
+		sysctl_get(this->mib, nullptr, len);
+		return len;
+	}
+
+	/**
 	 * Update the given buffer with a value retrieved from the
 	 * sysctl.
 	 *
@@ -204,8 +217,7 @@ class Sysctl {
 	 */
 	template <typename T>
 	std::unique_ptr<T[]> get() const {
-		size_t len = 0;
-		sysctl_get(this->mib, nullptr, len);
+		auto const len = size();
 		auto result = std::unique_ptr<T[]>(new T[len / sizeof(T)]);
 		get(result.get(), len);
 		return result;
@@ -283,6 +295,16 @@ class Sysctl<0> {
 	}
 
 	/**
+	 * @copydoc Sysctl::size() const
+	 */
+	size_t size() const
+	{
+		size_t len = 0;
+		sysctl_raw(this->mib, this->depth, nullptr, &len, nullptr, 0);
+		return len;
+	}
+
+	/**
 	 * @copydoc Sysctl::get(void * const, size_t const) const
 	 */
 	void get(void * const buf, size_t const bufsize) const {
@@ -303,8 +325,7 @@ class Sysctl<0> {
 	 */
 	template <typename T>
 	std::unique_ptr<T[]> get() const {
-		size_t len = 0;
-		sysctl_raw(this->mib, this->depth, nullptr, &len, nullptr, 0);
+		size_t const len = size();
 		auto result = std::unique_ptr<T[]>(new T[len / sizeof(T)]);
 		get(result.get(), len);
 		return result;
