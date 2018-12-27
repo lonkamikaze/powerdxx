@@ -39,6 +39,7 @@ using constants::CP_TIMES;
 using types::ms;
 using types::coreid_t;
 using types::cptime_t;
+using types::mhz_t;
 
 using errors::Exit;
 using errors::Exception;
@@ -218,7 +219,7 @@ void print_sysctls() {
 			verbose("cannot access sysctl: "_s + mibname);
 			if (i == 0) {
 				fail(Exit::ENOFREQ, e,
-				     "at least the first CPU core must support frequency updates");
+				     "at least the first CPU core must report its clock frequency");
 			}
 		}
 		sprintf_safe(mibname, FREQ_LEVELS, i);
@@ -239,12 +240,41 @@ void print_sysctls() {
  * growth as a space separated list.
  */
 void run() try {
+	/*
+	 * Setup cptimes buffer for two samples.
+	 */
 	sys::ctl::Sysctl<> const cp_times_ctl = {CP_TIMES};
 
 	auto const columns = cp_times_ctl.size() / sizeof(cptime_t);
 	auto cp_times = std::unique_ptr<cptime_t[]>(
 	    new cptime_t[2 * columns]{});
 
+	/*
+	 * Setup clock frequency sources for each core.
+	 */
+	coreid_t const cores = columns / CPUSTATES;
+	auto corefreqs = std::unique_ptr<sys::ctl::Sync<mhz_t, sys::ctl::Sysctl<>>[]>(
+	    new sys::ctl::Sync<mhz_t, sys::ctl::Sysctl<>>[cores]{});
+
+	for (coreid_t i = 0; i < cores; ++i) {
+		char mibname[40];
+		sprintf_safe(mibname, FREQ, i);
+		try {
+			corefreqs[i] = sys::ctl::Sysctl<>{mibname};
+		} catch (sys::sc_error<sys::ctl::error> e) {
+			if (i == 0) {
+				fail(Exit::ENOFREQ, e,
+				     "at least the first CPU core must report its clock frequency");
+			}
+			/* Fall back to previous clock provider. */
+			corefreqs[i] = corefreqs[i - 1];
+		}
+	}
+
+	/*
+	 * Record `cptimes * freq` in order to get an absolute measure of
+	 * the load.
+	 */
 	auto time = std::chrono::steady_clock::now();
 	auto last = time;
 	auto const stop = time + g.duration;
@@ -255,10 +285,14 @@ void run() try {
 		cp_times_ctl.get(&cp_times[sample * columns],
 		                 sizeof(cptime_t) * columns);
 		*g.out << std::chrono::duration_cast<ms>(time - last).count();
+		mhz_t freq = 1;
 		for (int i = 0; i < columns; ++i) {
+			if (i % CPUSTATES == 0) {
+				freq = corefreqs[i / CPUSTATES];
+			}
 			*g.out << ' '
-			       << (cp_times[sample * columns + i] -
-			           cp_times[((sample + 1) % 2) * columns + i]);
+			       << freq * (cp_times[sample * columns + i] -
+			                  cp_times[((sample + 1) % 2) * columns + i]);
 		}
 	};
 	while (time < stop) {
