@@ -1,4 +1,4 @@
-.Dd 19 October, 2016
+.Dd 27 December, 2018
 .Dt loadrec 1
 .Os
 .Sh NAME
@@ -48,12 +48,8 @@ The polling interval to take load samples at, defaults to 25 milliseconds.
 The output file to write the load to.
 .El
 .Sh USAGE NOTES
-To create reproducible results stop any running CPU clock daemons
-like
-.Xr powerd 8
-or
-.Xr powerd++ 8 . And set a fixed CPU frequency below the threshold
-at which the turbo mode is activated. E.g. an
+To create reproducible results set a fixed CPU frequency below the
+threshold at which the turbo mode is activated. E.g. an
 .Nm Intel(R) Core(TM) i7-4500U CPU
 supports the following frequency settings:
 .Bd -literal -offset 4m
@@ -75,8 +71,7 @@ to record a wider range of loads):
 # service powerd++ stop
 Stopping powerdxx.
 Waiting for PIDS: 63574.
-# sysctl dev.cpu.0.freq=1700
-dev.cpu.0.freq: 2401 -> 1700
+# powerd++ -M1700
 .Ed
 .Pp
 Run
@@ -88,19 +83,19 @@ hw.machine=amd64
 hw.model=Intel(R) Core(TM) i7-4500U CPU @ 1.80GHz
 hw.ncpu=4
 hw.acpi.acline=1
-dev.cpu.0.freq=1700
+dev.cpu.0.freq=768
 dev.cpu.0.freq_levels=2401/15000 2400/15000 2300/14088 2200/13340 2000/11888 1900/11184 1800/10495 1700/9680 1500/8372 1400/7738 1300/7119 1200/6511 1100/5789 900/4643 800/4090 768/3550
-0 1658618 4728 563004 146277 7197047 1900009 5683 552503 10915 7100524 1849422 5838 528699 25364 7160311 1883098 5987 539053 12131 7129365
-25 0 0 0 0 3 0 0 1 0 2 1 0 0 0 2 0 0 0 0 3
-25 0 0 0 0 3 0 0 2 0 1 0 0 0 0 3 0 0 0 0 3
-25 0 0 0 0 4 1 0 2 0 1 0 0 0 0 4 0 0 0 0 2
-25 0 0 1 1 1 0 0 1 0 2 0 0 0 0 3 1 0 0 0 4
-25 0 0 0 0 3 0 0 0 0 2 0 0 0 0 3 1 0 0 0 2
-25 0 0 0 0 3 2 0 0 0 1 0 0 0 0 3 0 0 0 0 3
-25 0 0 1 0 2 1 0 1 0 2 0 0 0 0 3 0 0 0 1 2
-25 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3
-25 0 0 2 0 2 0 0 1 0 3 0 0 0 0 3 0 0 0 0 3
-25 1 0 2 0 0 1 0 0 0 2 1 0 0 0 3 0 0 0 0 4
+0 57097728 0 8232192 594432 100574976 58932480 0 7773696 32256 99760896 56408064 0 8003328 115200 101972736 56011008 0 7926528 33024 102528768
+25 2304 0 768 0 0 1536 0 1536 0 0 3072 0 0 0 0 2304 0 768 0 0
+25 1536 0 768 0 0 1536 0 768 0 0 2304 0 0 0 0 1536 0 768 0 0
+25 1536 0 768 0 0 2304 0 0 0 0 768 0 768 768 0 2304 0 0 0 0
+25 1536 0 768 0 0 2304 0 0 0 0 2304 0 0 0 0 2304 0 0 0 0
+25 2304 0 0 0 0 1536 0 768 0 0 2304 0 0 0 0 2304 0 0 0 0
+25 3072 0 0 0 0 2304 0 768 0 0 3072 0 0 0 0 3072 0 0 0 0
+25 768 0 1536 0 0 2304 0 0 0 0 1536 0 768 0 0 2304 0 0 0 0
+25 2304 0 0 0 0 1536 0 0 768 0 2304 0 0 0 0 2304 0 0 0 0
+25 1536 0 768 0 0 2304 0 0 0 0 2304 0 0 0 0 1536 0 768 0 0
+25 1536 0 768 0 0 1536 0 768 0 0 2304 0 0 0 0 1536 0 768 0 0
 .Ed
 .Pp
 Printing the load creates significant load itself, so for the actual
