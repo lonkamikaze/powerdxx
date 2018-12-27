@@ -481,6 +481,18 @@ void init() {
 		auto & core = g.cores[i];
 		core.cp_time = g.cp_times[i];
 	}
+
+	/* test kern.cp_times is readable */
+	try {
+		g.cp_times_ctl.get(g.cp_times[0],
+		                   g.ncpu * sizeof(g.cp_times[0]));
+	} catch (sys::sc_error<sys::ctl::error> e) {
+		/* The kern.cp_times sysctl must be readable, ENOMEM
+		 * is  fine, see update_loads(). */
+		if (e != ENOMEM) {
+			sysctl_fail(e);
+		}
+	}
 }
 
 /**
@@ -499,7 +511,16 @@ void update_loads() {
 		g.cp_times_ctl.get(g.cp_times[0],
 		                   g.ncpu * sizeof(g.cp_times[0]));
 	} catch (sys::sc_error<sys::ctl::error> e) {
-		sysctl_fail(e);
+		/*
+		 * Ignore errors assuming it's ENOMEM.
+		 *
+		 * If HT is disabled kern.cp_times reports more cores
+		 * than hw.ncpu does. It's fine to ignore, because
+		 * these excess cores never report any load.
+		 *
+		 * The init() function performs a test read to ensure
+		 * kern.cp_times does not fail for a different reason.
+		 */
 	}
 
 	mhz_t freq;
