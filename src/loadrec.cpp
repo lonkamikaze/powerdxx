@@ -241,8 +241,9 @@ void print_sysctls() {
 void run() try {
 	sys::ctl::Sysctl<> const cp_times_ctl = {CP_TIMES};
 
-	auto cp_times = std::unique_ptr<cptime_t[][CPUSTATES]>(
-	    new cptime_t[2 * g.ncpu][CPUSTATES]{});
+	auto const columns = cp_times_ctl.size() / sizeof(cptime_t);
+	auto cp_times = std::unique_ptr<cptime_t[]>(
+	    new cptime_t[2 * columns]{});
 
 	auto time = std::chrono::steady_clock::now();
 	auto last = time;
@@ -251,15 +252,13 @@ void run() try {
 	/* Takes a sample and prints it, avoids duplicating code
 	 * behind the loop. */
 	auto const takeAndPrintSample = [&]() {
-		cp_times_ctl.get(cp_times[sample * g.ncpu],
-		                 g.ncpu * sizeof(cp_times[0]));
+		cp_times_ctl.get(&cp_times[sample * columns],
+		                 sizeof(cptime_t) * columns);
 		*g.out << std::chrono::duration_cast<ms>(time - last).count();
-		for (int i = 0; i < g.ncpu; ++i) {
-			for (size_t q = 0; q < CPUSTATES; ++q) {
-				*g.out << ' '
-				       << (cp_times[sample * g.ncpu + i][q] -
-				           cp_times[((sample + 1) % 2) * g.ncpu + i][q]);
-			}
+		for (int i = 0; i < columns; ++i) {
+			*g.out << ' '
+			       << (cp_times[sample * columns + i] -
+			           cp_times[((sample + 1) % 2) * columns + i]);
 		}
 	};
 	while (time < stop) {
