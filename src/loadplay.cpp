@@ -67,7 +67,7 @@ using namespace version::literals;
  * This value is used to ensure correct input data interpretation.
  */
 constexpr flag_t const FEATURES{
-	0_FREQ_TRACKING
+	1_FREQ_TRACKING
 };
 
 /**
@@ -954,6 +954,7 @@ class Emulator {
 	 */
 	void operator ()() try {
 		double statTime = 0.; /* in seconds */
+		auto const features = sysctls[LOADREC_FEATURES].get<flag_t>();
 		auto time = std::chrono::steady_clock::now();
 		for (uint64_t interval;
 		     !this->die && (std::cin >> interval).good();) {
@@ -965,6 +966,12 @@ class Emulator {
 			mhz_t statMaxFreq = 0;
 			statTime += double(interval) / 1000;
 			std::cout << statTime;
+			/* update reference clock frequencies */
+			for (coreid_t core = 0;
+			     features & 1_FREQ_TRACKING && core < this->ncpu;
+			     ++core) {
+				std::cin >> this->freqRefs[core];
+			}
 			/* perform calculations */
 			for (coreid_t core = 0; core < this->ncpu; ++core) {
 				/* get frame load */
@@ -1111,6 +1118,36 @@ class Main {
 			sysctls.getMib(ACLINE);
 		} catch (std::out_of_range &) {
 			warn(""_s + ACLINE + " is not set, please check your load record");
+		}
+
+		/* skip frame time */
+		input = input.substr(input.find(' ') + 1);
+
+		/* determine the number of cores */
+		size_t columns = 1;
+		for (auto ch : input) { columns += ch == ' '; }
+		/* for each core there is a set of CPUSTATES and a freq column */
+		coreid_t const cores = columns / (CPUSTATES + 1);
+
+		/* check reference frequencies */
+		std::istringstream istream{input};
+		for (coreid_t i = 0;
+		     features & 1_FREQ_TRACKING && i < cores; ++i) {
+			mhz_t freq;
+			istream >> freq;
+			input = input.substr(input.find(' ') + 1);
+			if (freq <= 0) {
+				fail("recorded clock frequencies must be > 0");
+				return;
+			}
+		}
+
+		/* initialise kern.cp_times */
+		try {
+			sysctls.addValue(std::string{CP_TIMES}, input);
+		} catch (std::out_of_range &) {
+			fail("kern.cp_times cannot be set, please check your load record");
+			return;
 		}
 
 		/* start background thread */
