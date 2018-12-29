@@ -9,6 +9,7 @@
 #include "utility.hpp"
 #include "constants.hpp"
 #include "fixme.hpp"
+#include "version.hpp"
 
 #include <iostream>  /* std::cin, std::cout, std::cerr */
 #include <iomanip>   /* std::fixed, std::setprecision */
@@ -55,6 +56,19 @@ using types::mhz_t;
 using types::coreid_t;
 
 using fixme::to_string;
+
+using version::LOADREC_FEATURES;
+using version::flag_t;
+using namespace version::literals;
+
+/**
+ * The set of supported features.
+ *
+ * This value is used to ensure correct input data interpretation.
+ */
+constexpr flag_t const FEATURES{
+	0_FREQ_TRACKING
+};
 
 /**
  * Safe wrapper around strncmp, which automatically determines the
@@ -409,6 +423,8 @@ class SysctlValue {
 			return size<int>();
 		case CTLTYPE_LONG:
 			return size<long>();
+		case CTLTYPE_U64:
+			return size<uint64_t>();
 		default:
 			throw -1;
 		}
@@ -505,6 +521,8 @@ class SysctlValue {
 			return this->get(static_cast<int *>(dst), size);
 		case CTLTYPE_LONG:
 			return this->get(static_cast<long *>(dst), size);
+		case CTLTYPE_U64:
+			return this->get(static_cast<uint64_t *>(dst), size);
 		default:
 			return -1;
 		}
@@ -546,6 +564,9 @@ class SysctlValue {
 			break;
 		case CTLTYPE_LONG:
 			this->set(static_cast<long const *>(newp), newlen);
+			break;
+		case CTLTYPE_U64:
+			this->set(static_cast<uint64_t const *>(newp), newlen);
 			break;
 		default:
 			return -1;
@@ -671,13 +692,14 @@ class Sysctls {
 	 * Maps name → mib.
 	 */
 	std::unordered_map<std::string, mib_t> mibs{
-		{"hw.machine", {CTL_HW, HW_MACHINE}},
-		{"hw.model",   {CTL_HW, HW_MODEL}},
-		{"hw.ncpu",    {CTL_HW, HW_NCPU}},
-		{ACLINE,       {1000}},
-		{FREQ,         {1001}},
-		{FREQ_LEVELS,  {1002}},
-		{CP_TIMES,     {1003}}
+		{"hw.machine",     {CTL_HW, HW_MACHINE}},
+		{"hw.model",       {CTL_HW, HW_MODEL}},
+		{"hw.ncpu",        {CTL_HW, HW_NCPU}},
+		{ACLINE,           {1000}},
+		{FREQ,             {1001}},
+		{FREQ_LEVELS,      {1002}},
+		{CP_TIMES,         {1003}},
+		{LOADREC_FEATURES, {1004}}
 	};
 
 	/**
@@ -690,7 +712,8 @@ class Sysctls {
 		{{1000},               {CTLTYPE_INT,    "2"}},
 		{{1001},               {CTLTYPE_INT,    "0"}},
 		{{1002},               {CTLTYPE_STRING, ""}},
-		{{1003},               {CTLTYPE_LONG,   ""}}
+		{{1003},               {CTLTYPE_LONG,   ""}},
+		{{1004},               {CTLTYPE_U64,    "0"}}
 	};
 
 	public:
@@ -1049,12 +1072,12 @@ class Main {
 			sysctls.addValue(match[1].str(), match[2].str());
 		}
 
-		/* initialise kern.cp_times */
-		try {
-			input = input.substr(input.find(' '));
-			sysctls.addValue(std::string{CP_TIMES}, input);
-		} catch (std::out_of_range &) {
-			fail("kern.cp_times cannot be set, please check your load record");
+		/* check supported feature flags */
+		auto const features = sysctls[LOADREC_FEATURES].get<flag_t>();
+		auto const unknown = features & ~FEATURES;
+		if (unknown) {
+			fail("%s contains unsupported feature flags: %#lx"_fmt
+			     (LOADREC_FEATURES, unknown));
 			return;
 		}
 

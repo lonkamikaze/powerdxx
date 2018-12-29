@@ -10,6 +10,7 @@
 #include "errors.hpp"
 #include "utility.hpp"
 #include "clas.hpp"
+#include "version.hpp"
 
 #include "sys/sysctl.hpp"
 
@@ -51,6 +52,20 @@ using clas::ival;
 
 using sys::ctl::make_Sysctl;
 using sys::ctl::make_Once;
+
+using version::LOADREC_FEATURES;
+using version::flag_t;
+using namespace version::literals;
+
+/**
+ * The set of supported features.
+ *
+ * This value is stored in load recordings to allow loadplay to correctly
+ * interpret the data.
+ */
+constexpr flag_t const FEATURES{
+	0_FREQ_TRACKING
+};
 
 /**
  * The global state.
@@ -191,7 +206,8 @@ void print_sysctls() {
 	} catch (sys::sc_error<sys::ctl::error>) {
 		verbose("cannot read "_s + ACLINE);
 	}
-	*g.out << "hw.machine=" << make_Sysctl(CTL_HW, HW_MACHINE).get<char>().get() << '\n'
+	*g.out << "%s=%ld\n"_fmt(LOADREC_FEATURES, FEATURES)
+	       << "hw.machine=" << make_Sysctl(CTL_HW, HW_MACHINE).get<char>().get() << '\n'
 	       << "hw.model=" << make_Sysctl(CTL_HW, HW_MODEL).get<char>().get() << '\n'
 	       << "hw.ncpu=" << g.ncpu << '\n'
 	       << ACLINE << '=' << make_Once(1U, hw_acpi_acline) << '\n';
