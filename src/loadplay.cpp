@@ -294,6 +294,26 @@ class SysctlValue {
 	 */
 	typedef decltype(onSet)::function_t callback_function;
 
+	/**
+	 * Provide the size of this value represented as a string of Ts.
+	 *
+	 * @tparam T
+	 *	The type this value is supposed to be a array of
+	 * @return
+	 *	The size of the whole string of Ts
+	 */
+	template <typename T>
+	size_t size() const {
+		lock_guard const lock{this->mtx};
+		size_t count = 0;
+		T value;
+		for (std::istringstream stream{this->value};
+		     stream.good(); ++count) {
+			stream >> value;
+		}
+		return count * sizeof(T);
+	}
+
 	public:
 	/**
 	 * Default constructor.
@@ -385,19 +405,11 @@ class SysctlValue {
 		switch (this->type) {
 		case CTLTYPE_STRING:
 			return this->value.size() + 1;
-		case CTLTYPE_INT: {
-			std::istringstream stream{this->value};
-			size_t count = 1;
-			int value;
-			while ((stream >> value).good()) { ++count; }
-			return count * sizeof(value);
-		} case CTLTYPE_LONG: {
-			std::istringstream stream{this->value};
-			size_t count = 1;
-			long value;
-			while ((stream >> value).good()) { ++count; }
-			return count * sizeof(value);
-		} default:
+		case CTLTYPE_INT:
+			return size<int>();
+		case CTLTYPE_LONG:
+			return size<long>();
+		default:
 			throw -1;
 		}
 	}
@@ -487,9 +499,9 @@ class SysctlValue {
 		lock_guard const lock{this->mtx};
 
 		switch (this->type) {
-		case CTLTYPE_STRING: {
+		case CTLTYPE_STRING:
 			return this->get(static_cast<char *>(dst), size);
-		} case CTLTYPE_INT:
+		case CTLTYPE_INT:
 			return this->get(static_cast<int *>(dst), size);
 		case CTLTYPE_LONG:
 			return this->get(static_cast<long *>(dst), size);
