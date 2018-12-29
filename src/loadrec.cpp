@@ -64,7 +64,7 @@ using namespace version::literals;
  * interpret the data.
  */
 constexpr flag_t const FEATURES{
-	0_FREQ_TRACKING
+	1_FREQ_TRACKING
 };
 
 /**
@@ -212,8 +212,8 @@ void print_sysctls() {
 	       << "hw.ncpu=" << g.ncpu << '\n'
 	       << ACLINE << '=' << make_Once(1U, hw_acpi_acline) << '\n';
 
-	char mibname[40];
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
+		char mibname[40];
 		sprintf_safe(mibname, FREQ, i);
 		try {
 			sys::ctl::Sysctl<> ctl{mibname};
@@ -276,8 +276,7 @@ void run() try {
 	}
 
 	/*
-	 * Record `cptimes * freq` in order to get an absolute measure of
-	 * the load.
+	 * Record freq and cptimes.
 	 */
 	auto time = std::chrono::steady_clock::now();
 	auto last = time;
@@ -289,14 +288,13 @@ void run() try {
 		cp_times_ctl.get(&cp_times[sample * columns],
 		                 sizeof(cptime_t) * columns);
 		*g.out << std::chrono::duration_cast<ms>(time - last).count();
-		mhz_t freq = 1;
+		for (coreid_t i = 0; i < cores; ++i) {
+			*g.out << ' ' << static_cast<mhz_t>(corefreqs[i]);
+		}
 		for (int i = 0; i < columns; ++i) {
-			if (i % CPUSTATES == 0) {
-				freq = corefreqs[i / CPUSTATES];
-			}
 			*g.out << ' '
-			       << freq * (cp_times[sample * columns + i] -
-			                  cp_times[((sample + 1) % 2) * columns + i]);
+			       << cp_times[sample * columns + i] -
+			          cp_times[((sample + 1) % 2) * columns + i];
 		}
 	};
 	while (time < stop) {
