@@ -24,6 +24,7 @@
 #include <mutex>
 #include <chrono>    /* std::chrono::steady_clock::now() */
 #include <vector>
+#include <algorithm> /* std::max() */
 
 #include <cstring>   /* strncmp() */
 #include <cassert>   /* assert() */
@@ -935,11 +936,12 @@ class Emulator {
 		/* output headers */
 		std::cout << "time[s]";
 		for (int i = 0; i < this->ncpu; ++i) {
-			std::cout << " cpu." << i << ".freq[MHz]"
+			std::cout << " cpu." << i << ".recfreq[MHz]"
+			          << " cpu." << i << ".freq[MHz]"
 			          << " cpu." << i << ".recload"
 			          << " cpu." << i << ".load";
 		}
-		std::cout << " max(freqs)[MHz] sum(recloads) max(recloads) sum(loads) max(loads)"
+		std::cout << " max(recfreqs)[MHz] max(freqs)[MHz] sum(recloads) max(recloads) sum(loads) max(loads)"
 		          << std::endl << std::fixed << std::setprecision(3);
 	}
 
@@ -964,6 +966,7 @@ class Emulator {
 			double statSumLoads = 0.;
 			double statMaxLoads = 0.;
 			mhz_t statMaxFreq = 0;
+			mhz_t statMaxRecfreq = 0;
 			statTime += double(interval) / 1000;
 			std::cout << statTime;
 			/* update reference clock frequencies */
@@ -986,17 +989,18 @@ class Emulator {
 
 				auto const coreFreq = this->freqs[core]->get<mhz_t>();
 				auto const coreRefFreq = this->freqRefs[core];
+				std::cout << ' ' << coreRefFreq << ' ' << coreFreq;
 
 				if (!frameSum) {
-					std::cout << ' ' << coreFreq << ' ' << 0. << ' ' << 0.;
+					std::cout << ' ' << 0. << ' ' << 0.;
 					continue;
 				}
 
 				/* calc recorded stats */
 				double const recLoad = double(frameLoad) / frameSum;
 				statSumRecloads += recLoad;
-				statMaxRecloads = statMaxRecloads > recLoad ? statMaxRecloads : recLoad;
-				std::cout << ' ' << coreFreq << ' ' << recLoad;
+				statMaxRecloads = std::max(statMaxRecloads, recLoad);
+				std::cout << ' ' << recLoad;
 
 				/* weigh load and sum */
 				frameLoad *= coreRefFreq;
@@ -1017,7 +1021,8 @@ class Emulator {
 				}
 
 				/* calc stats */
-				statMaxFreq = statMaxFreq > coreFreq ? statMaxFreq : coreFreq;
+				statMaxRecfreq = std::max(statMaxRecfreq, coreRefFreq);
+				statMaxFreq = std::max(statMaxFreq, coreFreq);
 				double const load = double(frameLoad) / frameSum;
 				statSumLoads += load;
 				statMaxLoads = statMaxLoads > load ? statMaxLoads : load;
@@ -1025,7 +1030,8 @@ class Emulator {
 			}
 
 			/* print stats */
-			std::cout << ' ' << statMaxFreq
+			std::cout << ' ' << statMaxRecfreq
+			          << ' ' << statMaxFreq
 			          << ' ' << statSumRecloads
 			          << ' ' << statMaxRecloads
 			          << ' ' << statSumLoads
