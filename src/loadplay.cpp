@@ -842,9 +842,9 @@ class Emulator {
 	std::unique_ptr<SysctlValue * []> freqs{new SysctlValue *[ncpu]{}};
 
 	/**
-	 * The reference frequencies the recording was based on.
+	 * The recorded clock frequencies.
 	 */
-	std::unique_ptr<mhz_t[]> freqRefs{new mhz_t[ncpu]{}};
+	std::unique_ptr<mhz_t[]> recfreqs{new mhz_t[ncpu]{}};
 
 	/**
 	 * The kern.cp_times sysctl handler.
@@ -894,7 +894,7 @@ class Emulator {
 			}
 
 			/* take current clock frequency as reference */
-			this->freqRefs[i] = this->freqs[i]->get<mhz_t>();
+			this->recfreqs[i] = this->freqs[i]->get<mhz_t>();
 
 			/* get freq_levels */
 			sprintf_safe(name, FREQ_LEVELS, i);
@@ -973,7 +973,7 @@ class Emulator {
 			for (coreid_t core = 0;
 			     features & 1_FREQ_TRACKING && core < this->ncpu;
 			     ++core) {
-				std::cin >> this->freqRefs[core];
+				std::cin >> this->recfreqs[core];
 			}
 			/* perform calculations */
 			for (coreid_t core = 0; core < this->ncpu; ++core) {
@@ -988,8 +988,8 @@ class Emulator {
 				}
 
 				auto const coreFreq = this->freqs[core]->get<mhz_t>();
-				auto const coreRefFreq = this->freqRefs[core];
-				std::cout << ' ' << coreRefFreq << ' ' << coreFreq;
+				auto const coreRecfreq = this->recfreqs[core];
+				std::cout << ' ' << coreRecfreq << ' ' << coreFreq;
 
 				if (!frameSum) {
 					std::cout << ' ' << 0. << ' ' << 0.;
@@ -1003,7 +1003,7 @@ class Emulator {
 				std::cout << ' ' << recLoad;
 
 				/* weigh load and sum */
-				frameLoad *= coreRefFreq;
+				frameLoad *= coreRecfreq;
 				frameSum *= coreFreq;
 
 				/* add carry load from last frame */
@@ -1021,7 +1021,7 @@ class Emulator {
 				}
 
 				/* calc stats */
-				statMaxRecfreq = std::max(statMaxRecfreq, coreRefFreq);
+				statMaxRecfreq = std::max(statMaxRecfreq, coreRecfreq);
 				statMaxFreq = std::max(statMaxFreq, coreFreq);
 				double const load = double(frameLoad) / frameSum;
 				statSumLoads += load;
