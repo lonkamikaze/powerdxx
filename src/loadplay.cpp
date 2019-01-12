@@ -24,7 +24,7 @@
 #include <mutex>
 #include <chrono>    /* std::chrono::steady_clock::now() */
 #include <vector>
-#include <algorithm> /* std::max() */
+#include <algorithm> /* std::min() */
 
 #include <cstring>   /* strncmp() */
 #include <cassert>   /* assert() */
@@ -50,6 +50,7 @@ using constants::FREQ_LEVELS;
 
 using utility::sprintf_safe;
 using namespace utility::literals;
+using utility::Sum;
 
 using types::ms;
 using types::cptime_t;
@@ -813,6 +814,194 @@ class Sysctls {
 } sysctls{}; /**< Sole instance of \ref Sysctls. */
 
 /**
+ * The reported state of a single CPU pipeline.
+ */
+struct CoreReport {
+	/**
+	 * The core clock frequency in [MHz].
+	 */
+	mhz_t freq;
+
+	/**
+	 * The core load as a fraction.
+	 */
+	double load;
+};
+
+/**
+ * Print a core clock frequency and load.
+ *
+ * The clock frequency is printed at 1 MHz resolution, the load at
+ * 0.1 MHz.
+ *
+ * @param out
+ *	The stream to print to
+ * @param core
+ *	The core information to print
+ * @return
+ *	A reference to the out stream
+ */
+std::ostream & operator <<(std::ostream & out, CoreReport const & core) {
+	return out << " %d %.1f"_fmt(core.freq, core.load * core.freq);
+}
+
+/**
+ * The report frame information for a single CPU pipeline.
+ */
+struct CoreFrameReport {
+	/**
+	 * The recorded core state.
+	 */
+	CoreReport rec;
+
+	/**
+	 * The running core state.
+	 */
+	CoreReport run;
+};
+
+/**
+ * Print recorded and running clock frequency and load for a frame.
+ *
+ * @param out
+ *	The stream to print to
+ * @param frame
+ *	The frame information to print
+ * @return
+ *	A reference to the out stream
+ */
+std::ostream & operator <<(std::ostream & out, CoreFrameReport const & frame) {
+	return out << frame.rec << frame.run;
+}
+
+/**
+ * Provides a mechanism to provide frame wise per core load information.
+ */
+class Report {
+	private:
+	/**
+	 * The output stream to report to.
+	 */
+	std::ostream & out;
+
+	/**
+	 * The number of cpu cores to provide reports for.
+	 */
+	coreid_t const ncpu;
+
+	/**
+	 * The time passed in [ms].
+	 */
+	Sum<uint64_t> time;
+
+	/**
+	 * Per frame per core data.
+	 */
+	std::unique_ptr<CoreFrameReport[]> cores;
+
+	public:
+	/**
+	 * Construct a report.
+	 *
+	 * @param out
+	 *	The stream to output to
+	 * @param ncpu
+	 *	The number of CPU cores to report
+	 */
+	Report(std::ostream & out, coreid_t const ncpu) :
+	    out{out}, ncpu{ncpu}, time{}, cores{new CoreFrameReport[ncpu]{}} {
+		out << "time[s]";
+		for (coreid_t i = 0; i < ncpu; ++i) {
+			out << " cpu.%d.rec.freq[MHz] cpu.%d.rec.load[MHz] cpu.%d.run.freq[MHz] cpu.%d.run.load[MHz]"_fmt
+			       (i, i, i, i);
+		}
+		out << std::endl;
+	}
+
+	/**
+	 * Represents a frame of the report.
+	 *
+	 * It provides access to each CoreFrameReport via the subscript
+	 * operator [].
+	 *
+	 * The frame data is output when the frame goes out of scope.
+	 */
+	class Frame {
+		private:
+		/**
+		 * The report this frame belongs to.
+		 */
+		Report & report;
+
+		public:
+		/**
+		 * Construct a report frame.
+		 *
+		 * @param report
+		 *	The report this frame belongs to
+		 * @param duration
+		 *	The frame duration
+		 */
+		Frame(Report & report, uint64_t const duration) :
+		    report{report} {
+			report.time += duration;
+		}
+
+		/**
+		 * Subscript operator for per core frame report data.
+		 *
+		 * @param i
+		 *	The core index
+		 * @return
+		 *	A reference to the core frame data
+		 */
+		CoreFrameReport & operator [](coreid_t const i) {
+			assert(i < this->report.ncpu && "out of bounds access");
+			return this->report.cores[i];
+		}
+
+		/**
+		 * Subscript operator for per core frame report data.
+		 *
+		 * @param i
+		 *	The core index
+		 * @return
+		 *	A const reference to the core frame data
+		 */
+		CoreFrameReport const & operator [](coreid_t const i) const {
+			assert(i < this->report.ncpu && "out of bounds access");
+			return this->report.cores[i];
+		}
+
+		/**
+		 * Finalises the frame by outputting it.
+		 */
+		~Frame() {
+			auto & out = this->report.out;
+			out << "%d.%03d"_fmt(this->report.time / 1000,
+			                     this->report.time % 1000);
+			for (coreid_t i = 0; i < this->report.ncpu; ++i) {
+				out << (*this)[i];
+			}
+			out << std::endl;
+		}
+	};
+
+	/**
+	 * Constructs a frame for this report.
+	 *
+	 * @tparam ArgTs
+	 *	The constructor argument types
+	 * @param args
+	 *	The constructor arguments
+	 */
+	template <typename ... ArgTs>
+	Frame frame(ArgTs && ... args) {
+		return {*this, std::forward<ArgTs>(args) ...};
+	}
+};
+
+/**
  * Instances of this class represent an emulator session.
  *
  * This should be run in its own thread and expects the sysctl table
@@ -837,14 +1026,55 @@ class Emulator {
 	int const ncpu = this->size / sizeof(cptime_t[CPUSTATES]);
 
 	/**
-	 * Pointers to the dev.cpu.%d.freq handlers.
+	 * Per core information.
 	 */
-	std::unique_ptr<SysctlValue * []> freqs{new SysctlValue *[ncpu]{}};
+	struct Core {
+		/**
+		 * The sysctl handler.
+		 *
+		 * The constructor ensures this points to a valid handler.
+		 */
+		SysctlValue * freqCtl{nullptr};
+
+		/**
+		 * The clock frequency the simulation is running at.
+		 *
+		 * Updated at the end of frame and used in the next
+		 * frame.
+		 */
+		mhz_t runFreq{0};
+
+		/**
+		 * The recorded clock frequency.
+		 *
+		 * If FREQ_TRACKING is enabled this is updated at
+		 * during the preliminary stage and used at the beginning
+		 * of frame stage.
+		 */
+		mhz_t recFreq{0};
+
+		/**
+		 * The load cycles simulated for this frame in [kcycles].
+		 *
+		 * This is determined at the beginning of frame and used
+		 * to calculate the reported load at the end of frame.
+		 */
+		cptime_t runLoadCycles{0};
+
+		/**
+		 * The load cycles carried over to the next frame in [kcycles].
+		 *
+		 * This is determined at the beginning of frame and
+		 * used to calculated the simulation load at the
+		 * beginning of the next frame.
+		 */
+		cptime_t carryLoadCycles{0};
+	};
 
 	/**
-	 * The recorded clock frequencies.
+	 * Simulation state information for each core.
 	 */
-	std::unique_ptr<mhz_t[]> recfreqs{new mhz_t[ncpu]{}};
+	std::unique_ptr<Core[]> cores{new Core[this->ncpu]{}};
 
 	/**
 	 * The kern.cp_times sysctl handler.
@@ -855,11 +1085,6 @@ class Emulator {
 	 * The current kern.cp_times values.
 	 */
 	std::unique_ptr<cptime_t[]> sum{new cptime_t[CPUSTATES * ncpu]{}};
-
-	/**
-	 * The load points to carry over to the next frame.
-	 */
-	std::unique_ptr<cptime_t[]> carry{new cptime_t[ncpu]{}};
 
 	public:
 	/**
@@ -877,24 +1102,28 @@ class Emulator {
 	Emulator(bool const & die) : die{die} {
 		/* get freq and freq_levels sysctls */
 		std::vector<mhz_t> freqLevels{};
-		for (int i = 0; i < this->ncpu; ++i) {
+		for (coreid_t i = 0; i < this->ncpu; ++i) {
+			auto & core = this->cores[i];
+
 			/* get freqency handler */
 			char name[40];
 			sprintf_safe(name, FREQ, i);
 			try {
-				this->freqs[i] = &sysctls[name];
+				core.freqCtl = &sysctls[name];
 			} catch (std::out_of_range &) {
 				if (i == 0) {
 					/* should never be reached */
 					fail("missing sysctl: "_s + name);
 					throw;
-				} else {
-					this->freqs[i] = this->freqs[i - 1];
 				}
+				/* fall back to data from the previous core */
+				core = this->cores[i - 1];
+				continue;
 			}
 
-			/* take current clock frequency as reference */
-			this->recfreqs[i] = this->freqs[i]->get<mhz_t>();
+			/* initialise current and reference clock */
+			core.runFreq = core.freqCtl->get<mhz_t>();
+			core.recFreq = core.runFreq;
 
 			/* get freq_levels */
 			sprintf_safe(name, FREQ_LEVELS, i);
@@ -914,7 +1143,7 @@ class Emulator {
 				}
 			}
 
-			this->freqs[i]->registerOnSet([freqLevels](SysctlValue & ctl) {
+			core.freqCtl->registerOnSet([freqLevels](SysctlValue & ctl) {
 				auto const freq = ctl.get<mhz_t>();
 				auto result = freq;
 				auto diff = freq + 1000000;
@@ -931,18 +1160,7 @@ class Emulator {
 
 		/* initialise kern.cp_times buffer */
 		auto size = this->size;
-		cp_times.get(sum.get(), size);
-
-		/* output headers */
-		std::cout << "time[s]";
-		for (int i = 0; i < this->ncpu; ++i) {
-			std::cout << " cpu." << i << ".recfreq[MHz]"
-			          << " cpu." << i << ".freq[MHz]"
-			          << " cpu." << i << ".recload"
-			          << " cpu." << i << ".load";
-		}
-		std::cout << " max(recfreqs)[MHz] max(freqs)[MHz] sum(recloads) max(recloads) sum(loads) max(loads)"
-		          << std::endl << std::fixed << std::setprecision(3);
+		cp_times.get(this->sum.get(), size);
 	}
 
 	/**
@@ -955,93 +1173,104 @@ class Emulator {
 	 * and sends a SIGINT to the process.
 	 */
 	void operator ()() try {
-		double statTime = 0.; /* in seconds */
 		auto const features = sysctls[LOADREC_FEATURES].get<flag_t>();
+		Report report(std::cout, this->ncpu);
+
 		auto time = std::chrono::steady_clock::now();
 		for (uint64_t interval;
 		     !this->die && (std::cin >> interval).good();) {
-			/* reporting variables */
-			double statSumRecloads = 0.;
-			double statMaxRecloads = 0.;
-			double statSumLoads = 0.;
-			double statMaxLoads = 0.;
-			mhz_t statMaxFreq = 0;
-			mhz_t statMaxRecfreq = 0;
-			statTime += double(interval) / 1000;
-			std::cout << statTime;
-			/* update reference clock frequencies */
-			for (coreid_t core = 0;
-			     features & 1_FREQ_TRACKING && core < this->ncpu;
-			     ++core) {
-				std::cin >> this->recfreqs[core];
+			/* setup new output frame */
+			auto frame = report.frame(interval);
+
+			/*
+			 * preliminary
+			 */
+
+			/* get recorded core clocks */
+			for (coreid_t i = 0; i < this->ncpu; ++i) {
+				auto & core = this->cores[i];
+
+				/* update recorded clock frequency */
+				if (features & 1_FREQ_TRACKING) {
+					std::cin >> core.recFreq;
+				}
 			}
-			/* perform calculations */
-			for (coreid_t core = 0; core < this->ncpu; ++core) {
-				/* get frame load */
-				cptime_t frameSum = 0;
-				cptime_t frameLoad = 0;
+
+			/*
+			 * beginning of frame
+			 */
+
+			/* calculate recorded load */
+			for (coreid_t i = 0; i < this->ncpu; ++i) {
+				auto & core = this->cores[i];
+
+				/* get recorded ticks */
+				double recTicks = 0;
+				double recBusyTicks = 0;
 				for (size_t state = 0; state < CPUSTATES; ++state) {
 					cptime_t ticks;
 					std::cin >> ticks;
-					frameSum += ticks;
-					frameLoad += state == CP_IDLE ? 0 : ticks;
+					recTicks += ticks;
+					recBusyTicks += state == CP_IDLE ? 0 : ticks;
 				}
 
-				auto const coreFreq = this->freqs[core]->get<mhz_t>();
-				auto const coreRecfreq = this->recfreqs[core];
-				std::cout << ' ' << coreRecfreq << ' ' << coreFreq;
+				/* get recorded load in [MHz] */
+				double const recLoad =
+				    recTicks
+				    ? recBusyTicks * core.recFreq / recTicks
+				    : 0;
 
-				if (!frameSum) {
-					std::cout << ' ' << 0. << ' ' << 0.;
-					continue;
-				}
+				/* update report with recorded data */
+				frame[i].rec =
+				    {core.recFreq, recLoad / core.recFreq};
 
-				/* calc recorded stats */
-				double const recLoad = double(frameLoad) / frameSum;
-				statSumRecloads += recLoad;
-				statMaxRecloads = std::max(statMaxRecloads, recLoad);
-				std::cout << ' ' << recLoad;
+				/* get recorded load in [kcycles] */
+				cptime_t recLoadCycles = recLoad * interval;
 
-				/* weigh load and sum */
-				frameLoad *= coreRecfreq;
-				frameSum *= coreFreq;
+				/* add carry from last frame */
+				recLoadCycles += core.carryLoadCycles;
 
-				/* add carry load from last frame */
-				frameLoad += this->carry[core];
-				this->carry[core] = 0;
+				/* get the load carrying into the next frame,
+				 * assume the whole frame runs at the current
+				 * clock speed */
+				cptime_t const runCycles =
+				    core.runFreq * interval;
+				core.runLoadCycles =
+				    std::min<cptime_t>(runCycles,
+				                       recLoadCycles);
+				core.carryLoadCycles =
+				    recLoadCycles - core.runLoadCycles;
 
-				/* set load */
-				if (frameSum >= frameLoad) {
-					sum[core * CPUSTATES + CP_USER] += frameLoad;
-					sum[core * CPUSTATES + CP_IDLE] += frameSum - frameLoad;
-				} else {
-					this->carry[core] = frameLoad - frameSum;
-					sum[core * CPUSTATES + CP_USER] += frameSum;
-					sum[core * CPUSTATES + CP_IDLE] += 0;
-				}
-
-				/* calc stats */
-				statMaxRecfreq = std::max(statMaxRecfreq, coreRecfreq);
-				statMaxFreq = std::max(statMaxFreq, coreFreq);
-				double const load = double(frameLoad) / frameSum;
-				statSumLoads += load;
-				statMaxLoads = statMaxLoads > load ? statMaxLoads : load;
-				std::cout << ' ' << load;
+				/* set load for this core */
+				this->sum[i * CPUSTATES + CP_USER] +=
+				    core.runLoadCycles;
+				this->sum[i * CPUSTATES + CP_IDLE] +=
+				    runCycles - core.runLoadCycles;
 			}
 
-			/* print stats */
-			std::cout << ' ' << statMaxRecfreq
-			          << ' ' << statMaxFreq
-			          << ' ' << statSumRecloads
-			          << ' ' << statMaxRecloads
-			          << ' ' << statSumLoads
-			          << ' ' << statMaxLoads << std::endl;
+			/* commit changes */
+			cp_times.set(&sum[0], this->size);
 
 			/* sleep */
 			std::this_thread::sleep_until(time += ms{interval});
 
-			/* commit changes */
-			cp_times.set(&sum[0], this->size);
+			/*
+			 * end of frame
+			 */
+
+			/* update output */
+			for (coreid_t i = 0; i < this->ncpu; ++i) {
+				auto & core = this->cores[i];
+				core.runFreq = core.freqCtl->get<mhz_t>();
+				cptime_t const runCycles =
+				    core.runFreq * interval;
+				frame[i].run =
+				    {core.runFreq,
+				     runCycles
+				     ? static_cast<double>(core.runLoadCycles) /
+				       runCycles
+				     : 0};
+			}
 		}
 
 		/* tell process to die */
