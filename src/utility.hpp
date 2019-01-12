@@ -175,6 +175,58 @@ constexpr Formatter<16384> operator "" _fmt(char const * const fmt, size_t const
 }
 } /* namespace literals */
 
+/**
+ * A simple value container only allowing += and copy assignment.
+ *
+ * @tparam T
+ *	The value type
+ */
+template <typename T>
+class Sum {
+	private:
+	/**
+	 * The sum of values accumulated.
+	 */
+	T value;
+
+	public:
+	/**
+	 * Construct from an initial value.
+	 *
+	 * @param value
+	 *	The initial value
+	 */
+	explicit constexpr Sum(T const & value) : value{value} {}
+
+	/**
+	 * Default construct.
+	 */
+	constexpr Sum() : Sum{0} {}
+
+	/**
+	 * Returns the current sum of values.
+	 *
+	 * @return
+	 *	The sum of values by const reference
+	 */
+	constexpr operator T const &() const {
+		return this->value;
+	}
+
+	/**
+	 * Add a value to the sum.
+	 *
+	 * @param value
+	 *	The value to add to the current sum
+	 * @return
+	 *	A self reference
+	 */
+	constexpr Sum & operator +=(T const & value) {
+		this->value += value;
+		return *this;
+	}
+};
+
 } /* namespace utility */
 
 #endif /* _POWERDXX_UTILITY_HPP_ */
