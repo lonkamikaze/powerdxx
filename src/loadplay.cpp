@@ -1177,10 +1177,10 @@ class Emulator {
 		Report report(std::cout, this->ncpu);
 
 		auto time = std::chrono::steady_clock::now();
-		for (uint64_t interval;
-		     !this->die && (std::cin >> interval).good();) {
+		for (uint64_t duration;
+		     !this->die && (std::cin >> duration).good();) {
 			/* setup new output frame */
-			auto frame = report.frame(interval);
+			auto frame = report.frame(duration);
 
 			/*
 			 * preliminary
@@ -1225,7 +1225,7 @@ class Emulator {
 				    {core.recFreq, recLoad / core.recFreq};
 
 				/* get recorded load in [kcycles] */
-				cptime_t recLoadCycles = recLoad * interval;
+				cptime_t recLoadCycles = recLoad * duration;
 
 				/* add carry from last frame */
 				recLoadCycles += core.carryLoadCycles;
@@ -1234,7 +1234,7 @@ class Emulator {
 				 * assume the whole frame runs at the current
 				 * clock speed */
 				cptime_t const runCycles =
-				    core.runFreq * interval;
+				    core.runFreq * duration;
 				core.runLoadCycles =
 				    std::min<cptime_t>(runCycles,
 				                       recLoadCycles);
@@ -1252,7 +1252,7 @@ class Emulator {
 			cp_times.set(&sum[0], this->size);
 
 			/* sleep */
-			std::this_thread::sleep_until(time += ms{interval});
+			std::this_thread::sleep_until(time += ms{duration});
 
 			/*
 			 * end of frame
@@ -1263,7 +1263,7 @@ class Emulator {
 				auto & core = this->cores[i];
 				core.runFreq = core.freqCtl->get<mhz_t>();
 				cptime_t const runCycles =
-				    core.runFreq * interval;
+				    core.runFreq * duration;
 				frame[i].run =
 				    {core.runFreq,
 				     runCycles
