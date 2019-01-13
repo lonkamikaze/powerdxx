@@ -75,7 +75,7 @@ Documentation
 
 The manual pages can be read with the following commands:
 
-    > man ./powerd++.8 ./loadrec.1 ./loadplay.1
+    > man man/powerd++.8 man/loadrec.1 man/loadplay.1
 
 Tooling
 -------
