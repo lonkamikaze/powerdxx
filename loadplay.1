@@ -86,9 +86,6 @@ There is one sample for each recorded line. The duration of each frame
 depends on the recording, which defaults to 25\ ms. 
 At this sample rate loads are dominated by noise, so a gliding average
 should be applied to any load columns for further use, such as plotting.
-Note that the
-.Ic max()
-columns must be recreated in this case.
 .Sh IMPLEMENTATION
 The injected
 .Pa libloadplay.so
