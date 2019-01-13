@@ -77,8 +77,8 @@ The manual pages can be read with the following commands:
 
     > man man/powerd++.8 man/loadrec.1 man/loadplay.1
 
-Tooling
--------
+Load Recording and Replay
+-------------------------
 
 In addition to the `powerd++` daemon this repository also comes with
 the tools `loadrec` and `loadplay`. They can be used to record loads
