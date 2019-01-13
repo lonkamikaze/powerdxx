@@ -71,7 +71,8 @@ clean:
 doc::
 	rm -rf ${.TARGET}/*
 	cd "${.CURDIR}" && (cat doxy/doxygen.conf; \
-		echo PROJECT_NUMBER='"${RELEASE}"') | doxygen -
+		echo PROJECT_NUMBER='"${RELEASE}"') | \
+		env PREFIX="${PREFIX}" doxygen -
 
 doc/latex/refman.pdf: doc
 	cd "${.CURDIR}" && cd "${.TARGET:H}" && ${MAKE}
