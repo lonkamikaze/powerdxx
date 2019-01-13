@@ -126,7 +126,7 @@ the header of the load recording. If the heading is incomplete the
 setup routines print a message on
 .Pa stderr .
 All the following intercepted function calls will return failure,
-ensuring that the hijacked process is unable to operate and terminates.
+ensuring that the host process is unable to operate and terminates.
 .Pp
 Like
 .Xr powerd++ 8
@@ -150,11 +150,11 @@ input lines, simulates the load and updates the
 entry in the thread safe sysctl table. For each frame a line of output
 with load statistics is produced.
 .Pp
-Interaction with the hijacked process happens solely through the sysctl
+Interaction with the host process happens solely through the sysctl
 table. The simulation reads the recorded loads and the current core
 frequencies to update
 .Nm kern.cp_times .
-The hijacked process reads this data and adjusts the clock frequencies,
+The host process reads this data and adjusts the clock frequencies,
 which in turn affects the next frame.
 .Ss FINALISATION
 After reading the last line of input the simulation thread sends a
