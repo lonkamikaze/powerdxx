@@ -69,28 +69,16 @@ The Following columns are present, columns containing
 occur for each core simulated:
 .Bl -tag -width indent
 .It Ic time[s]
-The simulation progress in seconds.
-.It Ic cpu.%d.freq[MHz]
-The current clock speed rating.
-.It Ic cpu.%d.recload
-The load as recorded, a value in the range [0,\ 1.0].
-.It Ic cpu.%d.load
-The load under the current clock speed. This value may go above 1.0,
-because the current speed rating may be too low to consume the load.
-In this case the unconsumed load (i.e. everything above 1.0) spills
-over to the next simulation frame.
-.It Ic max(freqs)[MHz]
-The highest clock speed in the output line.
-.It Ic sum(recloads)
-The sum of recorded loads in in the output line, a value in the range
-[0,\ ncpu].
-.It Ic max(recloads)
-The highest recorded load in this output line, a value in the range
-[0,\ 1.0].
-.It Ic sum(loads)
-The sum of loads according to the current clock speed in the output line.
-.It Ic max(loads)
-The highest load according to the current clock speed in the output line.
+The simulation progress in 0.001 second resolution.
+.It Ic cpu.%d.rec.freq[MHz]
+The recorded clock frequency, sampled at the end of the frame.
+.It Ic cpu.%d.rec.load[MHz]
+The recorded load in 0.1 MHz resolution.
+.It Ic cpu.%d.run.freq[MHz]
+The simulated clock frequency set by the host process, sampled at
+the end of the frame.
+.It Ic cpu.%d.run.load[MHz]
+The simulated load in 0.1 MHz resolution.
 .El
 .Pp
 .Ss SAMPLING
