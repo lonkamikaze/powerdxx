@@ -345,12 +345,12 @@ void init() {
 			g.cores[core].freq = {{name}};
 			controller = core;
 		} catch (sys::sc_error<sys::ctl::error> e) {
-			verbose("cannot access sysctl: "_s + name);
 			if (e == ENOENT) {
 				if (0 > controller) {
-					fail(Exit::ENOFREQ, e, "at least the first CPU core must support frequency updates");
+					fail(Exit::ENOFREQ, e, "cannot access "_s + name + ", at least the first CPU core must support frequency updates");
 				}
 			} else {
+				verbose("cannot access sysctl: "_s + name);
 				sysctl_fail(e);
 			}
 		}
