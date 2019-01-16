@@ -10,10 +10,28 @@ BEGIN {
 	# The backspace character is used to combine characters
 	BS = "\x08"
 
-	# Special character substitutions
+	# special HTML character substitutions
 	SUB["&"] = "&amp;"
 	SUB["<"] = "&lt;"
 	SUB[">"] = "&gt;"
+
+	# formatting flags
+	FMT_REGULAR    = 0
+	FMT_BOLD       = 1
+	FMT_UNDERLINE  = 2
+
+	# formatting selectors
+	SELECT["_"] = FMT_UNDERLINE
+
+	# opening tags
+	OPEN[FMT_BOLD]                 = "<b>"
+	OPEN[FMT_UNDERLINE]            = "<u>"
+	OPEN[FMT_BOLD + FMT_UNDERLINE] = "<b><u>"
+
+	# closing tags
+	CLOSE[FMT_BOLD]                 = "</b>"
+	CLOSE[FMT_UNDERLINE]            = "</u>"
+	CLOSE[FMT_BOLD + FMT_UNDERLINE] = "</u></b>"
 
 	print "<pre>"
 }
@@ -79,31 +97,32 @@ function u8error(msg)
 	n = p
 
 	#
-	# replace special characters
+	# detect per character formatting
 	#
+	delete format
+	delete ochars
+
+	olen = 0
 	for (i = 1; i <= n; ++i) {
-		uchars[i] in SUB && uchars[i] = SUB[uchars[i]]
+		# skip ahead of formatting to the output character
+		while (uchars[i + 1] == BS) {
+			i += 2
+			continue
+		}
+		# add character
+		ochars[++olen] = uchars[i]
+		# apply formatting
+		for (p = i - 2; uchars[p + 1] == BS; p -= 2) {
+			format[olen] = SELECT[uchars[p]]
+			format[olen] += (uchars[i] == uchars[p] ? FMT_BOLD : FMT_REGULAR)
+		}
 	}
 
 	#
-	# detect per character formatting
+	# replace special characters
 	#
-	delete hide
-	delete formatted
-	delete bold
-	delete underline
-	delete strike
-
-	for (i = 1; i <= n; ++i) {
-		if (uchars[i] != BS) {
-			continue
-		}
-		# hide composed characters
-		hide[i - 1] = hide[i] = 1
-		# detect formatting
-		bold[i + 1] = (uchars[i - 1] == uchars[i + 1]) || bold[i - 1];
-		underline[i + 1] = !bold[i + 1] && (uchars[i - 1] == "_") || underline[i - 1];
-		strike[i + 1] = !bold[i + 1] && (uchars[i - 1] == "-") || strike[i - 1];
+	for (i = 1; i <= olen; ++i) {
+		ochars[i] in SUB && ochars[i] = SUB[ochars[i]]
 	}
 
 	#
@@ -111,48 +130,15 @@ function u8error(msg)
 	#
 	$0 = ""
 
-	bmode = 0
-	umode = 0
-	smode = 0
-	for (i = 1; i <= n; ++i) {
-		if (hide[i]) {
-			continue
+	last = FMT_REGULAR
+	for (i = 1; i <= olen; ++i) {
+		if (format[i] != last) {
+			$0 = $0 CLOSE[last] OPEN[format[i]]
 		}
-		if (!bmode && bold[i]) {
-			$0 = $0 "<b>"
-			bmode = 1
-		}
-		if (!umode && underline[i]) {
-			$0 = $0 "<u>"
-			umode = 1
-		}
-		if (!smode && strike[i]) {
-			$0 = $0 "<strike>"
-			smode = 1
-		}
-		if (smode && !strike[i]) {
-			$0 = $0 "</strike>"
-			smode = 0
-		}
-		if (umode && !underline[i]) {
-			$0 = $0 "</u>"
-			umode = 0
-		}
-		if (bmode && !bold[i]) {
-			$0 = $0 "</b>"
-			bmode = 0
-		}
-		$0 = $0 uchars[i]
+		$0 = $0 ochars[i]
+		last = format[i]
 	}
-	if (smode && !strike[i]) {
-		$0 = $0 "</strike>"
-	}
-	if (umode && !underline[i]) {
-		$0 = $0 "</u>"
-	}
-	if (bmode && !bold[i]) {
-		$0 = $0 "</b>"
-	}
+	$0 = $0 CLOSE[last]
 
 	print
 }
