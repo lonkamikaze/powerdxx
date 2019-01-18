@@ -104,18 +104,19 @@ function u8error(msg)
 
 	olen = 0
 	for (i = 1; i <= n; ++i) {
-		# skip ahead of formatting to the output character
-		while (uchars[i + 1] == BS) {
-			i += 2
-			continue
+		++olen
+		# check all formatting characters
+		for (; uchars[i + 1] == BS; i += 2) {
+			format[olen] = or(format[olen], SELECT[uchars[i]])
+			# bold is any match in the chain of characters,
+			# so check the current one against all the
+			# following ones
+			for (p = i + 2; uchars[p - 1] == BS; p += 2) {
+				format[olen] = or(format[olen], uchars[i] == uchars[p] ? FMT_BOLD : FMT_REGULAR)
+			}
 		}
 		# add character
-		ochars[++olen] = uchars[i]
-		# apply formatting
-		for (p = i - 2; uchars[p + 1] == BS; p -= 2) {
-			format[olen] = SELECT[uchars[p]]
-			format[olen] += (uchars[i] == uchars[p] ? FMT_BOLD : FMT_REGULAR)
-		}
+		ochars[olen] = uchars[i]
 	}
 
 	#
