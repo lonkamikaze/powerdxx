@@ -42,8 +42,7 @@ END {
 
 function u8error(msg)
 {
-	printf("utf-8 error:%d:%d:%d: %s\n\n%s\n% " p "s\n", NR, p, i, msg, $0, "^")
-	exit 1
+	printf("utf-8 error:%d:%d:%d: %s\n\n%s\n% " p "s\n", NR, p, i, msg, $0, "^") > "/dev/stderr"
 }
 
 {
@@ -65,6 +64,8 @@ function u8error(msg)
 		{
 			if (chars[i] < "\x80" || chars[i] >= "\xc0") {
 				u8error("unexected byte in multibyte character")
+				mbyte = 0
+				continue
 			}
 			uchars[p] = uchars[p] chars[i]
 			p += !--mbyte
