@@ -10,6 +10,12 @@ BEGIN {
 	# The backspace character is used to combine characters
 	BS = "\x08"
 
+	# prepare requested escapes
+	n = u8chars(escape, ESCAPE)
+	for (i = 1; i <= n; ++i) {
+		SUB[escape[i]] = "\\" escape[i]
+	}
+
 	# special HTML character substitutions
 	SUB["&"] = "&amp;"
 	SUB["<"] = "&lt;"
@@ -42,24 +48,21 @@ END {
 
 function u8error(msg)
 {
-	printf("utf-8 error:%d:%d:%d: %s\n\n%s\n% " p "s\n", NR, p, i, msg, $0, "^") > "/dev/stderr"
+	printf("utf-8 error:%d:%d:%d: %s\n\n%s\n% " p "s\n", NR, p, i, msg, str, "^") > "/dev/stderr"
 }
 
+function u8chars(uchars, str,
+                 n, chars, p, mbyte, i)
 {
 	# split characters
 	delete chars
+	n = split(str, chars, "")
 
-	n = split($0, chars, "")
-
-	#
-	# merge utf-8 multibyte chars
-	#
 	delete uchars
-
-	p = 1
-	mbyte = 0
+	p = 1      # index of the next unicode character
+	mbyte = 0  # expected multi-byte character bytes
 	for (i = 1; i <= n; ++i) {
-		# no leading bits, 1 byte characte
+		# no leading bits, 1 byte character
 		if (mbyte)
 		{
 			if (chars[i] < "\x80" || chars[i] >= "\xc0") {
@@ -95,7 +98,15 @@ function u8error(msg)
 			u8error("byte is not a character")
 		}
 	}
-	n = p
+	return p - 1
+}
+
+{
+	#
+	# merge utf-8 multibyte chars
+	#
+	delete uchars
+	n = u8chars(uchars, $0)
 
 	#
 	# detect per character formatting
