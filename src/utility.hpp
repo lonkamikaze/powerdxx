@@ -165,8 +165,6 @@ namespace literals {
  *
  * @param fmt
  *	A printf style format string
- * @param const
- *	Unused
  * @return
  *	A Formatter instance
  */
