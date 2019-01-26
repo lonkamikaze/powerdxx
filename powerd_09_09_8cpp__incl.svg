@@ -12,13 +12,16 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
+<g id="a_node1"><a xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
 <polygon fill="#bfbfbf" stroke="#000000" points="847.5,-224.5 847.5,-243.5 926.5,-243.5 926.5,-224.5 847.5,-224.5"/>
 <text text-anchor="middle" x="887" y="-231.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">powerd++.cpp</text>
+</a>
+</g>
 </g>
 <!-- Node1 -->
 <g id="node2" class="node">
 <title>Node1</title>
-<g id="a_node2"><a xlink:href="Options_8hpp.html" target="_top" xlink:title="This file provides nih::Options&lt;&gt;, a substitute for getopt(3). ">
+<g id="a_node2"><a xlink:href="Options_8hpp.html" target="_top" xlink:title="This file provides nih::Options&lt;&gt;, a substitute for getopt(3).">
 <polygon fill="#ffffff" stroke="#000000" points="127.5,-168.5 127.5,-187.5 196.5,-187.5 196.5,-168.5 127.5,-168.5"/>
 <text text-anchor="middle" x="162" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">Options.hpp</text>
 </a>
@@ -33,7 +36,7 @@
 <!-- Node7 -->
 <g id="node8" class="node">
 <title>Node7</title>
-<g id="a_node8"><a xlink:href="Cycle_8hpp.html" target="_top" xlink:title="Implements timing::Cycle, a cyclic sleep functor. ">
+<g id="a_node8"><a xlink:href="Cycle_8hpp.html" target="_top" xlink:title="Implements timing::Cycle, a cyclic sleep functor.">
 <polygon fill="#ffffff" stroke="#000000" points="620.5,-168.5 620.5,-187.5 681.5,-187.5 681.5,-168.5 620.5,-168.5"/>
 <text text-anchor="middle" x="651" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">Cycle.hpp</text>
 </a>
@@ -48,7 +51,7 @@
 <!-- Node10 -->
 <g id="node11" class="node">
 <title>Node10</title>
-<g id="a_node11"><a xlink:href="types_8hpp.html" target="_top" xlink:title="A collection of type aliases. ">
+<g id="a_node11"><a xlink:href="types_8hpp.html" target="_top" xlink:title="A collection of type aliases.">
 <polygon fill="#ffffff" stroke="#000000" points="494.5,-112.5 494.5,-131.5 553.5,-131.5 553.5,-112.5 494.5,-112.5"/>
 <text text-anchor="middle" x="524" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">types.hpp</text>
 </a>
@@ -63,7 +66,7 @@
 <!-- Node11 -->
 <g id="node12" class="node">
 <title>Node11</title>
-<g id="a_node12"><a xlink:href="constants_8hpp.html" target="_top" xlink:title="Defines a collection of constants. ">
+<g id="a_node12"><a xlink:href="constants_8hpp.html" target="_top" xlink:title="Defines a collection of constants.">
 <polygon fill="#ffffff" stroke="#000000" points="485,-168.5 485,-187.5 563,-187.5 563,-168.5 485,-168.5"/>
 <text text-anchor="middle" x="524" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">constants.hpp</text>
 </a>
@@ -78,7 +81,7 @@
 <!-- Node12 -->
 <g id="node13" class="node">
 <title>Node12</title>
-<g id="a_node13"><a xlink:href="errors_8hpp.html" target="_top" xlink:title="Common error handling code. ">
+<g id="a_node13"><a xlink:href="errors_8hpp.html" target="_top" xlink:title="Common error handling code.">
 <polygon fill="#ffffff" stroke="#000000" points="282,-112.5 282,-131.5 342,-131.5 342,-112.5 282,-112.5"/>
 <text text-anchor="middle" x="312" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">errors.hpp</text>
 </a>
@@ -93,7 +96,7 @@
 <!-- Node13 -->
 <g id="node14" class="node">
 <title>Node13</title>
-<g id="a_node14"><a xlink:href="utility_8hpp.html" target="_top" xlink:title="Implements generally useful functions. ">
+<g id="a_node14"><a xlink:href="utility_8hpp.html" target="_top" xlink:title="Implements generally useful functions.">
 <polygon fill="#ffffff" stroke="#000000" points="282.5,-56.5 282.5,-75.5 341.5,-75.5 341.5,-56.5 282.5,-56.5"/>
 <text text-anchor="middle" x="312" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">utility.hpp</text>
 </a>
@@ -108,7 +111,7 @@
 <!-- Node16 -->
 <g id="node17" class="node">
 <title>Node16</title>
-<g id="a_node17"><a xlink:href="clas_8hpp.html" target="_top" xlink:title="Implements functions to process command line arguments. ">
+<g id="a_node17"><a xlink:href="clas_8hpp.html" target="_top" xlink:title="Implements functions to process command line arguments.">
 <polygon fill="#ffffff" stroke="#000000" points="407.5,-168.5 407.5,-187.5 460.5,-187.5 460.5,-168.5 407.5,-168.5"/>
 <text text-anchor="middle" x="434" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">clas.hpp</text>
 </a>
@@ -123,7 +126,7 @@
 <!-- Node18 -->
 <g id="node19" class="node">
 <title>Node18</title>
-<g id="a_node19"><a xlink:href="sysctl_8hpp.html" target="_top" xlink:title="Implements safer c++ wrappers for the sysctl() interface. ">
+<g id="a_node19"><a xlink:href="sysctl_8hpp.html" target="_top" xlink:title="Implements safer c++ wrappers for the sysctl() interface.">
 <polygon fill="#ffffff" stroke="#000000" points="896,-168.5 896,-187.5 976,-187.5 976,-168.5 896,-168.5"/>
 <text text-anchor="middle" x="936" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys/sysctl.hpp</text>
 </a>
@@ -138,8 +141,11 @@
 <!-- Node22 -->
 <g id="node23" class="node">
 <title>Node22</title>
+<g id="a_node23"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1124,-112.5 1124,-131.5 1176,-131.5 1176,-112.5 1124,-112.5"/>
 <text text-anchor="middle" x="1150" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">memory</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node22 -->
 <g id="edge42" class="edge">
@@ -150,7 +156,7 @@
 <!-- Node25 -->
 <g id="node26" class="node">
 <title>Node25</title>
-<g id="a_node26"><a xlink:href="pidfile_8hpp.html" target="_top" xlink:title="Implements safer c++ wrappers for the pidfile_*() interface. ">
+<g id="a_node26"><a xlink:href="pidfile_8hpp.html" target="_top" xlink:title="Implements safer c++ wrappers for the pidfile_*() interface.">
 <polygon fill="#ffffff" stroke="#000000" points="700,-168.5 700,-187.5 780,-187.5 780,-168.5 700,-168.5"/>
 <text text-anchor="middle" x="740" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys/pidfile.hpp</text>
 </a>
@@ -165,7 +171,7 @@
 <!-- Node27 -->
 <g id="node28" class="node">
 <title>Node27</title>
-<g id="a_node28"><a xlink:href="signal_8hpp.html" target="_top" xlink:title="Implements a c++ wrapper for the signal(3) call. ">
+<g id="a_node28"><a xlink:href="signal_8hpp.html" target="_top" xlink:title="Implements a c++ wrapper for the signal(3) call.">
 <polygon fill="#ffffff" stroke="#000000" points="798,-168.5 798,-187.5 878,-187.5 878,-168.5 798,-168.5"/>
 <text text-anchor="middle" x="838" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys/signal.hpp</text>
 </a>
@@ -180,8 +186,11 @@
 <!-- Node29 -->
 <g id="node30" class="node">
 <title>Node29</title>
+<g id="a_node30"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1032,-168.5 1032,-187.5 1086,-187.5 1086,-168.5 1032,-168.5"/>
 <text text-anchor="middle" x="1059" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">iostream</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node29 -->
 <g id="edge40" class="edge">
@@ -192,8 +201,11 @@
 <!-- Node30 -->
 <g id="node31" class="node">
 <title>Node30</title>
+<g id="a_node31"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1104,-168.5 1104,-187.5 1146,-187.5 1146,-168.5 1104,-168.5"/>
 <text text-anchor="middle" x="1125" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">locale</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node30 -->
 <g id="edge41" class="edge">
@@ -204,8 +216,11 @@
 <!-- Node31 -->
 <g id="node32" class="node">
 <title>Node31</title>
+<g id="a_node32"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1164,-168.5 1164,-187.5 1220,-187.5 1220,-168.5 1164,-168.5"/>
 <text text-anchor="middle" x="1192" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">algorithm</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node31 -->
 <g id="edge43" class="edge">
@@ -216,8 +231,11 @@
 <!-- Node32 -->
 <g id="node33" class="node">
 <title>Node32</title>
+<g id="a_node33"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1238,-168.5 1238,-187.5 1278,-187.5 1278,-168.5 1238,-168.5"/>
 <text text-anchor="middle" x="1258" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">limits</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node32 -->
 <g id="edge44" class="edge">
@@ -228,8 +246,11 @@
 <!-- Node33 -->
 <g id="node34" class="node">
 <title>Node33</title>
+<g id="a_node34"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1296.5,-168.5 1296.5,-187.5 1341.5,-187.5 1341.5,-168.5 1296.5,-168.5"/>
 <text text-anchor="middle" x="1319" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cstdlib</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node33 -->
 <g id="edge45" class="edge">
@@ -240,8 +261,11 @@
 <!-- Node34 -->
 <g id="node35" class="node">
 <title>Node34</title>
+<g id="a_node35"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1360,-168.5 1360,-187.5 1406,-187.5 1406,-168.5 1360,-168.5"/>
 <text text-anchor="middle" x="1383" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cstdint</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node34 -->
 <g id="edge46" class="edge">
@@ -252,8 +276,11 @@
 <!-- Node35 -->
 <g id="node36" class="node">
 <title>Node35</title>
+<g id="a_node36"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1424.5,-168.5 1424.5,-187.5 1505.5,-187.5 1505.5,-168.5 1424.5,-168.5"/>
 <text text-anchor="middle" x="1465" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys/resource.h</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node35 -->
 <g id="edge47" class="edge">
@@ -264,8 +291,11 @@
 <!-- Node2 -->
 <g id="node3" class="node">
 <title>Node2</title>
+<g id="a_node3"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="108.5,-112.5 108.5,-131.5 157.5,-131.5 157.5,-112.5 108.5,-112.5"/>
 <text text-anchor="middle" x="133" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cstddef</text>
+</a>
+</g>
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge2" class="edge">
@@ -276,8 +306,11 @@
 <!-- Node3 -->
 <g id="node4" class="node">
 <title>Node3</title>
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="176,-112.5 176,-131.5 226,-131.5 226,-112.5 176,-112.5"/>
 <text text-anchor="middle" x="201" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">iomanip</text>
+</a>
+</g>
 </g>
 <!-- Node1&#45;&gt;Node3 -->
 <g id="edge3" class="edge">
@@ -288,8 +321,11 @@
 <!-- Node4 -->
 <g id="node5" class="node">
 <title>Node4</title>
+<g id="a_node5"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="0,-112.5 0,-131.5 52,-131.5 52,-112.5 0,-112.5"/>
 <text text-anchor="middle" x="26" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sstream</text>
+</a>
+</g>
 </g>
 <!-- Node1&#45;&gt;Node4 -->
 <g id="edge4" class="edge">
@@ -300,8 +336,11 @@
 <!-- Node5 -->
 <g id="node6" class="node">
 <title>Node5</title>
+<g id="a_node6"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="130,-.5 130,-19.5 192,-19.5 192,-.5 130,-.5"/>
 <text text-anchor="middle" x="161" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">type_traits</text>
+</a>
+</g>
 </g>
 <!-- Node1&#45;&gt;Node5 -->
 <g id="edge5" class="edge">
@@ -312,8 +351,11 @@
 <!-- Node6 -->
 <g id="node7" class="node">
 <title>Node6</title>
+<g id="a_node7"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="571.5,-112.5 571.5,-131.5 620.5,-131.5 620.5,-112.5 571.5,-112.5"/>
 <text text-anchor="middle" x="596" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cassert</text>
+</a>
+</g>
 </g>
 <!-- Node1&#45;&gt;Node6 -->
 <g id="edge6" class="edge">
@@ -324,8 +366,11 @@
 <!-- Node8 -->
 <g id="node9" class="node">
 <title>Node8</title>
+<g id="a_node9"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="563,-56.5 563,-75.5 609,-75.5 609,-56.5 563,-56.5"/>
 <text text-anchor="middle" x="586" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">chrono</text>
+</a>
+</g>
 </g>
 <!-- Node7&#45;&gt;Node8 -->
 <g id="edge8" class="edge">
@@ -336,8 +381,11 @@
 <!-- Node9 -->
 <g id="node10" class="node">
 <title>Node9</title>
+<g id="a_node10"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="677.5,-112.5 677.5,-131.5 728.5,-131.5 728.5,-112.5 677.5,-112.5"/>
 <text text-anchor="middle" x="703" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">unistd.h</text>
+</a>
+</g>
 </g>
 <!-- Node7&#45;&gt;Node9 -->
 <g id="edge9" class="edge">
@@ -372,8 +420,11 @@
 <!-- Node14 -->
 <g id="node15" class="node">
 <title>Node14</title>
+<g id="a_node15"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="398.5,-.5 398.5,-19.5 439.5,-19.5 439.5,-.5 398.5,-.5"/>
 <text text-anchor="middle" x="419" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">string</text>
+</a>
+</g>
 </g>
 <!-- Node13&#45;&gt;Node14 -->
 <g id="edge17" class="edge">
@@ -384,8 +435,11 @@
 <!-- Node15 -->
 <g id="node16" class="node">
 <title>Node15</title>
+<g id="a_node16"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="290.5,-.5 290.5,-19.5 333.5,-19.5 333.5,-.5 290.5,-.5"/>
 <text text-anchor="middle" x="312" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cstdio</text>
+</a>
+</g>
 </g>
 <!-- Node13&#45;&gt;Node15 -->
 <g id="edge18" class="edge">
@@ -420,8 +474,11 @@
 <!-- Node17 -->
 <g id="node18" class="node">
 <title>Node17</title>
+<g id="a_node18"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="360,-112.5 360,-131.5 400,-131.5 400,-112.5 360,-112.5"/>
 <text text-anchor="middle" x="380" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">utility</text>
+</a>
+</g>
 </g>
 <!-- Node16&#45;&gt;Node17 -->
 <g id="edge24" class="edge">
@@ -438,7 +495,7 @@
 <!-- Node19 -->
 <g id="node20" class="node">
 <title>Node19</title>
-<g id="a_node20"><a xlink:href="error_8hpp.html" target="_top" xlink:title="Provides system call error handling. ">
+<g id="a_node20"><a xlink:href="error_8hpp.html" target="_top" xlink:title="Provides system call error handling.">
 <polygon fill="#ffffff" stroke="#000000" points="811.5,-112.5 811.5,-131.5 866.5,-131.5 866.5,-112.5 811.5,-112.5"/>
 <text text-anchor="middle" x="839" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">error.hpp</text>
 </a>
@@ -459,8 +516,11 @@
 <!-- Node23 -->
 <g id="node24" class="node">
 <title>Node23</title>
+<g id="a_node24"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="950,-112.5 950,-131.5 1018,-131.5 1018,-112.5 950,-112.5"/>
 <text text-anchor="middle" x="984" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys/types.h</text>
+</a>
+</g>
 </g>
 <!-- Node18&#45;&gt;Node23 -->
 <g id="edge32" class="edge">
@@ -471,8 +531,11 @@
 <!-- Node24 -->
 <g id="node25" class="node">
 <title>Node24</title>
+<g id="a_node25"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="1036,-112.5 1036,-131.5 1106,-131.5 1106,-112.5 1036,-112.5"/>
 <text text-anchor="middle" x="1071" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys/sysctl.h</text>
+</a>
+</g>
 </g>
 <!-- Node18&#45;&gt;Node24 -->
 <g id="edge33" class="edge">
@@ -483,8 +546,11 @@
 <!-- Node20 -->
 <g id="node21" class="node">
 <title>Node20</title>
+<g id="a_node21"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="785,-56.5 785,-75.5 829,-75.5 829,-56.5 785,-56.5"/>
 <text text-anchor="middle" x="807" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cerrno</text>
+</a>
+</g>
 </g>
 <!-- Node19&#45;&gt;Node20 -->
 <g id="edge28" class="edge">
@@ -495,8 +561,11 @@
 <!-- Node21 -->
 <g id="node22" class="node">
 <title>Node21</title>
+<g id="a_node22"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="847,-56.5 847,-75.5 893,-75.5 893,-56.5 847,-56.5"/>
 <text text-anchor="middle" x="870" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cstring</text>
+</a>
+</g>
 </g>
 <!-- Node19&#45;&gt;Node21 -->
 <g id="edge29" class="edge">
@@ -513,8 +582,11 @@
 <!-- Node26 -->
 <g id="node27" class="node">
 <title>Node26</title>
+<g id="a_node27"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="746.5,-112.5 746.5,-131.5 793.5,-131.5 793.5,-112.5 746.5,-112.5"/>
 <text text-anchor="middle" x="770" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">libutil.h</text>
+</a>
+</g>
 </g>
 <!-- Node25&#45;&gt;Node26 -->
 <g id="edge36" class="edge">
@@ -531,8 +603,11 @@
 <!-- Node28 -->
 <g id="node29" class="node">
 <title>Node28</title>
+<g id="a_node29"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="884.5,-112.5 884.5,-131.5 931.5,-131.5 931.5,-112.5 884.5,-112.5"/>
 <text text-anchor="middle" x="908" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">csignal</text>
+</a>
+</g>
 </g>
 <!-- Node27&#45;&gt;Node28 -->
 <g id="edge39" class="edge">

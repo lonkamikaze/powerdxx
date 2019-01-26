@@ -1,5 +1,6 @@
 <map id="errors.hpp" name="errors.hpp">
-<area shape="rect" id="node2" href="$clas_8hpp.html" title="Implements functions to process command line arguments. " alt="" coords="76,80,147,107"/>
-<area shape="rect" id="node3" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings..." alt="" coords="5,155,95,181"/>
-<area shape="rect" id="node4" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd. " alt="" coords="125,155,231,181"/>
+<area shape="rect" id="node1" title="Common error handling code." alt="" coords="71,5,151,32"/>
+<area shape="rect" id="node2" href="$clas_8hpp.html" title="Implements functions to process command line arguments." alt="" coords="76,80,147,107"/>
+<area shape="rect" id="node3" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="5,155,95,181"/>
+<area shape="rect" id="node4" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="125,155,231,181"/>
 </map>

@@ -12,16 +12,22 @@
 <!-- Node28 -->
 <g id="node1" class="node">
 <title>Node28</title>
+<g id="a_node1"><a xlink:title="Per AC line state settings.">
 <polygon fill="#bfbfbf" stroke="#000000" points="0,-.5 0,-41.5 122,-41.5 122,-.5 0,-.5"/>
 <text text-anchor="start" x="8" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{powerd++.cpp}::Global</text>
 <text text-anchor="middle" x="61" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">::ACSet</text>
+</a>
+</g>
 </g>
 <!-- Node29 -->
 <g id="node2" class="node">
 <title>Node29</title>
+<g id="a_node2"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="4,-111.5 4,-130.5 48,-130.5 48,-111.5 4,-111.5"/>
 <text text-anchor="middle" x="26" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">mhz_t</text>
+</a>
+</g>
 </g>
 <!-- Node29&#45;&gt;Node28 -->
 <g id="edge1" class="edge">
@@ -35,8 +41,11 @@
 <!-- Node30 -->
 <g id="node3" class="node">
 <title>Node30</title>
+<g id="a_node3"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="69,-111.5 69,-130.5 123,-130.5 123,-111.5 69,-111.5"/>
 <text text-anchor="middle" x="96" y="-118.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cptime_t</text>
+</a>
+</g>
 </g>
 <!-- Node30&#45;&gt;Node28 -->
 <g id="edge2" class="edge">

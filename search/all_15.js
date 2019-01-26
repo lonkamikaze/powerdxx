@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['_7eframe',['~Frame',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Report_1_1Frame.html#a820593ab287d3d78a47050ac33dab67f',1,'anonymous_namespace{loadplay.cpp}::Report::Frame']]],
   ['_7efreqguard',['~FreqGuard',['../classanonymous__namespace_02powerd_09_09_8cpp_03_1_1FreqGuard.html#abb75ca94b93421ae8a95f03760140d45',1,'anonymous_namespace{powerd++.cpp}::FreqGuard']]],
   ['_7ehold',['~Hold',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Hold.html#a993a4f57ee89499daee6cae6e32c6ec3',1,'anonymous_namespace{loadplay.cpp}::Hold']]],
   ['_7emain',['~Main',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html#a5262167ac06ee51ab4e13ac699472c8d',1,'anonymous_namespace{loadplay.cpp}::Main']]],

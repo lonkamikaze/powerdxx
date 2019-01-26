@@ -13,5 +13,6 @@ var searchData=
   ['freq_5fmin_5fbatt',['FREQ_MIN_BATT',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fca488833294871063d32f02c823cb9b464',1,'anonymous_namespace{powerd++.cpp}']]],
   ['freq_5frange',['FREQ_RANGE',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fcab3edc421d1ead3e35fcb02893e1ff2cf',1,'anonymous_namespace{powerd++.cpp}']]],
   ['freq_5frange_5fac',['FREQ_RANGE_AC',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fca79c0c765c8988295078641acfeb10b32',1,'anonymous_namespace{powerd++.cpp}']]],
-  ['freq_5frange_5fbatt',['FREQ_RANGE_BATT',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fcaa1d00feb31e2040cea093732770c2cda',1,'anonymous_namespace{powerd++.cpp}']]]
+  ['freq_5frange_5fbatt',['FREQ_RANGE_BATT',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fcaa1d00feb31e2040cea093732770c2cda',1,'anonymous_namespace{powerd++.cpp}']]],
+  ['freq_5ftracking',['FREQ_TRACKING',['../namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279ae8b8c25307c44b2ce50047ce2e13babd',1,'version']]]
 ];

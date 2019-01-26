@@ -12,14 +12,20 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
+<g id="a_node1"><a xlink:title="This file provides nih::Options&lt;&gt;, a substitute for getopt(3).">
 <polygon fill="#bfbfbf" stroke="#000000" points="127,-56.5 127,-75.5 196,-75.5 196,-56.5 127,-56.5"/>
 <text text-anchor="middle" x="161.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">Options.hpp</text>
+</a>
+</g>
 </g>
 <!-- Node1 -->
 <g id="node2" class="node">
 <title>Node1</title>
+<g id="a_node2"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="0,-.5 0,-19.5 49,-19.5 49,-.5 0,-.5"/>
 <text text-anchor="middle" x="24.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cstddef</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node1 -->
 <g id="edge1" class="edge">
@@ -30,8 +36,11 @@
 <!-- Node2 -->
 <g id="node3" class="node">
 <title>Node2</title>
+<g id="a_node3"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="67.5,-.5 67.5,-19.5 117.5,-19.5 117.5,-.5 67.5,-.5"/>
 <text text-anchor="middle" x="92.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">iomanip</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node2 -->
 <g id="edge2" class="edge">
@@ -42,8 +51,11 @@
 <!-- Node3 -->
 <g id="node4" class="node">
 <title>Node3</title>
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="135.5,-.5 135.5,-19.5 187.5,-19.5 187.5,-.5 135.5,-.5"/>
 <text text-anchor="middle" x="161.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sstream</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node3 -->
 <g id="edge3" class="edge">
@@ -54,8 +66,11 @@
 <!-- Node4 -->
 <g id="node5" class="node">
 <title>Node4</title>
+<g id="a_node5"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="205.5,-.5 205.5,-19.5 267.5,-19.5 267.5,-.5 205.5,-.5"/>
 <text text-anchor="middle" x="236.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">type_traits</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node4 -->
 <g id="edge4" class="edge">
@@ -66,8 +81,11 @@
 <!-- Node5 -->
 <g id="node6" class="node">
 <title>Node5</title>
+<g id="a_node6"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="286,-.5 286,-19.5 335,-19.5 335,-.5 286,-.5"/>
 <text text-anchor="middle" x="310.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cassert</text>
+</a>
+</g>
 </g>
 <!-- Node0&#45;&gt;Node5 -->
 <g id="edge5" class="edge">

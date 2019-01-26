@@ -12,13 +12,16 @@
 <!-- Node2 -->
 <g id="node1" class="node">
 <title>Node2</title>
+<g id="a_node1"><a xlink:title="Implementations in the fixme namespace.">
 <polygon fill="#bfbfbf" stroke="#000000" points="6,-56.5 6,-75.5 65,-75.5 65,-56.5 6,-56.5"/>
 <text text-anchor="middle" x="35.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">fixme.hpp</text>
+</a>
+</g>
 </g>
 <!-- Node3 -->
 <g id="node2" class="node">
 <title>Node3</title>
-<g id="a_node2"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD. ">
+<g id="a_node2"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.">
 <polygon fill="#ffffff" stroke="#000000" points="0,-.5 0,-19.5 71,-19.5 71,-.5 0,-.5"/>
 <text text-anchor="middle" x="35.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">loadplay.cpp</text>
 </a>

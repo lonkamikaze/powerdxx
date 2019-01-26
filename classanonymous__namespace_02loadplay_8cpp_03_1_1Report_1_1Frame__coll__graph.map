@@ -1,0 +1,14 @@
+<map id="anonymous_namespace{loadplay.cpp}::Report::Frame" name="anonymous_namespace{loadplay.cpp}::Report::Frame">
+<area shape="rect" id="node1" title="Represents a frame of the report." alt="" coords="1232,89,1395,145"/>
+<area shape="rect" id="node2" href="$classanonymous__namespace_02loadplay_8cpp_03_1_1Report.html" title="Provides a mechanism to provide frame wise per core load information." alt="" coords="984,97,1147,138"/>
+<area shape="rect" id="node3" title=" " alt="" coords="771,5,839,32"/>
+<area shape="rect" id="node4" title=" " alt="" coords="712,56,899,112"/>
+<area shape="rect" id="node5" href="$namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport" title="The report frame information for a single CPU pipeline." alt="" coords="429,63,644,105"/>
+<area shape="rect" id="node6" href="$namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport" title="The reported state of a single CPU pipeline." alt="" coords="180,63,359,105"/>
+<area shape="rect" id="node7" title=" " alt="" coords="26,71,85,97"/>
+<area shape="rect" id="node8" href="$classutility_1_1Sum.html" title=" " alt="" coords="726,136,885,163"/>
+<area shape="rect" id="node9" title="STL class." alt="" coords="758,187,853,213"/>
+<area shape="rect" id="node10" title="STL class." alt="" coords="470,179,603,221"/>
+<area shape="rect" id="node11" title="STL class." alt="" coords="192,187,347,213"/>
+<area shape="rect" id="node12" title="STL class." alt="" coords="5,187,105,213"/>
+</map>

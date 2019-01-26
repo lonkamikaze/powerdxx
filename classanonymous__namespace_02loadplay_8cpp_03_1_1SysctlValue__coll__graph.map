@@ -1,5 +1,6 @@
 <map id="anonymous_namespace{loadplay.cpp}::SysctlValue" name="anonymous_namespace{loadplay.cpp}::SysctlValue">
-<area shape="rect" id="node2" title="STL class. " alt="" coords="269,13,349,39"/>
-<area shape="rect" id="node3" title="STL class. " alt="" coords="5,5,132,47"/>
-<area shape="rect" id="node4" href="$classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html" title="anonymous_namespace\l\{loadplay.cpp\}::Callback\l\&lt; anonymous_namespace\{loadplay.cpp\}\l::SysctlValue &amp;\&gt;" alt="" coords="181,64,437,135"/>
+<area shape="rect" id="node1" title="Instances of this class represents a specific sysctl value." alt="" coords="524,56,705,97"/>
+<area shape="rect" id="node2" href="$classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html" title=" " alt="" coords="181,5,437,76"/>
+<area shape="rect" id="node3" title="STL class." alt="" coords="269,101,349,127"/>
+<area shape="rect" id="node4" title="STL class." alt="" coords="5,93,132,135"/>
 </map>

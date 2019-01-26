@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['powerd_2b_2b_288_29',['powerd++(8)',['../man_8_powerdxx.html',1,'']]],
   ['percent',['PERCENT',['../namespaceanonymous__namespace_02clas_8cpp_03.html#ad33ed495d1449d52604c62ca046bc8e9a6865d19576ae60f95fd4e61333404352',1,'anonymous_namespace{clas.cpp}']]],
   ['pfh',['pfh',['../classsys_1_1pid_1_1Pidfile.html#a3676a12932adc48080107003497e5aa0',1,'sys::pid::Pidfile']]],
   ['pidfile',['Pidfile',['../classsys_1_1pid_1_1Pidfile.html',1,'sys::pid::Pidfile'],['../classsys_1_1pid_1_1Pidfile.html#a8b2079b74548305dfd33eb611543ffde',1,'sys::pid::Pidfile::Pidfile()']]],

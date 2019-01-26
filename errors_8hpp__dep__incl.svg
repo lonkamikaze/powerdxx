@@ -12,13 +12,16 @@
 <!-- Node5 -->
 <g id="node1" class="node">
 <title>Node5</title>
+<g id="a_node1"><a xlink:title="Common error handling code.">
 <polygon fill="#bfbfbf" stroke="#000000" points="49.5,-112.5 49.5,-131.5 109.5,-131.5 109.5,-112.5 49.5,-112.5"/>
 <text text-anchor="middle" x="79.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">errors.hpp</text>
+</a>
+</g>
 </g>
 <!-- Node6 -->
 <g id="node2" class="node">
 <title>Node6</title>
-<g id="a_node2"><a xlink:href="clas_8hpp.html" target="_top" xlink:title="Implements functions to process command line arguments. ">
+<g id="a_node2"><a xlink:href="clas_8hpp.html" target="_top" xlink:title="Implements functions to process command line arguments.">
 <polygon fill="#ffffff" stroke="#000000" points="53,-56.5 53,-75.5 106,-75.5 106,-56.5 53,-56.5"/>
 <text text-anchor="middle" x="79.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">clas.hpp</text>
 </a>
@@ -33,7 +36,7 @@
 <!-- Node7 -->
 <g id="node3" class="node">
 <title>Node7</title>
-<g id="a_node3"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings...">
+<g id="a_node3"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings.">
 <polygon fill="#ffffff" stroke="#000000" points="0,-.5 0,-19.5 67,-19.5 67,-.5 0,-.5"/>
 <text text-anchor="middle" x="33.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">loadrec.cpp</text>
 </a>
@@ -48,7 +51,7 @@
 <!-- Node8 -->
 <g id="node4" class="node">
 <title>Node8</title>
-<g id="a_node4"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd. ">
+<g id="a_node4"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
 <polygon fill="#ffffff" stroke="#000000" points="90,-.5 90,-19.5 169,-19.5 169,-.5 90,-.5"/>
 <text text-anchor="middle" x="129.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">powerd++.cpp</text>
 </a>

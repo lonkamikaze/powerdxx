@@ -12,15 +12,21 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
+<g id="a_node1"><a xlink:title="A read once representation of a Sysctl.">
 <polygon fill="#bfbfbf" stroke="#000000" points="0,-.5 0,-30.5 96,-30.5 96,-.5 0,-.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::ctl::Once&lt; T,</text>
 <text text-anchor="middle" x="48" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000"> SysctlT &gt;</text>
+</a>
+</g>
 </g>
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
+<g id="a_node2"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="33.5,-78.5 33.5,-97.5 62.5,-97.5 62.5,-78.5 33.5,-78.5"/>
 <text text-anchor="middle" x="48" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">T</text>
+</a>
+</g>
 </g>
 <!-- Node2&#45;&gt;Node1 -->
 <g id="edge1" class="edge">

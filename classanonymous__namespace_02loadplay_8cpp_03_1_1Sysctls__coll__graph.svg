@@ -12,18 +12,24 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
+<g id="a_node1"><a xlink:title="Singleton class representing the sysctl table for this library.">
 <polygon fill="#bfbfbf" stroke="#000000" points="833,-58.5 833,-88.5 955,-88.5 955,-58.5 833,-58.5"/>
 <text text-anchor="start" x="841" y="-76.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="middle" x="894" y="-65.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{loadplay.cpp}::Sysctls</text>
+</a>
+</g>
 </g>
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
+<g id="a_node2"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="616.5,-83.5 616.5,-135.5 749.5,-135.5 749.5,-83.5 616.5,-83.5"/>
 <text text-anchor="start" x="624.5" y="-123.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">std::unordered_map</text>
 <text text-anchor="start" x="624.5" y="-112.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">&lt; std::string, anonymous</text>
 <text text-anchor="start" x="624.5" y="-101.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">_namespace{loadplay.cpp}</text>
 <text text-anchor="middle" x="683" y="-90.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">::mib_t &gt;</text>
+</a>
+</g>
 </g>
 <!-- Node2&#45;&gt;Node1 -->
 <g id="edge1" class="edge">
@@ -35,7 +41,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html" target="_top" xlink:title="Represents MIB, but wraps it to provide the necessary operators to use it as an std::map key...">
+<g id="a_node3"><a xlink:href="structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html" target="_top" xlink:title="Represents MIB, but wraps it to provide the necessary operators to use it as an std::map key.">
 <polygon fill="#ffffff" stroke="#000000" points="396,-60.5 396,-90.5 518,-90.5 518,-60.5 396,-60.5"/>
 <text text-anchor="start" x="404" y="-78.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="middle" x="457" y="-67.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{loadplay.cpp}::mib_t</text>
@@ -52,11 +58,14 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
+<g id="a_node6"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="604,-12.5 604,-64.5 762,-64.5 762,-12.5 604,-12.5"/>
 <text text-anchor="start" x="612" y="-52.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">std::map&lt; anonymous</text>
 <text text-anchor="start" x="612" y="-41.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">_namespace{loadplay.cpp}</text>
 <text text-anchor="start" x="612" y="-30.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">::mib_t, anonymous_namespace</text>
 <text text-anchor="middle" x="683" y="-19.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{loadplay.cpp}::SysctlValue &gt;</text>
+</a>
+</g>
 </g>
 <!-- Node3&#45;&gt;Node6 -->
 <g id="edge6" class="edge">
@@ -68,7 +77,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:title="STL class. ">
+<g id="a_node4"><a xlink:title="STL class.">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="198,-89 198,-108 258,-108 258,-89 198,-89"/>
 <text text-anchor="middle" x="228" y="-96" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">std::string</text>
 </a>
@@ -84,7 +93,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html" target="_top" xlink:title="Instances of this class represents a specific sysctl value. ">
+<g id="a_node7"><a xlink:href="classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html" target="_top" xlink:title="Instances of this class represents a specific sysctl value.">
 <polygon fill="#ffffff" stroke="#000000" points="389,-11.5 389,-41.5 525,-41.5 525,-11.5 389,-11.5"/>
 <text text-anchor="start" x="397" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="middle" x="457" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{loadplay.cpp}::SysctlValue</text>
@@ -92,7 +101,7 @@
 </g>
 </g>
 <!-- Node4&#45;&gt;Node7 -->
-<g id="edge8" class="edge">
+<g id="edge9" class="edge">
 <title>Node4&#45;&gt;Node7</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M268.1624,-85.8725C307.3915,-73.5385 367.1263,-54.7572 408.8763,-41.6306"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="266.8992,-82.6007 258.4094,-88.939 268.9988,-89.2784 266.8992,-82.6007"/>
@@ -101,7 +110,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:title="STL class. ">
+<g id="a_node5"><a xlink:title="STL class.">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="0,-83.5 0,-113.5 95,-113.5 95,-83.5 0,-83.5"/>
 <text text-anchor="start" x="8" y="-101.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">std::basic_string&lt;</text>
 <text text-anchor="middle" x="47.5" y="-90.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000"> char &gt;</text>
@@ -131,17 +140,17 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
-<g id="a_node8"><a xlink:href="classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html" target="_top" xlink:title="anonymous_namespace\l\{loadplay.cpp\}::Callback\l\&lt; anonymous_namespace\{loadplay.cpp\}\l::SysctlValue &amp;\&gt;">
+<g id="a_node8"><a xlink:href="classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="132,-.5 132,-52.5 324,-52.5 324,-.5 132,-.5"/>
 <text text-anchor="start" x="140" y="-40.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="start" x="140" y="-29.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{loadplay.cpp}::Callback</text>
 <text text-anchor="start" x="140" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">&lt; anonymous_namespace{loadplay.cpp}</text>
-<text text-anchor="middle" x="228" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">::SysctlValue &amp;&gt;</text>
+<text text-anchor="middle" x="228" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">::SysctlValue &amp; &gt;</text>
 </a>
 </g>
 </g>
 <!-- Node8&#45;&gt;Node7 -->
-<g id="edge9" class="edge">
+<g id="edge8" class="edge">
 <title>Node8&#45;&gt;Node7</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M334.1305,-26.5C352.7696,-26.5 371.706,-26.5 388.95,-26.5"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="334.1213,-23.0001 324.1213,-26.5 334.1212,-30.0001 334.1213,-23.0001"/>

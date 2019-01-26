@@ -12,10 +12,10 @@
 <!-- Node0 -->
 <g id="node1" class="node">
 <title>Node0</title>
-<g id="a_node1"><a xlink:href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core" target="_top" xlink:title="Contains the management information for a single CPU core. ">
+<g id="a_node1"><a xlink:href="structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html" target="_top" xlink:title="Represents MIB, but wraps it to provide the necessary operators to use it as an std::map key.">
 <polygon fill="#ffffff" stroke="#000000" points="0,-.5 0,-30.5 122,-30.5 122,-.5 0,-.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
-<text text-anchor="middle" x="61" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{powerd++.cpp}::Core</text>
+<text text-anchor="middle" x="61" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{loadplay.cpp}::mib_t</text>
 </a>
 </g>
 </g>

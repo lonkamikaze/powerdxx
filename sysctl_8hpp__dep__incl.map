@@ -1,4 +1,5 @@
 <map id="sys/sysctl.hpp" name="sys/sysctl.hpp">
-<area shape="rect" id="node2" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings..." alt="" coords="5,80,95,107"/>
-<area shape="rect" id="node3" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd. " alt="" coords="119,80,224,107"/>
+<area shape="rect" id="node1" title="Implements safer c++ wrappers for the sysctl() interface." alt="" coords="57,5,163,32"/>
+<area shape="rect" id="node2" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="5,80,95,107"/>
+<area shape="rect" id="node3" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="119,80,224,107"/>
 </map>

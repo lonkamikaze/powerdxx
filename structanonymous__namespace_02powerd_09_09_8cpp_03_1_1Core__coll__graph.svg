@@ -12,15 +12,21 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
+<g id="a_node1"><a xlink:title="Contains the management information for a single CPU core.">
 <polygon fill="#bfbfbf" stroke="#000000" points="369,-141 369,-171 491,-171 491,-141 369,-141"/>
 <text text-anchor="start" x="377" y="-159" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="middle" x="430" y="-148" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{powerd++.cpp}::Core</text>
+</a>
+</g>
 </g>
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
+<g id="a_node2"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="3,-251.5 3,-270.5 47,-270.5 47,-251.5 3,-251.5"/>
 <text text-anchor="middle" x="25" y="-258.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">mhz_t</text>
+</a>
+</g>
 </g>
 <!-- Node2&#45;&gt;Node1 -->
 <g id="edge1" class="edge">
@@ -36,8 +42,11 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
+<g id="a_node6"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="125,-218.5 125,-237.5 254,-237.5 254,-218.5 125,-218.5"/>
 <text text-anchor="middle" x="189.5" y="-225.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">std::unique_ptr&lt; mhz_t[]&gt;</text>
+</a>
+</g>
 </g>
 <!-- Node2&#45;&gt;Node6 -->
 <g id="edge6" class="edge">
@@ -49,8 +58,11 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
+<g id="a_node3"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="164,-180.5 164,-199.5 215,-199.5 215,-180.5 164,-180.5"/>
 <text text-anchor="middle" x="189.5" y="-187.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">coreid_t</text>
+</a>
+</g>
 </g>
 <!-- Node3&#45;&gt;Node1 -->
 <g id="edge2" class="edge">
@@ -62,7 +74,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="classsys_1_1ctl_1_1Sync.html" target="_top" xlink:title="sys::ctl::Sync\&lt; mhz_t \&gt;">
+<g id="a_node4"><a xlink:href="classsys_1_1ctl_1_1Sync.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="128.5,-142.5 128.5,-161.5 250.5,-161.5 250.5,-142.5 128.5,-142.5"/>
 <text text-anchor="middle" x="189.5" y="-149.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::ctl::Sync&lt; mhz_t &gt;</text>
 </a>
@@ -78,8 +90,11 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
+<g id="a_node5"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="0,-123.5 0,-142.5 50,-142.5 50,-123.5 0,-123.5"/>
 <text text-anchor="middle" x="25" y="-130.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">SysctlT</text>
+</a>
+</g>
 </g>
 <!-- Node5&#45;&gt;Node4 -->
 <g id="edge4" class="edge">
@@ -91,7 +106,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="classsys_1_1ctl_1_1Sync.html" target="_top" xlink:title="sys::ctl::Sync\&lt; decikelvin_t \&gt;">
+<g id="a_node9"><a xlink:href="classsys_1_1ctl_1_1Sync.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="116,-104.5 116,-123.5 263,-123.5 263,-104.5 116,-104.5"/>
 <text text-anchor="middle" x="189.5" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::ctl::Sync&lt; decikelvin_t &gt;</text>
 </a>
@@ -114,8 +129,11 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
+<g id="a_node7"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="155.5,-56.5 155.5,-75.5 223.5,-75.5 223.5,-56.5 155.5,-56.5"/>
 <text text-anchor="middle" x="189.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">decikelvin_t</text>
+</a>
+</g>
 </g>
 <!-- Node7&#45;&gt;Node1 -->
 <g id="edge7" class="edge">
@@ -129,8 +147,11 @@
 <!-- Node8 -->
 <g id="node8" class="node">
 <title>Node8</title>
+<g id="a_node8"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="162.5,-.5 162.5,-19.5 216.5,-19.5 216.5,-.5 162.5,-.5"/>
 <text text-anchor="middle" x="189.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cptime_t</text>
+</a>
+</g>
 </g>
 <!-- Node8&#45;&gt;Node1 -->
 <g id="edge8" class="edge">

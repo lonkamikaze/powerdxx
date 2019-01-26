@@ -1,7 +1,9 @@
 <map id="utility.hpp" name="utility.hpp">
-<area shape="rect" id="node2" href="$errors_8hpp.html" title="Common error handling code. " alt="" coords="61,80,141,107"/>
-<area shape="rect" id="node3" href="$clas_8hpp.html" title="Implements functions to process command line arguments. " alt="" coords="139,155,209,181"/>
-<area shape="rect" id="node4" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings..." alt="" coords="5,229,95,256"/>
-<area shape="rect" id="node5" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd. " alt="" coords="121,229,227,256"/>
-<area shape="rect" id="node6" href="$loadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD. " alt="" coords="285,80,380,107"/>
+<area shape="rect" id="node1" title="Implements generally useful functions." alt="" coords="184,5,263,32"/>
+<area shape="rect" id="node2" href="$errors_8hpp.html" title="Common error handling code." alt="" coords="71,80,151,107"/>
+<area shape="rect" id="node3" href="$clas_8hpp.html" title="Implements functions to process command line arguments." alt="" coords="147,155,217,181"/>
+<area shape="rect" id="node4" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="173,229,263,256"/>
+<area shape="rect" id="node5" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="5,229,111,256"/>
+<area shape="rect" id="node6" href="$loadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD." alt="" coords="364,155,459,181"/>
+<area shape="rect" id="node7" href="$version_8hpp.html" title="Defines types and constants used for version management." alt="" coords="291,80,380,107"/>
 </map>

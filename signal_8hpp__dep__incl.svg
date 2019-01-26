@@ -12,13 +12,16 @@
 <!-- Node5 -->
 <g id="node1" class="node">
 <title>Node5</title>
+<g id="a_node1"><a xlink:title="Implements a c++ wrapper for the signal(3) call.">
 <polygon fill="#bfbfbf" stroke="#000000" points="0,-56.5 0,-75.5 80,-75.5 80,-56.5 0,-56.5"/>
 <text text-anchor="middle" x="40" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys/signal.hpp</text>
+</a>
+</g>
 </g>
 <!-- Node6 -->
 <g id="node2" class="node">
 <title>Node6</title>
-<g id="a_node2"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd. ">
+<g id="a_node2"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
 <polygon fill="#ffffff" stroke="#000000" points=".5,-.5 .5,-19.5 79.5,-19.5 79.5,-.5 .5,-.5"/>
 <text text-anchor="middle" x="40" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">powerd++.cpp</text>
 </a>

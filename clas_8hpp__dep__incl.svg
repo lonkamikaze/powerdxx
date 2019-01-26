@@ -12,13 +12,16 @@
 <!-- Node9 -->
 <g id="node1" class="node">
 <title>Node9</title>
+<g id="a_node1"><a xlink:title="Implements functions to process command line arguments.">
 <polygon fill="#bfbfbf" stroke="#000000" points="52,-56.5 52,-75.5 105,-75.5 105,-56.5 52,-56.5"/>
 <text text-anchor="middle" x="78.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">clas.hpp</text>
+</a>
+</g>
 </g>
 <!-- Node10 -->
 <g id="node2" class="node">
 <title>Node10</title>
-<g id="a_node2"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings...">
+<g id="a_node2"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings.">
 <polygon fill="#ffffff" stroke="#000000" points="0,-.5 0,-19.5 67,-19.5 67,-.5 0,-.5"/>
 <text text-anchor="middle" x="33.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">loadrec.cpp</text>
 </a>
@@ -33,7 +36,7 @@
 <!-- Node11 -->
 <g id="node3" class="node">
 <title>Node11</title>
-<g id="a_node3"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd. ">
+<g id="a_node3"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
 <polygon fill="#ffffff" stroke="#000000" points="85,-.5 85,-19.5 164,-19.5 164,-.5 85,-.5"/>
 <text text-anchor="middle" x="124.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">powerd++.cpp</text>
 </a>

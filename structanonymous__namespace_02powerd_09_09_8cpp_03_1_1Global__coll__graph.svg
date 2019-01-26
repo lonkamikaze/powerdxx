@@ -12,15 +12,21 @@
 <!-- Node11 -->
 <g id="node1" class="node">
 <title>Node11</title>
+<g id="a_node1"><a xlink:title="A collection of all the gloabl, mutable states.">
 <polygon fill="#bfbfbf" stroke="#000000" points="881,-173 881,-203 1003,-203 1003,-173 881,-173"/>
 <text text-anchor="start" x="889" y="-191" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="middle" x="942" y="-180" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{powerd++.cpp}::Global</text>
+</a>
+</g>
 </g>
 <!-- Node12 -->
 <g id="node2" class="node">
 <title>Node12</title>
+<g id="a_node2"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="702.5,-378.5 702.5,-397.5 732.5,-397.5 732.5,-378.5 702.5,-378.5"/>
 <text text-anchor="middle" x="717.5" y="-385.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">ms</text>
+</a>
+</g>
 </g>
 <!-- Node12&#45;&gt;Node11 -->
 <g id="edge1" class="edge">
@@ -32,7 +38,7 @@
 <!-- Node13 -->
 <g id="node3" class="node">
 <title>Node13</title>
-<g id="a_node3"><a xlink:href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Global_1_1ACSet" target="_top" xlink:title="Per AC line state settings. ">
+<g id="a_node3"><a xlink:href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Global_1_1ACSet" target="_top" xlink:title="Per AC line state settings.">
 <polygon fill="#ffffff" stroke="#000000" points="369,-280.5 369,-321.5 491,-321.5 491,-280.5 369,-280.5"/>
 <text text-anchor="start" x="377" y="-309.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="start" x="377" y="-298.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{powerd++.cpp}::Global</text>
@@ -59,8 +65,11 @@
 <!-- Node14 -->
 <g id="node4" class="node">
 <title>Node14</title>
+<g id="a_node4"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="3,-161.5 3,-180.5 47,-180.5 47,-161.5 3,-161.5"/>
 <text text-anchor="middle" x="25" y="-168.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">mhz_t</text>
+</a>
+</g>
 </g>
 <!-- Node14&#45;&gt;Node13 -->
 <g id="edge3" class="edge">
@@ -74,7 +83,7 @@
 <!-- Node21 -->
 <g id="node11" class="node">
 <title>Node21</title>
-<g id="a_node11"><a xlink:href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core" target="_top" xlink:title="Contains the management information for a single CPU core. ">
+<g id="a_node11"><a xlink:href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core" target="_top" xlink:title="Contains the management information for a single CPU core.">
 <polygon fill="#ffffff" stroke="#000000" points="369,-130 369,-160 491,-160 491,-130 369,-130"/>
 <text text-anchor="start" x="377" y="-148" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
 <text text-anchor="middle" x="430" y="-137" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">{powerd++.cpp}::Core</text>
@@ -95,8 +104,11 @@
 <!-- Node24 -->
 <g id="node14" class="node">
 <title>Node24</title>
+<g id="a_node14"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="125,-115.5 125,-134.5 254,-134.5 254,-115.5 125,-115.5"/>
 <text text-anchor="middle" x="189.5" y="-122.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">std::unique_ptr&lt; mhz_t[]&gt;</text>
+</a>
+</g>
 </g>
 <!-- Node14&#45;&gt;Node24 -->
 <g id="edge17" class="edge">
@@ -108,8 +120,11 @@
 <!-- Node15 -->
 <g id="node5" class="node">
 <title>Node15</title>
+<g id="a_node5"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="162.5,-306.5 162.5,-325.5 216.5,-325.5 216.5,-306.5 162.5,-306.5"/>
 <text text-anchor="middle" x="189.5" y="-313.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">cptime_t</text>
+</a>
+</g>
 </g>
 <!-- Node15&#45;&gt;Node13 -->
 <g id="edge4" class="edge">
@@ -121,9 +136,12 @@
 <!-- Node18 -->
 <g id="node8" class="node">
 <title>Node18</title>
+<g id="a_node8"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="509,-334 509,-364 628,-364 628,-334 509,-334"/>
 <text text-anchor="start" x="517" y="-352" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">std::unique_ptr&lt; cptime</text>
 <text text-anchor="middle" x="568.5" y="-341" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">_t[][CPUSTATES]&gt;</text>
+</a>
+</g>
 </g>
 <!-- Node15&#45;&gt;Node18 -->
 <g id="edge8" class="edge">
@@ -144,7 +162,7 @@
 <!-- Node16 -->
 <g id="node6" class="node">
 <title>Node16</title>
-<g id="a_node6"><a xlink:href="classsys_1_1ctl_1_1Once.html" target="_top" xlink:title="sys::ctl::Once\&lt; coreid\l_t, 2 \&gt;">
+<g id="a_node6"><a xlink:href="classsys_1_1ctl_1_1Once.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="512,-38 512,-68 625,-68 625,-38 512,-38"/>
 <text text-anchor="start" x="520" y="-56" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::ctl::Once&lt; coreid</text>
 <text text-anchor="middle" x="568.5" y="-45" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">_t, 2 &gt;</text>
@@ -161,8 +179,11 @@
 <!-- Node17 -->
 <g id="node7" class="node">
 <title>Node17</title>
+<g id="a_node7"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="164,-.5 164,-19.5 215,-19.5 215,-.5 164,-.5"/>
 <text text-anchor="middle" x="189.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">coreid_t</text>
+</a>
+</g>
 </g>
 <!-- Node17&#45;&gt;Node16 -->
 <g id="edge6" class="edge">
@@ -188,7 +209,7 @@
 <!-- Node19 -->
 <g id="node9" class="node">
 <title>Node19</title>
-<g id="a_node9"><a xlink:href="classsys_1_1ctl_1_1Sysctl.html" target="_top" xlink:title="Represents a sysctl MIB address. ">
+<g id="a_node9"><a xlink:href="classsys_1_1ctl_1_1Sysctl.html" target="_top" xlink:title="Represents a sysctl MIB address.">
 <polygon fill="#ffffff" stroke="#000000" points="646,-40.5 646,-59.5 789,-59.5 789,-40.5 646,-40.5"/>
 <text text-anchor="middle" x="717.5" y="-47.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::ctl::Sysctl&lt; MibDepth &gt;</text>
 </a>
@@ -205,10 +226,13 @@
 <!-- Node20 -->
 <g id="node10" class="node">
 <title>Node20</title>
+<g id="a_node10"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="647.5,-125.5 647.5,-166.5 787.5,-166.5 787.5,-125.5 647.5,-125.5"/>
 <text text-anchor="start" x="655.5" y="-154.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">std::unique_ptr&lt; anonymous</text>
 <text text-anchor="start" x="655.5" y="-143.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">_namespace{powerd++.cpp}</text>
 <text text-anchor="middle" x="717.5" y="-132.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">::Core[]&gt;</text>
+</a>
+</g>
 </g>
 <!-- Node20&#45;&gt;Node11 -->
 <g id="edge10" class="edge">
@@ -227,7 +251,7 @@
 <!-- Node22 -->
 <g id="node12" class="node">
 <title>Node22</title>
-<g id="a_node12"><a xlink:href="classsys_1_1ctl_1_1Sync.html" target="_top" xlink:title="sys::ctl::Sync\&lt; mhz_t \&gt;">
+<g id="a_node12"><a xlink:href="classsys_1_1ctl_1_1Sync.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="128.5,-77.5 128.5,-96.5 250.5,-96.5 250.5,-77.5 128.5,-77.5"/>
 <text text-anchor="middle" x="189.5" y="-84.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::ctl::Sync&lt; mhz_t &gt;</text>
 </a>
@@ -243,8 +267,11 @@
 <!-- Node23 -->
 <g id="node13" class="node">
 <title>Node23</title>
+<g id="a_node13"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="0,-58.5 0,-77.5 50,-77.5 50,-58.5 0,-58.5"/>
 <text text-anchor="middle" x="25" y="-65.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">SysctlT</text>
+</a>
+</g>
 </g>
 <!-- Node23&#45;&gt;Node22 -->
 <g id="edge15" class="edge">
@@ -256,7 +283,7 @@
 <!-- Node26 -->
 <g id="node16" class="node">
 <title>Node26</title>
-<g id="a_node16"><a xlink:href="classsys_1_1ctl_1_1Sync.html" target="_top" xlink:title="sys::ctl::Sync\&lt; decikelvin_t \&gt;">
+<g id="a_node16"><a xlink:href="classsys_1_1ctl_1_1Sync.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="116,-39.5 116,-58.5 263,-58.5 263,-39.5 116,-39.5"/>
 <text text-anchor="middle" x="189.5" y="-46.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">sys::ctl::Sync&lt; decikelvin_t &gt;</text>
 </a>
@@ -279,8 +306,11 @@
 <!-- Node25 -->
 <g id="node15" class="node">
 <title>Node25</title>
+<g id="a_node15"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="155.5,-244.5 155.5,-263.5 223.5,-263.5 223.5,-244.5 155.5,-244.5"/>
 <text text-anchor="middle" x="189.5" y="-251.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">decikelvin_t</text>
+</a>
+</g>
 </g>
 <!-- Node25&#45;&gt;Node21 -->
 <g id="edge18" class="edge">
