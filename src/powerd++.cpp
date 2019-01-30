@@ -83,6 +83,13 @@ enum class AcLineState : unsigned int {
 };
 
 /**
+ * Contains the management information for a group of cores with
+ * a common clock frequency.
+ */
+struct CoreGroup {
+};
+
+/**
  * Contains the management information for a single CPU core.
  */
 struct Core {
@@ -287,6 +294,13 @@ struct Global {
 	 * core.
 	 */
 	std::unique_ptr<Core[]> cores{new Core[this->ncpu]};
+
+	/**
+	 * This buffer is to be allocated with the number of core
+	 * groups. A core group is created by init() for each core
+	 * that has a dev.cpu.%d.freq handle.
+	 */
+	std::unique_ptr<CoreGroup[]> groups{nullptr};
 } g; /**< The gobal state. */
 
 static_assert(countof(g.acstates) == to_value(AcLineState::LENGTH),
@@ -331,6 +345,23 @@ void init() {
 	} catch (sys::sc_error<sys::ctl::error>) {
 		verbose("cannot read "_s + ACLINE);
 	}
+
+	/*
+	 * Count the number of controlling cores and set up the core
+	 * group buffer.
+	 */
+	coreid_t controllers = 0;
+	for (coreid_t core = 0; core < g.ncpu; ++core) {
+		/* get the frequency handler */
+		char name[40];
+		sprintf_safe(name, FREQ, core);
+		try {
+			sys::ctl::Sysctl<>{name};
+			++controllers;
+		} catch (sys::sc_error<sys::ctl::error> e) {
+		}
+	}
+	g.groups = std::unique_ptr<CoreGroup[]>{new CoreGroup[controllers]{}};
 
 	/*
 	 * Get the frequency controlling core for each core.
