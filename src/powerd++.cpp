@@ -94,7 +94,7 @@ struct CoreGroup {
  */
 struct Core {
 	/**
-	 * The sysctl kern.cpu.N.freq, if present.
+	 * The sysctl dev.cpu.%d.freq, if present.
 	 */
 	sys::ctl::SysctlSync<mhz_t> freq{{}};
 
@@ -104,7 +104,7 @@ struct Core {
 	cptime_t const * cp_time;
 
 	/**
-	 * The kern.cpu.N.freq value for the current load sample.
+	 * The dev.cpu.%d.freq value for the current load sample.
 	 *
 	 * This is updated by update_loads().
 	 */
@@ -180,8 +180,6 @@ struct Core {
 	 */
 	decikelvin_t group_maxtemp{0};
 };
-
-
 
 /**
  * A collection of all the gloabl, mutable states.
