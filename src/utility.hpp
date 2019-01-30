@@ -225,6 +225,100 @@ class Sum {
 	}
 };
 
+/**
+ * A simple value container that provides the minimum of assigned values.
+ *
+ * @tparam T
+ *	The value type
+ */
+template <typename T>
+class Min {
+	private:
+	/**
+	 * The minimum of the assigned values.
+	 */
+	T value;
+
+	public:
+	/**
+	 * Construct from an initial value.
+	 *
+	 * @param value
+	 *	The initial value
+	 */
+	constexpr Min(T const & value, int = 0) : value{value} {}
+
+	/**
+	 * Returns the current minimum.
+	 *
+	 * @return
+	 *	The minimum by const reference
+	 */
+	constexpr operator T const &() const {
+		return this->value;
+	}
+
+	/**
+	 * Assign a new value, if it is less than the current value.
+	 *
+	 * @param value
+	 *	The value to assign
+	 * @return
+	 *	A self reference
+	 */
+	constexpr Min & operator =(T const & value) {
+		this->value = this->value <= value ? this->value : value;
+		return *this;
+	}
+};
+
+/**
+ * A simple value container that provides the maximum of assigned values.
+ *
+ * @tparam T
+ *	The value type
+ */
+template <typename T>
+class Max {
+	private:
+	/**
+	 * The maximum of the assigned values.
+	 */
+	T value;
+
+	public:
+	/**
+	 * Construct from an initial value.
+	 *
+	 * @param value
+	 *	The initial value
+	 */
+	constexpr Max(T const & value, int = 0) : value{value} {}
+
+	/**
+	 * Returns the current maximum.
+	 *
+	 * @return
+	 *	The maximum by const reference
+	 */
+	constexpr operator T const &() const {
+		return this->value;
+	}
+
+	/**
+	 * Assign a new value, if it is greater than the current value.
+	 *
+	 * @param value
+	 *	The value to assign
+	 * @return
+	 *	A self reference
+	 */
+	constexpr Max & operator =(T const & value) {
+		this->value = this->value >= value ? this->value : value;
+		return *this;
+	}
+};
+
 } /* namespace utility */
 
 #endif /* _POWERDXX_UTILITY_HPP_ */
