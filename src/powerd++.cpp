@@ -682,10 +682,9 @@ void update_freq(Global::ACSet const & acstate) {
 			if (group.temp >= group.temp_crit) {
 				newfreq = group.min;
 			} else if (group.temp > group.temp_high) {
-				auto const freqrange = group.max - group.min;
 				auto const tempdiff  = group.temp_crit - group.temp;
 				auto const temprange = group.temp_crit - group.temp_high;
-				mhz_t const tempfreq = freqrange * tempdiff / temprange + group.min;
+				mhz_t const tempfreq = group.max * tempdiff / temprange;
 				newfreq = std::max<mhz_t>(tempfreq, group.min);
 			}
 		}
