@@ -56,6 +56,8 @@ using utility::countof;
 using utility::sprintf_safe;
 using utility::to_value;
 using namespace utility::literals;
+using utility::Min;
+using utility::Max;
 
 using constants::CP_TIMES;
 using constants::ACLINE;
@@ -87,21 +89,10 @@ enum class AcLineState : unsigned int {
  * a common clock frequency.
  */
 struct CoreGroup {
-};
-
-/**
- * Contains the management information for a single CPU core.
- */
-struct Core {
 	/**
 	 * The sysctl dev.cpu.%d.freq, if present.
 	 */
 	sys::ctl::SysctlSync<mhz_t> freq{{}};
-
-	/**
-	 * A pointer to the kern.cp_times section for this core.
-	 */
-	cptime_t const * cp_time;
 
 	/**
 	 * The dev.cpu.%d.freq value for the current load sample.
@@ -111,9 +102,55 @@ struct Core {
 	mhz_t sample_freq{0};
 
 	/**
+	 * The minimum group clock rate.
+	 *
+	 * The greatest of all core minima in the group.
+	 */
+	Max<mhz_t> min{FREQ_DEFAULT_MIN};
+
+	/**
+	 * The maximum group clock rate.
+	 *
+	 * The least of all core maxima in the group.
+	 */
+	Min<mhz_t> max{FREQ_DEFAULT_MAX};
+
+	/**
+	 * The maximum load sum of all controlled cores.
+	 *
+	 * This is updated by update_loads().
+	 */
+	Max<mhz_t> loadsum{0};
+
+	/**
+	 * Critical core temperature in dK.
+	 */
+	Min<decikelvin_t> temp_crit{std::numeric_limits<decikelvin_t>::max()};
+
+	/**
+	 * High core temperature in dK.
+	 */
+	Min<decikelvin_t> temp_high{std::numeric_limits<decikelvin_t>::max()};
+
+	/**
+	 * The maximum temperature measurement taken in the group.
+	 */
+	Max<decikelvin_t> temp{0};
+};
+
+/**
+ * Contains the management information for a single CPU core.
+ */
+struct Core {
+	/**
+	 * A pointer to the kern.cp_times section for this core.
+	 */
+	cptime_t const * cp_time;
+
+	/**
 	 * The core that controls the frequency for this core.
 	 */
-	coreid_t controller{-1};
+	CoreGroup * group{nullptr};
 
 	/**
 	 * The idle ticks count.
@@ -124,13 +161,6 @@ struct Core {
 	 * Count of all ticks.
 	 */
 	cptime_t all{0};
-
-	/**
-	 * For the controlling core this is set to the group loadsum.
-	 *
-	 * This is updated by update_loads().
-	 */
-	mhz_t group_loadsum{0};
 
 	/**
 	 * The sum of all load samples.
@@ -150,35 +180,9 @@ struct Core {
 	std::unique_ptr<mhz_t[]> loads;
 
 	/**
-	 * The minimum core clock rate.
-	 */
-	mhz_t min{FREQ_DEFAULT_MIN};
-
-	/**
-	 * The maximum core clock rate.
-	 */
-	mhz_t max{FREQ_DEFAULT_MAX};
-
-	/**
 	 * The dev.cpu.%d.temperature sysctl, if present.
 	 */
 	sys::ctl::SysctlSync<decikelvin_t> temp{{}};
-
-	/**
-	 * Critical core temperature in dK.
-	 */
-	decikelvin_t temp_crit{std::numeric_limits<int>::max()};
-
-	/**
-	 * High core temperature in dK.
-	 */
-	decikelvin_t temp_high{std::numeric_limits<int>::max()};
-
-	/**
-	 * For the controlling core this is set to the maximum temperature
-	 * measurement taken in the group.
-	 */
-	decikelvin_t group_maxtemp{0};
 };
 
 /**
@@ -270,6 +274,16 @@ struct Global {
 	bool temp_throttling{false};
 
 	/**
+	 * User set critical core temperature in dK.
+	 */
+	decikelvin_t temp_crit{0};
+
+	/**
+	 * User set high core temperature in dK.
+	 */
+	decikelvin_t temp_high{0};
+
+	/**
 	 * Name of an alternative pidfile.
 	 *
 	 * If not given pidfile_open() uses a default name.
@@ -292,6 +306,11 @@ struct Global {
 	 * core.
 	 */
 	std::unique_ptr<Core[]> cores{new Core[this->ncpu]};
+
+	/**
+	 * The number of frequency controlling core groups.
+	 */
+	coreid_t ngroups{0};
 
 	/**
 	 * This buffer is to be allocated with the number of core
@@ -348,34 +367,33 @@ void init() {
 	 * Count the number of controlling cores and set up the core
 	 * group buffer.
 	 */
-	coreid_t controllers = 0;
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
 		/* get the frequency handler */
 		char name[40];
 		sprintf_safe(name, FREQ, core);
 		try {
 			sys::ctl::Sysctl<>{name};
-			++controllers;
+			++g.ngroups;
 		} catch (sys::sc_error<sys::ctl::error> e) {
 		}
 	}
-	g.groups = std::unique_ptr<CoreGroup[]>{new CoreGroup[controllers]{}};
+	g.groups = std::unique_ptr<CoreGroup[]>{new CoreGroup[g.ngroups]{}};
 
 	/*
 	 * Get the frequency controlling core for each core.
 	 * Basically acts as if the kernel supported local frequency changes.
 	 */
-	coreid_t controller = -1;
+	coreid_t groupi = -1;
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
 		/* get the frequency handler */
 		char name[40];
 		sprintf_safe(name, FREQ, core);
 		try {
-			g.cores[core].freq = {{name}};
-			controller = core;
+			sys::ctl::Sysctl<> const ctl{name};
+			g.groups[++groupi].freq = {ctl};
 		} catch (sys::sc_error<sys::ctl::error> e) {
 			if (e == ENOENT) {
-				if (0 > controller) {
+				if (0 > groupi) {
 					fail(Exit::ENOFREQ, e, "cannot access "_s + name + ", at least the first CPU core must support frequency updates");
 				}
 			} else {
@@ -383,7 +401,7 @@ void init() {
 				sysctl_fail(e);
 			}
 		}
-		g.cores[core].controller = controller;
+		g.cores[core].group = &g.groups[groupi];
 
 		/* create loads buffer */
 		g.cores[core].loads = std::unique_ptr<mhz_t[]>{new mhz_t[g.samples]{}};
@@ -411,44 +429,40 @@ void init() {
 		/* user provided throttling values */
 
 		/* check temperature throttling boundaries */
-		if (g.cores[0].temp_high >= g.cores[0].temp_crit) {
+		if (g.temp_high >= g.temp_crit) {
 			fail(Exit::EOUTOFRANGE, 0,
 			     "temperature throttling 'high < critical' violation:\n"
 			     "\t[%d C, %d C]"_fmt
-			     (celsius(g.cores[0].temp_high),
-			      celsius(g.cores[0].temp_crit)));
+			     (celsius(g.temp_high), celsius(g.temp_crit)));
 		}
 
-		/* propagate limits to all cores */
-		for (coreid_t i = 1; i < g.ncpu; ++i) {
-			g.cores[i].temp_high = g.cores[0].temp_high;
-			g.cores[i].temp_crit = g.cores[0].temp_crit;
+		/* propagate limits to all core groups */
+		assert(g.groups);
+		for (coreid_t i = 0; i < g.ngroups; ++i) {
+			g.groups[i].temp_high = g.temp_high;
+			g.groups[i].temp_crit = g.temp_crit;
 		}
 	} else {
 		/* try to determine tjmax */
-		for (coreid_t i = 0; i < g.ncpu; ++i) {
-			auto & core = g.cores[i];
+		for (coreid_t core = 0; core < g.ncpu; ++core) {
+			assert(g.cores[core].group);
+			auto & group = *g.cores[core].group;
 			for (auto const source : TJMAX_SOURCES) {
 				char name[40];
-				sprintf_safe(name, source, i);
+				sprintf_safe(name, source, core);
 				try {
-					core.temp_crit =
-					    sys::ctl::make_Once
-					        (core.temp_crit,
+					group.temp_crit =
+					    sys::ctl::make_Once<decikelvin_t>
+					        (group.temp_crit,
 					         sys::ctl::Sysctl<>{name});
 					g.temp_throttling = true;
-					core.temp_high =
-					    core.temp_crit - HITEMP_OFFSET;
+					group.temp_high =
+					    group.temp_crit - HITEMP_OFFSET;
 					break;
 				} catch (sys::sc_error<sys::ctl::error>) {
 					/* do nada */
 				}
 			}
-			auto & controller = g.cores[core.controller];
-			controller.temp_high =
-			    std::min(controller.temp_high, core.temp_high);
-			controller.temp_crit =
-			    std::min(controller.temp_crit, core.temp_crit);
 		}
 	}
 	if (!g.temp_throttling) {
@@ -465,10 +479,12 @@ void init() {
 		}
 	}
 
-	/* set per core min/max frequency boundaries */
+	/* set per group min/max frequency boundaries */
+	CoreGroup * group = nullptr;
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		auto & core = g.cores[i];
-		if (core.controller != i) { continue; }
+		if (core.group == group) { continue; }
+		group = core.group;
 		char name[40];
 		sprintf_safe(name, FREQ_LEVELS, i);
 		try {
@@ -476,19 +492,21 @@ void init() {
 			auto levels = ctl.get<char>();
 			/* the maximum should at least be the minimum
 			 * and vice versa */
-			core.max = FREQ_DEFAULT_MIN;
-			core.min = FREQ_DEFAULT_MAX;
+			Max<mhz_t> max{FREQ_DEFAULT_MIN};
+			Min<mhz_t> min{FREQ_DEFAULT_MAX};
 			for (auto pch = levels.get(); *pch; ++pch) {
 				mhz_t freq = strtol(pch, &pch, 10);
 				if (pch[0] != '/') { break; }
-				core.max = std::max(core.max, freq);
-				core.min = std::min(core.min, freq);
+				max = freq;
+				min = freq;
 				strtol(++pch, &pch, 10);
 				/* no idea what that value means */
 				if (pch[0] != ' ') { break; }
 			}
-			assert(core.min < core.max &&
+			assert(min < max &&
 			       "minimum must be less than maximum");
+			group->min = min;
+			group->max = max;
 		} catch (sys::sc_error<sys::ctl::error>) {
 			if (g.temp_throttling) {
 				verbose("cannot access sysctl: "_s + name +
@@ -529,9 +547,9 @@ void init() {
  * each core.
  *
  * @tparam Load
- *	Determines whether `group_loadsum` is updated
+ *	Determines whether CoreGroup::loadsum is updated
  * @tparam Temperature
- *	Determines whether `group_maxtemp` is updated
+ *	Determines whether CoreGroup::temp is updated
  */
 template <bool Load = 1, bool Temperature = 0>
 void update_loads() {
@@ -552,21 +570,19 @@ void update_loads() {
 		 */
 	}
 
-	mhz_t freq;
-	Load && (freq = 0);
+	assert(g.groups);
+	for (coreid_t groupi = 0; groupi < g.ngroups; ++groupi) {
+		/* reset controlling core data */
+		auto & group = g.groups[groupi];
+		group.sample_freq = group.freq;
+		Load && (group.loadsum = {0, 0});
+		Temperature && (group.temp = {0, 0});
+	}
+
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto & core = g.cores[corei];
-		auto & controller = g.cores[core.controller];
-
-		/* reset controlling core data */
-		if (&core == &controller) {
-			if (Load) {
-				core.sample_freq = core.freq;
-				freq = core.sample_freq;
-				core.group_loadsum = 0;
-			}
-			Temperature && (core.group_maxtemp = 0);
-		}
+		assert(core.group);
+		auto & group = *core.group;
 
 		/* update load */
 		if (Load) {
@@ -588,6 +604,7 @@ void update_loads() {
 			/* update current sample */
 			if (all) {
 				/* measurement succeeded */
+				mhz_t const freq = group.sample_freq;
 				core.loads[g.sample] = freq - (freq * idle) / all;
 			} else {
 				/* no samples since last sampling,
@@ -599,14 +616,12 @@ void update_loads() {
 			core.loadsum += core.loads[g.sample];
 
 			/* update group load */
-			controller.group_loadsum = std::max(controller.group_loadsum,
-			                                    core.loadsum);
+			group.loadsum = core.loadsum;
 		}
 
 		/* update group temperature */
 		if (Temperature) try {
-			controller.group_maxtemp =
-			    std::max<decikelvin_t>(controller.group_maxtemp, core.temp);
+			group.temp = core.temp;
 		} catch (sys::sc_error<sys::ctl::error> e) {
 			verbose("access to core %d temperature failed"_fmt(corei));
 			if (g.temp_throttling) {
@@ -639,19 +654,18 @@ template <bool Foreground, bool Temperature, bool Fixed>
 void update_freq(Global::ACSet const & acstate) {
 	update_loads<(!Fixed || Foreground), Temperature>();
 
-	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-		auto & core = g.cores[corei];
-		if (core.controller != corei) { continue; }
+	assert(g.groups);
+	for (coreid_t groupi = 0; groupi < g.ngroups; ++groupi) {
+		auto & group = g.groups[groupi];
 
 		/* determine target frequency */
-		mhz_t wantfreq, newfreq;
-		auto const max = std::min(core.max, acstate.freq_max);
-		auto const min = std::max(core.min, acstate.freq_min);
+		auto const max = std::min<mhz_t>(group.max, acstate.freq_max);
+		auto const min = std::max<mhz_t>(group.min, acstate.freq_min);
+		mhz_t wantfreq{0};
 		if (!Fixed) {
 			/* adaptive frequency mode */
-			wantfreq = core.group_loadsum / g.samples *
+			wantfreq = group.loadsum / g.samples *
 			           1024 / acstate.target_load;
-			newfreq = std::min(std::max(wantfreq, min), max);
 		} else {
 			/* fixed frequency mode */
 			/*
@@ -659,37 +673,38 @@ void update_freq(Global::ACSet const & acstate) {
 			 * wantfreq in this mode, because users might
 			 * be disturbed by seeing a 1THz target.
 			 */
-			wantfreq = std::min(std::max(acstate.target_freq, min), max);
-			newfreq = wantfreq;
+			wantfreq = acstate.target_freq;
 		}
+		Min<mhz_t> newfreq{max};
+		newfreq = std::max(min, wantfreq);
 		/* apply temperature throttling */
 		if (Temperature) {
-			if (core.group_maxtemp >= core.temp_crit) {
-				newfreq = core.min;
-			} else if (core.group_maxtemp > core.temp_high) {
-				auto const freqrange = core.max - core.min;
-				auto const tempdiff  = core.temp_crit - core.group_maxtemp;
-				auto const temprange = core.temp_crit - core.temp_high;
-				mhz_t const tempfreq = freqrange * tempdiff / temprange + core.min;
-				newfreq = std::min(newfreq, tempfreq);
+			if (group.temp >= group.temp_crit) {
+				newfreq = group.min;
+			} else if (group.temp > group.temp_high) {
+				auto const freqrange = group.max - group.min;
+				auto const tempdiff  = group.temp_crit - group.temp;
+				auto const temprange = group.temp_crit - group.temp_high;
+				mhz_t const tempfreq = freqrange * tempdiff / temprange + group.min;
+				newfreq = std::max<mhz_t>(tempfreq, group.min);
 			}
 		}
 		/* update CPU frequency */
-		if (core.sample_freq != newfreq) {
-			core.freq = newfreq;
+		if (group.sample_freq != newfreq) {
+			group.freq = newfreq;
 		}
 		/* foreground output */
 		if (Foreground && Temperature) {
 			std::cout << "power: %7s, load: %4d MHz, %3d C, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
 			             (acstate.name,
-			              (core.group_loadsum / g.samples),
-			              celsius(core.group_maxtemp),
-			              corei, core.sample_freq, wantfreq);
+			              (group.loadsum / g.samples),
+			              celsius(group.temp),
+			              groupi, group.sample_freq, wantfreq);
 		} else if (Foreground) {
 			std::cout << "power: %7s, load: %4d MHz, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
 			             (acstate.name,
-			              (core.group_loadsum / g.samples),
-			              corei, core.sample_freq, wantfreq);
+			              (group.loadsum / g.samples),
+			              groupi, group.sample_freq, wantfreq);
 		}
 	}
 	if (Foreground) { std::cout << std::flush; }
@@ -750,11 +765,11 @@ void init_loads() {
 	mhz_t load = 0;
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
 		auto & core = g.cores[corei];
+		assert(core.group);
+		auto & group = *core.group;
 
 		/* recalculate target load for controlling cores */
-		if (core.controller == corei) {
-			load = core.freq * acstate.target_load / 1024;
-		}
+		load = group.sample_freq * acstate.target_load / 1024;
 
 		/* apply target load to the whole sample buffer */
 		for (size_t i = 0; i < g.samples; ++i) {
@@ -970,7 +985,7 @@ void read_args(int const argc, char const * const argv[]) {
 		break;
 	case OE::HITEMP_RANGE:
 		g.temp_throttling = true;
-		std::tie(g.cores[0].temp_high, g.cores[0].temp_crit) =
+		std::tie(g.temp_high, g.temp_crit) =
 		    range(getopt[1], temperature);
 		break;
 	case OE::IVAL_POLL:
@@ -1022,17 +1037,19 @@ void show_settings() {
 	std::cerr << "CPU Cores\n"
 	             "\tCPU cores:             %d\n"
 	             "Core Groups\n"_fmt(g.ncpu);
+	assert(g.groups && g.ngroups);
+	auto * group = &g.groups[0];
 	for (coreid_t b = 0, e = 1; e <= g.ncpu; ++e) {
-		if (e == g.ncpu || e == g.cores[e].controller) {
+		if (e == g.ncpu || group != g.cores[e].group) {
 			std::cerr << "\t%3d:                   [%d, %d]\n"_fmt(b, b, e - 1);
 			b = e;
+			group = g.cores[e].group;
 		}
 	}
-	std::cerr << "Core Frequency Limits\n";
-	for (coreid_t i = 0; i < g.ncpu; ++i) {
-		if (i != g.cores[i].controller) { continue; }
+	std::cerr << "Core Group Frequency Limits\n";
+	for (coreid_t i = 0; i < g.ngroups; ++i) {
 		std::cerr << "\t%3d:                   [%d MHz, %d MHz]\n"_fmt
-		             (i, g.cores[i].min, g.cores[i].max);
+		             (i, g.groups[i].min, g.groups[i].max);
 	}
 	std::cerr << "Load Targets\n";
 	for (auto const & acstate : g.acstates) {
@@ -1045,12 +1062,11 @@ void show_settings() {
 	std::cerr << "Temperature Throttling\n";
 	if (g.temp_throttling) {
 		std::cerr << "\tactive:                yes\n";
-		for (coreid_t i = 0; i < g.ncpu; ++i) {
-			auto const & core = g.cores[i];
-			if (i != core.controller) { continue; }
+		for (coreid_t i = 0; i < g.ngroups; ++i) {
+			auto const & group = g.groups[i];
 			std::cerr << "\t%3d:                   [%d C, %d C]\n"_fmt
-			             (i, celsius(core.temp_high),
-			              celsius(core.temp_crit));
+			             (i, celsius(group.temp_high),
+			              celsius(group.temp_crit));
 		}
 	} else {
 		std::cerr << "\tactive:                no\n";
@@ -1076,15 +1092,15 @@ class FreqGuard final {
 	/**
 	 * Read and write all core frequencies, may throw.
 	 */
-	FreqGuard() : freqs{new mhz_t[g.ncpu]} {
-		for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-			auto & core = g.cores[corei];
-			if (core.controller != corei) { continue; }
+	FreqGuard() : freqs{new mhz_t[g.ngroups]} {
+		assert(g.groups);
+		for (coreid_t groupi = 0; groupi < g.ngroups; ++groupi) {
+			auto & group = g.groups[groupi];
 			try {
 				/* remember clock frequency */
-				this->freqs[corei] = core.freq;
+				this->freqs[groupi] = group.freq;
 				/* attempt clock frequency write */
-				core.freq = this->freqs[corei];
+				group.freq = this->freqs[groupi];
 			} catch (sys::sc_error<sys::ctl::error> e) {
 				if (EPERM == e) {
 					fail(Exit::EFORBIDDEN, e,
@@ -1100,11 +1116,10 @@ class FreqGuard final {
 	 * Restore all core frequencies.
 	 */
 	~FreqGuard() {
-		for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-			auto & core = g.cores[corei];
-			if (core.controller != corei) { continue; }
+		for (coreid_t groupi = 0; groupi < g.ngroups; ++groupi) {
+			auto & group = g.groups[groupi];
 			try {
-				core.freq = this->freqs[corei];
+				group.freq = this->freqs[groupi];
 			} catch (sys::sc_error<sys::ctl::error>) {
 				/* do nada */
 			}
