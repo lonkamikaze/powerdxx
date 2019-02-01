@@ -291,7 +291,7 @@ void run() try {
 		for (coreid_t i = 0; i < cores; ++i) {
 			*g.out << ' ' << static_cast<mhz_t>(corefreqs[i]);
 		}
-		for (int i = 0; i < columns; ++i) {
+		for (size_t i = 0; i < columns; ++i) {
 			*g.out << ' '
 			       << cp_times[sample * columns + i] -
 			          cp_times[((sample + 1) % 2) * columns + i];
