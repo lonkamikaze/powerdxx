@@ -116,11 +116,28 @@ struct CoreGroup {
 	Min<mhz_t> max{FREQ_DEFAULT_MAX};
 
 	/**
+	 * The maximum load reported by all cores in the group.
+	 *
+	 * This is updated by update_loads().
+	 */
+	Max<mhz_t> load{0};
+
+	/**
+	 * A ring buffer of maximum load samples for this core group.
+	 *
+	 * Each maximum load sample is weighted with the core frequency at
+	 * which it was taken.
+	 *
+	 * This is updated by update_loads().
+	 */
+	std::unique_ptr<mhz_t[]> loads;
+
+	/**
 	 * The maximum load sum of all controlled cores.
 	 *
 	 * This is updated by update_loads().
 	 */
-	Max<mhz_t> loadsum{0};
+	mhz_t loadsum{0};
 
 	/**
 	 * Critical core temperature in dK.
@@ -161,23 +178,6 @@ struct Core {
 	 * Count of all ticks.
 	 */
 	cptime_t all{0};
-
-	/**
-	 * The sum of all load samples.
-	 *
-	 * This is updated by update_loads().
-	 */
-	mhz_t loadsum{0};
-
-	/**
-	 * A ring buffer of load samples for this core.
-	 *
-	 * Each load sample is weighted with the core frequency at
-	 * which it was taken.
-	 *
-	 * This is updated by update_loads().
-	 */
-	std::unique_ptr<mhz_t[]> loads;
 
 	/**
 	 * The dev.cpu.%d.temperature sysctl, if present.
@@ -385,12 +385,15 @@ void init() {
 	 */
 	coreid_t groupi = -1;
 	for (coreid_t core = 0; core < g.ncpu; ++core) {
-		/* get the frequency handler */
+		/* get the frequency handler and setup loads buffers */
 		char name[40];
 		sprintf_safe(name, FREQ, core);
 		try {
 			sys::ctl::Sysctl<> const ctl{name};
-			g.groups[++groupi].freq = {ctl};
+			auto & group = g.groups[++groupi];
+			group.freq = {ctl};
+			/* create loads buffer */
+			group.loads = std::unique_ptr<mhz_t[]>{new mhz_t[g.samples]{}};
 		} catch (sys::sc_error<sys::ctl::error> e) {
 			if (e == ENOENT) {
 				if (0 > groupi) {
@@ -402,9 +405,6 @@ void init() {
 			}
 		}
 		g.cores[core].group = &g.groups[groupi];
-
-		/* create loads buffer */
-		g.cores[core].loads = std::unique_ptr<mhz_t[]>{new mhz_t[g.samples]{}};
 	}
 
 	/* set user frequency boundaries */
@@ -575,7 +575,6 @@ void update_loads() {
 		/* reset controlling core data */
 		auto & group = g.groups[groupi];
 		group.sample_freq = group.freq;
-		Load && (group.loadsum = Max<mhz_t>{0});
 		Temperature && (group.temp = Max<decikelvin_t>{0});
 	}
 
@@ -599,24 +598,17 @@ void update_loads() {
 			cptime_t const idle = idle_new - core.idle;
 			core.idle = idle_new;
 
-			/* subtract oldest sample */
-			core.loadsum -= core.loads[g.sample];
 			/* update current sample */
+			mhz_t const freq = group.sample_freq;
 			if (all) {
 				/* measurement succeeded */
-				mhz_t const freq = group.sample_freq;
-				core.loads[g.sample] = freq - (freq * idle) / all;
+				group.load = freq - (freq * idle) / all;
 			} else {
-				/* no samples since last sampling,
-				 * reuse the previous load */
-				core.loads[g.sample] =
-				    core.loads[(g.sample + g.samples - 1) % g.samples];
+				/*
+				 * just hope another core in the group
+				 * reports something
+				 */
 			}
-			/* add current sample */
-			core.loadsum += core.loads[g.sample];
-
-			/* update group load */
-			group.loadsum = core.loadsum;
 		}
 
 		/* update group temperature */
@@ -630,6 +622,19 @@ void update_loads() {
 			}
 		}
 	}
+
+	for (coreid_t groupi = 0; Load && groupi < g.ngroups; ++groupi) {
+		auto & group = g.groups[groupi];
+		/* subtract oldest sample */
+		group.loadsum -= group.loads[g.sample];
+		/* update current sample */
+		group.loads[g.sample] = group.load;
+		/* add current sample */
+		group.loadsum += group.loads[g.sample];
+		/* reset current group load for next cycle */
+		group.load = Max<mhz_t>{0};
+	}
+
 	Load && (g.sample = (g.sample + 1) % g.samples);
 }
 
@@ -762,19 +767,18 @@ void init_loads() {
 
 	/* fill the load buffer for each core */
 	mhz_t load = 0;
-	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {
-		auto & core = g.cores[corei];
-		assert(core.group);
-		auto & group = *core.group;
+	assert(g.groups);
+	for (coreid_t groupi = 0; groupi < g.ngroups; ++groupi) {
+		auto & group = g.groups[groupi];
 
-		/* recalculate target load for controlling cores */
+		/* recalculate target load for controlling groups */
 		load = group.sample_freq * acstate.target_load / 1024;
 
 		/* apply target load to the whole sample buffer */
 		for (size_t i = 0; i < g.samples; ++i) {
-			core.loadsum -= core.loads[i];
-			core.loadsum += load;
-			core.loads[i] = load;
+			group.loadsum -= group.loads[i];
+			group.loadsum += load;
+			group.loads[i] = load;
 		}
 	}
 }
