@@ -575,8 +575,8 @@ void update_loads() {
 		/* reset controlling core data */
 		auto & group = g.groups[groupi];
 		group.sample_freq = group.freq;
-		Load && (group.loadsum = {0, 0});
-		Temperature && (group.temp = {0, 0});
+		Load && (group.loadsum = Max<mhz_t>{0});
+		Temperature && (group.temp = Max<decikelvin_t>{0});
 	}
 
 	for (coreid_t corei = 0; corei < g.ncpu; ++corei) {

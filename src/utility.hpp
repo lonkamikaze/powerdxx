@@ -246,7 +246,7 @@ class Min {
 	 * @param value
 	 *	The initial value
 	 */
-	constexpr Min(T const & value, int = 0) : value{value} {}
+	explicit constexpr Min(T const & value) : value{value} {}
 
 	/**
 	 * Returns the current minimum.
@@ -293,7 +293,7 @@ class Max {
 	 * @param value
 	 *	The initial value
 	 */
-	constexpr Max(T const & value, int = 0) : value{value} {}
+	explicit constexpr Max(T const & value) : value{value} {}
 
 	/**
 	 * Returns the current maximum.
