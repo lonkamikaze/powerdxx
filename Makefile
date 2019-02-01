@@ -1,4 +1,5 @@
-FLAGS=     -std=c++14 -Wall -Werror -pedantic
+FLAGS=     -std=${STD} -Wall -Werror -pedantic
+STD=       c++14
 DBGFLAGS=  -O0 -g -DEBUG
 PFLAGS=    -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error
 GXX5=      g++5
@@ -12,7 +13,7 @@ SOS=       src/loadplay.cpp
 SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
 TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/:C/^/lib/}
 TMP!=      cd ${.CURDIR} && \
-           env MKDEP_CPP_OPTS="-MM -std=c++14" mkdep ${SRCS}
+           env MKDEP_CPP_OPTS="-MM -std=${STD}" mkdep ${SRCS}
 RELEASE!=  git tag -l --sort=-taggerdate 2>&- | head -n1 || :
 
 # Build
