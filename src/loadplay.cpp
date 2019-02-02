@@ -1157,7 +1157,7 @@ class Emulator {
 			try {
 				auto levels = sysctls[name]
 				              .get<std::string>();
-				levels = std::regex_replace(levels, "/[0-9]*"_r, "");
+				levels = std::regex_replace(levels, "/[-+]?[0-9]*"_r, "");
 				std::istringstream levelstream{levels};
 				freqLevels.clear();
 
