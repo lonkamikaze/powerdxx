@@ -103,6 +103,21 @@ inline std::regex operator "" _r(char const * const str, size_t const len) {
 }
 
 /**
+ * Calls fprintf(stderr, ...) if built with -DEBUG.
+ *
+ * @tparam ArgTs
+ *	The argument types to forward
+ * @param args
+ *	Arguments are forwarded to fprintf()
+ */
+template <typename ... ArgTs>
+constexpr void dprintf(ArgTs && ... args) {
+#ifdef EBUG
+	fprintf(stderr, std::forward<ArgTs>(args) ...);
+#endif
+}
+
+/**
  * Represents MIB, but wraps it to provide the necessary operators
  * to use it as an std::map key.
  */
@@ -1488,12 +1503,10 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 	    (namelen >= 1 && name[0] == CTL_VM)) {
 		return orig(name, namelen, oldp, oldlenp, newp, newlen);
 	}
-	#ifdef EBUG
 	/* must not print the special/fallback cases, because writing
 	 * to a stream in one of them causes a SEGFAULT (even when
 	 * using sprintf() and fwrite() with a stack buffer) */
-	fprintf(stderr, "sysctl(%d, %d)\n", name[0], name[1]);
-	#endif /* EBUG */
+	dprintf("sysctl(%d, %d)\n", name[0], name[1]);
 
 	mib_t mib{name, namelen};
 
@@ -1537,12 +1550,10 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
 	if (sysctl_fallback) {
 		return orig(name, mibp, sizep);
 	}
-	#ifdef EBUG
 	/* must not print the special/fallback cases, because writing
 	 * to a stream in one of them causes a SEGFAULT (even when
 	 * using sprintf() and fwrite() with a stack buffer) */
-	fprintf(stderr, "sysctlnametomib(%s)\n", name);
-	#endif /* EBUG */
+	dprintf("sysctlnametomib(%s)\n", name);
 	auto const & mib = sysctls.getMib(name);
 	for (size_t i = 0; i < *sizep && i < CTL_MAXNAME; ++i) {
 		mibp[i] = mib[i];
@@ -1578,12 +1589,10 @@ int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
 		Hold<bool> hold{sysctl_fallback, true};
 		return orig(name, oldp, oldlenp, newp, newlen);
 	}
-	#ifdef EBUG
 	/* must not print the special/fallback cases, because writing
 	 * to a stream in one of them causes a SEGFAULT (even when
 	 * using sprintf() and fwrite() with a stack buffer) */
-	fprintf(stderr, "sysctlbyname(%s)\n", name);
-	#endif /* EBUG */
+	dprintf("sysctlbyname(%s)\n", name);
 	/* use original function for regular operation, just without
 	 * holding the sysctl_fallback flag */
 	return orig(name, oldp, oldlenp, newp, newlen);
