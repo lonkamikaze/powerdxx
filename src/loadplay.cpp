@@ -664,6 +664,18 @@ std::string SysctlValue::get<std::string>() const {
 }
 
 /**
+ * Print a debugging message if built with -DEBUG.
+ *
+ * @param msg
+ *	The warning message
+ */
+inline void debug(std::string const & msg) {
+#ifdef EBUG
+	std::cerr << "libloadplay: DEBUG: " << msg << std::endl;
+#endif
+}
+
+/**
  * Print a warning.
  *
  * @param msg
@@ -1148,10 +1160,14 @@ class Emulator {
 				levels = std::regex_replace(levels, "/[0-9]*"_r, "");
 				std::istringstream levelstream{levels};
 				freqLevels.clear();
+
+				auto msg = "emulate core %d clock frequencies:"_fmt(i);
 				for (unsigned long level; levelstream.good();) {
 					levelstream >> level;
 					freqLevels.push_back(level);
+					msg += " %d"_fmt(level);
 				}
+				debug(msg);
 			} catch (std::out_of_range &) {
 				if (i == 0) {
 					/* warning handled in Main::main() */
@@ -1327,6 +1343,8 @@ class Main {
 		while (std::getline(std::cin, input) &&
 		       std::regex_match(input, match, expr)) {
 			sysctls.addValue(match[1].str(), match[2].str());
+			debug("sysctl %s = %s"_fmt
+			      (match[1].str().c_str(), match[2].str().c_str()));
 		}
 
 		/* check supported feature flags */
@@ -1395,6 +1413,7 @@ class Main {
 		/* initialise kern.cp_times */
 		try {
 			sysctls.addValue(std::string{CP_TIMES}, input);
+			debug("sysctl %s = %s"_fmt(CP_TIMES, input.c_str()));
 		} catch (std::out_of_range &) {
 			fail("kern.cp_times cannot be set, please check your load record");
 			return;
