@@ -27,7 +27,7 @@ USAGE
 		shift 2
 	;;
 	-o*)
-		exec <"${1#-o}"
+		exec >"${1#-o}"
 		shift
 	;;
 	- | -? | --*)
