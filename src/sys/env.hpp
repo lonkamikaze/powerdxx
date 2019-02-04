@@ -7,7 +7,7 @@
 
 #include "error.hpp"    /* sys::sc_error */
 
-#include <stdlib.h>     /* getenv(), setenv() etc. */
+#include <cstdlib>      /* getenv(), setenv() etc. */
 
 namespace sys {
 

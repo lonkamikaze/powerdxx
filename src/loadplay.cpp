@@ -4,14 +4,23 @@
  *
  * This library reads instructions from std::cin and outputs statistics
  * about the hijacked process on std::cout.
+ *
+ * The following environment variables affect the operation of loadplay:
+ *
+ * | Variable     | Description             |
+ * |--------------|-------------------------|
+ * | LOADPLAY_IN  | Alternative input file  |
+ * | LOADPLAY_OUT | Alternative output file |
  */
 
 #include "utility.hpp"
 #include "constants.hpp"
 #include "fixme.hpp"
 #include "version.hpp"
+#include "sys/env.hpp"
 
 #include <iostream>  /* std::cin, std::cout, std::cerr */
+#include <fstream>   /* std::ifstream, std::ofstream */
 #include <iomanip>   /* std::fixed, std::setprecision */
 #include <unordered_map>
 #include <map>
@@ -1037,6 +1046,16 @@ class Report {
 class Emulator {
 	private:
 	/**
+	 * The input data source.
+	 */
+	std::istream & cin;
+
+	/**
+	 * The output data sink.
+	 */
+	std::ostream & cout;
+
+	/**
 	 * A reference to a bool that tells the emulator to die.
 	 */
 	bool const & die;
@@ -1122,11 +1141,14 @@ class Emulator {
 	 *
 	 * @throws std::out_of_range
 	 *	In case one of the required sysctls is missing
+	 * @param cin,cout
+	 *	The character input and output streams
 	 * @param die
 	 *	If the referenced bool is true, emulation is terminated
 	 *	prematurely
 	 */
-	Emulator(bool const & die) : die{die} {
+	Emulator(std::istream & cin, std::ostream & cout, bool const & die) :
+	    cin{cin}, cout{cout}, die{die} {
 		/* get freq and freq_levels sysctls */
 		std::vector<mhz_t> freqLevels{};
 		for (coreid_t i = 0; i < this->ncpu; ++i) {
@@ -1195,9 +1217,9 @@ class Emulator {
 	}
 
 	/**
-	 * Performs load emulation and prints statistics std::cout.
+	 * Performs load emulation and prints statistics on cout.
 	 *
-	 * Reads std::cin to pull in load changes and updates the
+	 * Reads cin to pull in load changes and updates the
 	 * kern.cp_times sysctl to represent the current state.
 	 *
 	 * When it runs out of load changes it terminates emulation
@@ -1205,11 +1227,11 @@ class Emulator {
 	 */
 	void operator ()() try {
 		auto const features = sysctls[LOADREC_FEATURES].get<flag_t>();
-		Report report(std::cout, this->ncpu);
+		Report report(this->cout, this->ncpu);
 
 		auto time = std::chrono::steady_clock::now();
 		for (uint64_t duration;
-		     !this->die && (std::cin >> duration).good();) {
+		     !this->die && (this->cin >> duration).good();) {
 			/* setup new output frame */
 			auto frame = report.frame(duration);
 
@@ -1223,7 +1245,7 @@ class Emulator {
 
 				/* update recorded clock frequency */
 				if (features & 1_FREQ_TRACKING) {
-					std::cin >> core.recFreq;
+					this->cin >> core.recFreq;
 				}
 			}
 
@@ -1240,7 +1262,7 @@ class Emulator {
 				double recBusyTicks = 0;
 				for (size_t state = 0; state < CPUSTATES; ++state) {
 					cptime_t ticks;
-					std::cin >> ticks;
+					this->cin >> ticks;
 					recTicks += ticks;
 					recBusyTicks += state == CP_IDLE ? 0 : ticks;
 				}
@@ -1322,6 +1344,16 @@ class Main {
 	std::thread bgthread;
 
 	/**
+	 * The optional input file.
+	 */
+	std::ifstream in{sys::env::vars["LOADPLAY_IN"]};
+
+	/**
+	 * The optional output file.
+	 */
+	std::ofstream out{sys::env::vars["LOADPLAY_OUT"]};
+
+	/**
 	 * Used to request premature death from the emulation thread.
 	 */
 	bool die{false};
@@ -1330,17 +1362,26 @@ class Main {
 	/**
 	 * The constructor starts up the emulation.
 	 *
-	 * - Read the headers from std::cin and populate sysctls
+	 * - Read the headers from input and populate sysctls
 	 * - Ensure the existence of all required sysctls
 	 * - Spawn an Emulator instance in its own thread
 	 */
 	Main() {
+		/* check input character stream */
+		auto const & env = sys::env::vars;
+		if (env["LOADPLAY_IN"] && !this->in) {
+			fail("failed to open input file "_s +
+			     env["LOADPLAY_IN"].str());
+			return;
+		}
+		std::istream & cin{this->in ? this->in : std::cin};
+
 		std::string input;
 		std::smatch match;
 
 		/* get static sysctls */
 		auto const expr = "([^=]*)=(.*)"_r;
-		while (std::getline(std::cin, input) &&
+		while (std::getline(cin, input) &&
 		       std::regex_match(input, match, expr)) {
 			sysctls.addValue(match[1].str(), match[2].str());
 			debug("sysctl %s = %s"_fmt
@@ -1419,9 +1460,18 @@ class Main {
 			return;
 		}
 
+		/* check output character stream */
+		if (env["LOADPLAY_OUT"] && !this->out) {
+			fail("failed to open output file "_s +
+			     env["LOADPLAY_OUT"].str());
+			return;
+		}
+		std::ostream & cout{this->out ? this->out : std::cout};
+
 		/* start background thread */
 		try {
-			this->bgthread = std::thread{Emulator{this->die}};
+			this->bgthread =
+			    std::thread{Emulator{cin, cout, this->die}};
 		} catch (std::out_of_range &) {
 			fail("failed to start emulator thread");
 			return;
