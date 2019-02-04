@@ -15,19 +15,19 @@ USAGE
 		return 0
 	;;
 	-i | --input)
-		exec <"$2"
+		export LOADPLAY_IN="$2"
 		shift 2
 	;;
 	-i*)
-		exec <"${1#-i}"
+		export LOADPLAY_IN="${1#-i}"
 		shift
 	;;
 	-o | --output)
-		exec >"$2"
+		export LOADPLAY_OUT="$2"
 		shift 2
 	;;
 	-o*)
-		exec >"${1#-o}"
+		export LOADPLAY_OUT="${1#-o}"
 		shift
 	;;
 	- | -? | --*)
