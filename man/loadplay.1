@@ -1,4 +1,4 @@
-.Dd 13 January, 2019
+.Dd 4 February, 2019
 .Dt loadplay 1
 .Os
 .Sh NAME
@@ -47,19 +47,6 @@ command is a shell script that injects
 into
 .Ar command .
 This library simulates the load from the input and outputs load statistics.
-If
-.Ar command
-generates output on
-.Pa stdout ,
-it will be mixed into the load statistics. So
-.Xr powerd 8
-should be run without the
-.Fl v
-flag and
-.Xr powerd++ 8
-without the
-.Fl f
-flag.
 .Ss OUTPUT
 The first line of output contains column headings, columns are separated
 by a single space.
@@ -145,9 +132,28 @@ which in turn affects the next frame.
 After reading the last line of input the simulation thread sends a
 .Nm SIGINT
 to the process to cause it to terminate.
+.Sh ENVIRONMENT
+.Bl -tag -width indent
+.It Ev LOADPLAY_IN
+If set the file named is used for input instead of
+.Pa stdin .
+This only affects the input of
+.Nm ,
+the host process is not affected.
+.It Ev LOADPLAY_OUT
+If set the file named is used for output instead of
+.Pa stdout .
+This only affects the output of
+.Nm ,
+the host process is not affected.
+.It Ev LD_PRELOAD
+Used to inject
+.Pa libloadplay.so
+into the host process.
+.El
 .Sh FILES
 .Bl -tag -width indent
-.Pa %%PREFIX%%/lib/libloadplay.so
+.It Pa %%PREFIX%%/lib/libloadplay.so
 A library injected into
 .Ar command
 via the
