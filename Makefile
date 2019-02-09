@@ -2,8 +2,6 @@ FLAGS=     -std=${STD} -Wall -Werror -pedantic
 STD=       c++14
 DBGFLAGS=  -O0 -g -DEBUG
 PFLAGS=    -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error
-GXX=       g++
-GXXFLAGS=
 
 PREFIX?=   /usr/local
 DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
@@ -46,15 +44,11 @@ libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
 CXXFLAGS=  ${DBGFLAGS}
 .endif
 CXXFLAGS+= ${FLAGS}
-.ifmake(g++)
-CXX=       ${GXX}
-CXXFLAGS+= ${GXXFLAGS}
-.endif
 .ifmake(paranoid)
 CXXFLAGS+= ${PFLAGS}
 .endif
 
-debug g++ paranoid: all
+debug paranoid: all
 
 # Install
 install: ${TARGETS}
