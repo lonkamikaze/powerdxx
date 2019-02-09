@@ -1,4 +1,4 @@
-.Dd 4 February, 2019
+.Dd 9 February, 2019
 .Dt loadplay 1
 .Os
 .Sh NAME
@@ -73,7 +73,7 @@ There is one sample for each recorded line. The duration of each frame
 depends on the recording, which defaults to 25\ ms. 
 At this sample rate loads are dominated by noise, so a gliding average
 should be applied to any load columns for further use, such as plotting.
-.Sh IMPLEMENTATION
+.Sh IMPLEMENTATION NOTES
 The injected
 .Pa libloadplay.so
 works by intercepting system function calls and substituting the host
@@ -160,8 +160,51 @@ via the
 .Ev LD_PRELOAD
 environment variable.
 .El
+.Sh EXAMPLES
+Play a load recording with
+.Nm :
+.Bd -literal -offset 4m
+> loadplay -i loads/freq_tracking.load powerd++
+time[s] cpu.0.rec.freq[MHz] cpu.0.rec.load[MHz] cpu.0.run.freq[MHz] cpu.0.run.load[MHz] cpu.1.rec.freq[MHz] cpu.1.rec.load[MHz] cpu.1.run.freq[MHz] cpu.1.run.load[MHz] cpu.2.rec.freq[MHz] cpu.2.rec.load[MHz] cpu.2.run.freq[MHz] cpu.2.run.load[MHz] cpu.3.rec.freq[MHz] cpu.3.rec.load[MHz] cpu.3.run.freq[MHz] cpu.3.run.load[MHz]
+0.025 1700 1700.0 1700 1700.0 1700 0.0 1700 0.0 1700 1700.0 1700 1700.0 1700 850.0 1700 850.0
+0.050 1700 1700.0 1700 1700.0 1700 1700.0 1700 1700.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+0.075 1700 566.7 1700 566.6 1700 1700.0 1700 1700.0 1700 0.0 1700 0.0 1700 566.7 1700 566.6
+0.100 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+0.125 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+0.150 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+0.175 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+0.200 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+0.225 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+0.250 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+0.275 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+.Ed
+.Pp
+Capture load and
+.Nm
+output simultaneously into two different files:
+.Bd -literal -offset 4m
+> loadplay -i loads/freq_tracking.load -o load.csv powerd++ -f > load.out
+.Ed
+.Pp
+Capture and display
+.Nm
+output:
+.Bd -literal -offset 4m
+> loadplay -i loads/freq_tracking.load -o load.csv powerd++ -f | tee load.out
+power:  online, load:  527 MHz, cpu0.freq: 1700 MHz, wanted: 1405 MHz
+power:  online, load:  459 MHz, cpu0.freq: 1400 MHz, wanted: 1224 MHz
+power:  online, load:  502 MHz, cpu0.freq: 1200 MHz, wanted: 1338 MHz
+power:  online, load:  548 MHz, cpu0.freq: 1300 MHz, wanted: 1461 MHz
+power:  online, load:  704 MHz, cpu0.freq: 1500 MHz, wanted: 1877 MHz
+power:  online, load:  750 MHz, cpu0.freq: 1900 MHz, wanted: 2000 MHz
+power:  online, load:  805 MHz, cpu0.freq: 2000 MHz, wanted: 2146 MHz
+power:  online, load:  772 MHz, cpu0.freq: 2200 MHz, wanted: 2058 MHz
+power:  online, load:  574 MHz, cpu0.freq: 2000 MHz, wanted: 1530 MHz
+power:  online, load:  515 MHz, cpu0.freq: 1500 MHz, wanted: 1373 MHz
+.Ed
 .Sh SEE ALSO
-.Xr loadrec 1 , Xr powerd 8 , Xr powerd++ 8 , Xr rtld 1 , Xr signal 3
+.Xr loadrec 1 , Xr powerd 8 , Xr powerd++ 8 , Xr rtld 1 , Xr signal 3 ,
+.Xr tee 1
 .Sh AUTHORS
 Implementation and manual by
 .An Dominic Fandrey Aq kami@freebsd.org
