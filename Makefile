@@ -59,8 +59,8 @@ debug g++ paranoid: all
 # Install
 install: ${TARGETS}
 
-install deinstall: ${.TARGET}.sh pkg.tbl
-	@${.CURDIR}/${.TARGET}.sh < ${.CURDIR}/pkg.tbl \
+install deinstall: pkg/${.TARGET:C,.*/,,}.sh pkg/files
+	@${.CURDIR}/pkg/${.TARGET:C,.*/,,}.sh < ${.CURDIR}/pkg/files \
 		DESTDIR="${DESTDIR}" PREFIX="${PREFIX}" DOCSDIR="${DOCSDIR}" \
 		CURDIR="${.CURDIR}" OBJDIR="${.OBJDIR}"
 
