@@ -206,7 +206,7 @@ types::decikelvin_t clas::temperature(char const * const str) {
 	}
 	if (value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
-		             "temperature must be above absolute zero (-273.15°C): "_s + str);
+		             "temperature must be above absolute zero (-273.15 C): "_s + str);
 	}
 	return types::decikelvin_t(value * 10);
 }
