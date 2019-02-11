@@ -21,7 +21,7 @@
  * documented in nih::enum_has_members<>. Their presence is validated
  * at compile time.
  *
- * The enum values are returned whe selecting the next option, in order
+ * The enum values are returned when selecting the next option, in order
  * to do that a usage string and a list of definitions are needed:
  *
  * ~~~~{.cpp}
@@ -29,7 +29,7 @@
  *
  * static nih::Option<MyOptions> const OPTIONS[]{
  * 	{MyOptions::USAGE,        'h', "help",    "",     "Show this help"},
- * 	{MyOptions::USAGE,        0,   "usage",   "",     ""},
+ * 	{MyOptions::USAGE,         0,  "usage",   "",     ""},
  * 	{MyOptions::FILE_IN,      'i', "in",      "file", "Input file"},
  * 	{MyOptions::FILE_OUT,     'o', "out",     "file", "Output file"},
  * 	{MyOptions::FLAG_VERBOSE, 'v', "verbose", "",     "Verbose output"}
