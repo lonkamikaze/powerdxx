@@ -1067,8 +1067,8 @@ void show_settings() {
 		std::cerr << "\t%-22s"_fmt
 		             ((""_s + acstate.name + " power target:").c_str())
 		          << (acstate.target_load
-		              ? "%2d%% load\n"_fmt((acstate.target_load * 100 + 512) / 1024)
-		              : "%4d MHz\n"_fmt(acstate.target_freq));
+		              ? " %2d %% load\n"_fmt((acstate.target_load * 100 + 512) / 1024)
+		              : " %4d MHz\n"_fmt(acstate.target_freq));
 	}
 	std::cerr << "Temperature Throttling\n";
 	if (g.temp_throttling) {
