@@ -64,6 +64,11 @@ types::cptime_t clas::load(char const * const str) {
 	std::string load{str};
 	for (char & ch : load) { ch = std::tolower(ch); }
 
+	if (load == "") {
+		errors::fail(errors::Exit::ELOAD, 0,
+		             "load target value missing");
+	}
+
 	auto value = strtod(str, nullptr);
 	switch (unit(load)) {
 	case Unit::SCALAR:
@@ -91,6 +96,11 @@ types::cptime_t clas::load(char const * const str) {
 types::mhz_t clas::freq(char const * const str) {
 	std::string freqstr{str};
 	for (char & ch : freqstr) { ch = std::tolower(ch); }
+
+	if (freqstr == "") {
+		errors::fail(errors::Exit::EFREQ, 0,
+		             "frequency value missing");
+	}
 
 	auto value = strtod(str, nullptr);
 	switch (unit(freqstr)) {
@@ -124,6 +134,10 @@ types::ms clas::ival(char const * const str) {
 	std::string interval{str};
 	for (char & ch : interval) { ch = std::tolower(ch); }
 
+	if (interval == "") {
+		errors::fail(errors::Exit::EIVAL, 0, "interval value missing");
+	}
+
 	auto value = strtod(str, nullptr);
 	if (value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
@@ -143,6 +157,11 @@ types::ms clas::ival(char const * const str) {
 }
 
 size_t clas::samples(char const * const str) {
+	if (std::string{str} == str) {
+		errors::fail(errors::Exit::ESAMPLES, 0,
+		             "sample count value missing");
+	}
+
 	if (unit(str) != Unit::SCALAR) {
 		errors::fail(errors::Exit::ESAMPLES, 0,
 		             "sample count must be a scalar integer: "_s + str);
@@ -163,6 +182,11 @@ size_t clas::samples(char const * const str) {
 types::decikelvin_t clas::temperature(char const * const str) {
 	std::string tempstr{str};
 	for (char & ch : tempstr) { ch = std::toupper(ch); }
+
+	if (tempstr == "") {
+		errors::fail(errors::Exit::ETEMPERATURE, 0,
+		             "temperature value missing");
+	}
 
 	auto value = strtod(str, nullptr);
 	switch (unit(tempstr)) {

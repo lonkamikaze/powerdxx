@@ -138,6 +138,13 @@ template <typename T>
 std::pair<T, T> range(char const * const str, T (* func)(char const * const)) {
 	std::pair<T, T> result;
 	std::string first{str};
+
+	if (first == "") {
+		/* give func() an opportunity to fail */
+		func(str);
+		errors::fail(errors::Exit::ERANGEFMT, 0, "range missing");
+	}
+
 	auto const sep = first.find(':');
 	if (sep == std::string::npos) {
 		errors::fail(errors::Exit::ERANGEFMT, 0,
