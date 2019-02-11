@@ -933,7 +933,7 @@ void read_args(int const argc, char const * const argv[]) {
 	auto & ac_batt = g.acstates[to_value(AcLineState::BATTERY)];
 	auto & ac_unknown = g.acstates[to_value(AcLineState::UNKNOWN)];
 
-	while (true) switch (getopt()) {
+	while (true) try { switch (getopt()) {
 	case OE::USAGE:
 		std::cerr << getopt.usage();
 		throw Exception{Exit::OK, 0, ""};
@@ -1004,9 +1004,21 @@ void read_args(int const argc, char const * const argv[]) {
 	case OE::OPT_DASH:
 	case OE::OPT_LDASH:
 		fail(Exit::ECLARG, 0, "unexpected command line argument: "_s +
-		                      getopt[0] + "\n\n" + getopt.usage());
+		                      getopt[0] + "\n\n" +
+		                      getopt.show(0) + '\n' +
+		                      getopt.usage());
 	case OE::OPT_DONE:
 		return;
+	} /* switch */ } catch (Exception & e) {
+		switch (e.exitcode) {
+		case Exit::ECLARG:
+		case Exit::OK:
+			break;
+		default:
+			e.msg += "\n\n";
+			e.msg += getopt.show(1);
+		}
+		throw;
 	}
 }
 
