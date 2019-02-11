@@ -550,6 +550,53 @@ class Options {
 		}
 		return result.str();
 	}
+
+	/**
+	 * Provide a string containing the entire command line, with the
+	 * indexed argument underlined.
+	 *
+	 * @param i
+	 *	The argument index, like operator []
+	 * @return
+	 *	A string formatted to highlight the given argument
+	 */
+	std::string show(int const i = 0) const {
+		/* select a whole argument */
+		char const * const select = (*this)[i];
+		/* if the current option (i == 0) is requested, pick
+		 * up the pointer to the current short option character */
+		char const * const argp = i == 0 ? this->argp : nullptr;
+		using std::string;
+		string cmd;  /* command */
+		string ul;   /* underline */
+		/* build cmd string and pad ul string */
+		for (size_t p = 0; p < this->argc; ++p) {
+			cmd += p ? " " : "";
+			/* build each argument character wise */
+			for (auto it = this->argv[p]; *it; ++it) {
+				/* underline short option */
+				if (argp && it == argp) {
+					ul = string(cmd.length(), ' ');
+					ul += '^';
+				}
+				/* underline long option / argument */
+				if (!argp && it == select) {
+					ul = string(cmd.length(), ' ');
+					ul += string(strlen(select), '^');
+				}
+				/* add current character */
+				cmd += *it;
+			}
+		}
+		/* if nothing was underlined, the selected option must
+		 * be behind the command, e.g. if the last parameter
+		 * is missing an argument */
+		if (ul == "") {
+			ul = string(cmd.length(), ' ');
+			ul += " ^";
+		}
+		return cmd + '\n' + ul;
+	}
 };
 
 /**
