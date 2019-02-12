@@ -496,7 +496,7 @@ class Options {
 		if (this->argi + i < this->argc) {
 			return this->argv[this->argi + i];
 		}
-		/* read beyond end of argmuments */
+		/* read beyond end of arguments */
 		return "";
 	}
 
@@ -540,7 +540,7 @@ class Options {
 			                arguments[i].length() : arguments_max;
 			++i;
 		}
-		/* assemble all the definitions into the string with propper
+		/* assemble all the definitions into the string with proper
 		 * column widths */
 		for (size_t i = 0; i < DefCount; ++i) {
 			result << "  " << std::setw(options_max) << options[i]
