@@ -396,7 +396,7 @@ class Options {
 	 * @param defs
 	 *	An array of option definitions
 	 */
-	Options(int const argc, char const * const argv[],
+	Options(int const argc, char const * const * const argv,
 	        char const * const usage,
 	        Option<Enum> const (& defs)[DefCount]) :
 	    argc{argc}, argv{argv}, usageStr{usage}, defs{defs},
@@ -616,7 +616,7 @@ class Options {
  */
 template <class Enum, size_t DefCount>
 constexpr Options<Enum, DefCount>
-make_Options(int const argc, char const * const argv[],
+make_Options(int const argc, char const * const * const argv,
              char const * const usage, Option<Enum> const (&defs)[DefCount]) {
 	return Options<Enum, DefCount>{argc, argv, usage, defs};
 }
