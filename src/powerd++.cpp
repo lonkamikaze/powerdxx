@@ -937,90 +937,121 @@ void read_args(int const argc, char const * const argv[]) {
 	auto & ac_batt = g.acstates[to_value(AcLineState::BATTERY)];
 	auto & ac_unknown = g.acstates[to_value(AcLineState::UNKNOWN)];
 
-	while (true) try { switch (getopt()) {
-	case OE::USAGE:
-		std::cerr << getopt.usage();
-		throw Exception{Exit::OK, 0, ""};
-	case OE::FLAG_VERBOSE:
-		g.verbose = true;
-		break;
-	case OE::FLAG_FOREGROUND:
-		g.foreground = true;
-		break;
-	case OE::MODE_AC:
-		set_mode(AcLineState::ONLINE, getopt[1]);
-		break;
-	case OE::MODE_BATT:
-		set_mode(AcLineState::BATTERY, getopt[1]);
-		break;
-	case OE::MODE_UNKNOWN:
-		set_mode(AcLineState::UNKNOWN, getopt[1]);
-		break;
-	case OE::FREQ_MIN:
-		ac_unknown.freq_min = freq(getopt[1]);
-		break;
-	case OE::FREQ_MAX:
-		ac_unknown.freq_max = freq(getopt[1]);
-		break;
-	case OE::FREQ_MIN_AC:
-		ac_on.freq_min = freq(getopt[1]);
-		break;
-	case OE::FREQ_MAX_AC:
-		ac_on.freq_max = freq(getopt[1]);
-		break;
-	case OE::FREQ_MIN_BATT:
-		ac_batt.freq_min = freq(getopt[1]);
-		break;
-	case OE::FREQ_MAX_BATT:
-		ac_batt.freq_max = freq(getopt[1]);
-		break;
-	case OE::FREQ_RANGE:
-		std::tie(ac_unknown.freq_min, ac_unknown.freq_max) =
-		    range(freq, getopt[1]);
-		break;
-	case OE::FREQ_RANGE_AC:
-		std::tie(ac_on.freq_min, ac_on.freq_max) =
-		    range(freq, getopt[1]);
-		break;
-	case OE::FREQ_RANGE_BATT:
-		std::tie(ac_batt.freq_min, ac_batt.freq_max) =
-		    range(freq, getopt[1]);
-		break;
-	case OE::HITEMP_RANGE:
-		g.temp_throttling = true;
-		std::tie(g.temp_high, g.temp_crit) =
-		    range(temperature, getopt[1]);
-		break;
-	case OE::IVAL_POLL:
-		g.interval = ival(getopt[1]);
-		break;
-	case OE::CNT_SAMPLES:
-		g.samples = samples(getopt[1]);
-		break;
-	case OE::FILE_PID:
-		g.pidfilename = getopt[1];
-		break;
-	case OE::IGNORE:
-		/* for compatibility with powerd, ignore */
-		break;
-	case OE::OPT_UNKNOWN:
-	case OE::OPT_NOOPT:
-	case OE::OPT_DASH:
-	case OE::OPT_LDASH:
-		fail(Exit::ECLARG, 0, "unexpected command line argument: "_s +
-		                      getopt[0] + "\n\n" +
-		                      getopt.show(0) + '\n' +
-		                      getopt.usage());
-	case OE::OPT_DONE:
-		return;
-	} /* switch */ } catch (Exception & e) {
-		switch (e.exitcode) {
-		case Exit::ECLARG:
-		case Exit::OK:
+	try {
+		while (true) switch (getopt()) {
+		case OE::USAGE:
+			std::cerr << getopt.usage();
+			throw Exception{Exit::OK, 0, ""};
+		case OE::FLAG_VERBOSE:
+			g.verbose = true;
 			break;
-		default:
+		case OE::FLAG_FOREGROUND:
+			g.foreground = true;
+			break;
+		case OE::MODE_AC:
+			set_mode(AcLineState::ONLINE, getopt[1]);
+			break;
+		case OE::MODE_BATT:
+			set_mode(AcLineState::BATTERY, getopt[1]);
+			break;
+		case OE::MODE_UNKNOWN:
+			set_mode(AcLineState::UNKNOWN, getopt[1]);
+			break;
+		case OE::FREQ_MIN:
+			ac_unknown.freq_min = freq(getopt[1]);
+			break;
+		case OE::FREQ_MAX:
+			ac_unknown.freq_max = freq(getopt[1]);
+			break;
+		case OE::FREQ_MIN_AC:
+			ac_on.freq_min = freq(getopt[1]);
+			break;
+		case OE::FREQ_MAX_AC:
+			ac_on.freq_max = freq(getopt[1]);
+			break;
+		case OE::FREQ_MIN_BATT:
+			ac_batt.freq_min = freq(getopt[1]);
+			break;
+		case OE::FREQ_MAX_BATT:
+			ac_batt.freq_max = freq(getopt[1]);
+			break;
+		case OE::FREQ_RANGE:
+			std::tie(ac_unknown.freq_min, ac_unknown.freq_max) =
+			    range(freq, getopt[1]);
+			break;
+		case OE::FREQ_RANGE_AC:
+			std::tie(ac_on.freq_min, ac_on.freq_max) =
+			    range(freq, getopt[1]);
+			break;
+		case OE::FREQ_RANGE_BATT:
+			std::tie(ac_batt.freq_min, ac_batt.freq_max) =
+			    range(freq, getopt[1]);
+			break;
+		case OE::HITEMP_RANGE:
+			g.temp_throttling = true;
+			std::tie(g.temp_high, g.temp_crit) =
+			    range(temperature, getopt[1]);
+			break;
+		case OE::IVAL_POLL:
+			g.interval = ival(getopt[1]);
+			break;
+		case OE::CNT_SAMPLES:
+			g.samples = samples(getopt[1]);
+			break;
+		case OE::FILE_PID:
+			g.pidfilename = getopt[1];
+			break;
+		case OE::IGNORE:
+			/* for compatibility with powerd, ignore */
+			break;
+		case OE::OPT_UNKNOWN:
+		case OE::OPT_NOOPT:
+		case OE::OPT_DASH:
+		case OE::OPT_LDASH:
+			fail(Exit::ECLARG, 0,
+			     "unexpected command line argument: "_s + getopt[0]);
+		case OE::OPT_DONE:
+			return;
+		}
+	} catch (Exception & e) {
+		switch (getopt) {
+		case OE::USAGE:
+			break;
+		case OE::FLAG_VERBOSE:
+		case OE::FLAG_FOREGROUND:
+			e.msg += "\n\n";
+			e.msg += getopt.show(0);
+			break;
+		case OE::MODE_AC:
+		case OE::MODE_BATT:
+		case OE::MODE_UNKNOWN:
+		case OE::FREQ_MIN:
+		case OE::FREQ_MAX:
+		case OE::FREQ_MIN_AC:
+		case OE::FREQ_MAX_AC:
+		case OE::FREQ_MIN_BATT:
+		case OE::FREQ_MAX_BATT:
+		case OE::FREQ_RANGE:
+		case OE::FREQ_RANGE_AC:
+		case OE::FREQ_RANGE_BATT:
+		case OE::HITEMP_RANGE:
+		case OE::IVAL_POLL:
+		case OE::CNT_SAMPLES:
+		case OE::FILE_PID:
+		case OE::IGNORE:
 			e.msg += "\n\n";
 			e.msg += getopt.show(1);
+			break;
+		case OE::OPT_UNKNOWN:
+		case OE::OPT_NOOPT:
+		case OE::OPT_DASH:
+		case OE::OPT_LDASH:
+		case OE::OPT_DONE:
+			e.msg += "\n\n";
+			e.msg += getopt.show(0);
+			e.msg += "\n\n";
+			e.msg += getopt.usage();
+			break;
 		}
 		throw;
 	}
