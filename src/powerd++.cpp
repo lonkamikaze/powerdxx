@@ -976,20 +976,20 @@ void read_args(int const argc, char const * const argv[]) {
 		break;
 	case OE::FREQ_RANGE:
 		std::tie(ac_unknown.freq_min, ac_unknown.freq_max) =
-		    range(getopt[1], freq);
+		    range(freq, getopt[1]);
 		break;
 	case OE::FREQ_RANGE_AC:
 		std::tie(ac_on.freq_min, ac_on.freq_max) =
-		    range(getopt[1], freq);
+		    range(freq, getopt[1]);
 		break;
 	case OE::FREQ_RANGE_BATT:
 		std::tie(ac_batt.freq_min, ac_batt.freq_max) =
-		    range(getopt[1], freq);
+		    range(freq, getopt[1]);
 		break;
 	case OE::HITEMP_RANGE:
 		g.temp_throttling = true;
 		std::tie(g.temp_high, g.temp_crit) =
-		    range(getopt[1], temperature);
+		    range(temperature, getopt[1]);
 		break;
 	case OE::IVAL_POLL:
 		g.interval = ival(getopt[1]);

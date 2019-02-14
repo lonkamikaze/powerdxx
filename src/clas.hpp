@@ -127,15 +127,15 @@ inline int celsius(types::decikelvin_t const val) {
  *
  * @tparam T
  *	The return type of the conversion function
- * @param str
- *	The string containing the range
  * @param func
  *	The function that converts the values from the string
+ * @param str
+ *	The string containing the range
  * @return
  *	A pair with the `from` and `to` values
  */
 template <typename T>
-std::pair<T, T> range(char const * const str, T (* func)(char const * const)) {
+std::pair<T, T> range(T (& func)(char const * const), char const * const str) {
 	std::pair<T, T> result;
 	std::string first{str};
 
