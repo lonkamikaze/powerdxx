@@ -167,32 +167,62 @@ void init() {
 void read_args(int const argc, char const * const argv[]) {
 	auto getopt = make_Options(argc, argv, USAGE, OPTIONS);
 
-	while (true) switch (getopt()) {
-	case OE::USAGE:
-		std::cerr << getopt.usage();
-		throw Exception{Exit::OK, 0, ""};
-	case OE::FLAG_VERBOSE:
-		g.verbose = true;
-		break;
-	case OE::IVAL_DURATION:
-		g.duration = ival(getopt[1]);
-		break;
-	case OE::IVAL_POLL:
-		g.interval = ival(getopt[1]);
-		break;
-	case OE::FILE_OUTPUT:
-		g.outfilename = getopt[1];
-		break;
-	case OE::FILE_PID:
-		break;
-	case OE::OPT_UNKNOWN:
-	case OE::OPT_NOOPT:
-	case OE::OPT_DASH:
-	case OE::OPT_LDASH:
-		fail(Exit::ECLARG, 0, "unexpected command line argument: "_s +
-		                      getopt[0] + "\n\n" + getopt.usage());
-	case OE::OPT_DONE:
-		return;
+	try {
+		while (true) switch (getopt()) {
+		case OE::USAGE:
+			std::cerr << getopt.usage();
+			throw Exception{Exit::OK, 0, ""};
+		case OE::FLAG_VERBOSE:
+			g.verbose = true;
+			break;
+		case OE::IVAL_DURATION:
+			g.duration = ival(getopt[1]);
+			break;
+		case OE::IVAL_POLL:
+			g.interval = ival(getopt[1]);
+			break;
+		case OE::FILE_OUTPUT:
+			g.outfilename = getopt[1];
+			break;
+		case OE::FILE_PID:
+			break;
+		case OE::OPT_UNKNOWN:
+		case OE::OPT_NOOPT:
+		case OE::OPT_DASH:
+		case OE::OPT_LDASH:
+			fail(Exit::ECLARG, 0,
+			     "unexpected command line argument: "_s + getopt[0]);
+		case OE::OPT_DONE:
+			return;
+		}
+	} catch (Exception & e) {
+		switch (getopt) {
+		case OE::USAGE:
+			break;
+		case OE::FLAG_VERBOSE:
+			e.msg += "\n\n";
+			e.msg += getopt.show(0);
+			break;
+		case OE::IVAL_DURATION:
+		case OE::IVAL_POLL:
+		case OE::FILE_OUTPUT:
+		case OE::FILE_PID:
+			e.msg += "\n\n";
+			e.msg += getopt.show(1);
+			break;
+		case OE::OPT_UNKNOWN:
+		case OE::OPT_NOOPT:
+		case OE::OPT_DASH:
+		case OE::OPT_LDASH:
+			e.msg += "\n\n";
+			e.msg += getopt.show(0);
+			e.msg += "\n\n";
+			e.msg += getopt.usage();
+			break;
+		case OE::OPT_DONE:
+			return;
+		}
+		throw;
 	}
 }
 
