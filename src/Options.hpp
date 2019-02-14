@@ -262,11 +262,31 @@ class Options {
 	Option<Enum> const (& defs)[DefCount];
 
 	/**
-	 * The option definition to use for special options that are exposed
-	 * by the [] operator.
+	 * The option definition to use for unknown options.
 	 */
-	Option<Enum> const expose{
+	Option<Enum> const opt_unknown{
+		Enum::OPT_UNKNOWN, 0, nullptr, nullptr, nullptr
+	};
+
+	/**
+	 * The option definition to use for non-options.
+	 */
+	Option<Enum> const opt_noopt{
 		Enum::OPT_NOOPT, 0, nullptr, nullptr, nullptr
+	};
+
+	/**
+	 * The option definition to use for a single dash.
+	 */
+	Option<Enum> const opt_dash{
+		Enum::OPT_DASH, 0, nullptr, nullptr, nullptr
+	};
+
+	/**
+	 * The option definition to use for a single double-dash.
+	 */
+	Option<Enum> const opt_ldash{
+		Enum::OPT_LDASH, 0, nullptr, nullptr, nullptr
 	};
 
 	/**
@@ -345,21 +365,18 @@ class Options {
 	 * @param ch
 	 *	The short option to find
 	 * @return
-	 *	The option or OPT_UNKNOWN
+	 *	An option definition by reference
 	 */
-	Enum get(char const ch) {
+	Option<Enum> const & get(char const ch) {
 		if (!ch) {
-			this->current = &this->expose;
-			return Enum::OPT_DASH;
+			return this->opt_dash;
 		}
 		for (auto const & def : this->defs) {
 			if (def.sopt == ch) {
-				this->current = &def;
-				return def.enumval;
+				return def;
 			}
 		}
-		this->current = &this->expose;
-		return Enum::OPT_UNKNOWN;
+		return this->opt_unknown;
 	}
 
 	/**
@@ -368,21 +385,18 @@ class Options {
 	 * @param str
 	 *	The long option to find
 	 * @return
-	 *	The option or OPT_UNKNOWN
+	 *	An option definition by reference
 	 */
-	Enum get(char const * const str) {
+	Option<Enum> const &  get(char const * const str) {
 		if (!str[0]) {
-			this->current = &this->expose;
-			return Enum::OPT_LDASH;
+			return this->opt_ldash;
 		}
 		for (auto const & def : this->defs) {
 			if (match(str, def.lopt)) {
-				this->current = &def;
-				return def.enumval;
+				return def;
 			}
 		}
-		this->current = &this->expose;
-		return Enum::OPT_UNKNOWN;
+		return this->opt_unknown;
 	}
 
 	public:
@@ -403,23 +417,16 @@ class Options {
 	    argi{1}, argp{nullptr}, current{nullptr} {}
 
 	/**
-	 * Returns the next option from the command line arguments.
+	 * Updates the internal state by parsing the next option.
+	 *
+	 * When reaching the end of the argument list, the internal
+	 * state is reset, so a successive call will restart the
+	 * argument parsing.
 	 *
 	 * @return
-	 *	An Enum member representing the current option
-	 * @retval OPT_UNKNOWN
-	 *	An option that was not in the list of option definitions
-	 *	was encountered
-	 * @retval OPT_NOOPT
-	 *	An argument that is not an option was encountered
-	 * @retval OPT_DASH
-	 *	A lone dash "-" was encountered
-	 * @retval OPT_LDASH
-	 *	A lone long dash "--" was encountered
-	 * @retval OPT_DONE
-	 *	All arguments have been processed
+	 *	A self-reference
 	 */
-	Enum operator ()() {
+	Options & operator ()() {
 		/* point argi and argp to the appropriate places */
 		if (this->current) {
 			/* this is not the first call */
@@ -444,24 +451,53 @@ class Options {
 		}
 		/* ran out of options */
 		if (this->argi >= this->argc) {
-			return Enum::OPT_DONE;
+			/* reset state */
+			this->current = nullptr;
+			this->argi = 1;
+			this->argp = nullptr;
+			return *this;
 		}
 		/* continue short option chain */
 		if (this->argp) {
-			return get(this->argp[0]);
+			this->current = &get(this->argp[0]);
+			return *this;
 		}
 		/* long option */
 		if (bmatch(this->argv[this->argi], "--")) {
-			return get(this->argv[this->argi] + 2);
+			this->current = &get(this->argv[this->argi] + 2);
+			return *this;
 		}
 		/* short option */
 		if (this->argv[this->argi][0] == '-') {
 			this->argp = this->argv[this->argi] + 1;
-			return get(this->argp[0]);
+			this->current = &get(this->argp[0]);
+			return *this;
 		}
 		/* not an option */
-		this->current = &this->expose;
-		return Enum::OPT_NOOPT;
+		this->current = &this->opt_noopt;
+		return *this;
+	}
+
+	/**
+	 * Implicitly cast to the current option.
+	 *
+	 * @return
+	 *	An Enum member representing the current option
+	 * @retval OPT_UNKNOWN
+	 *	An option that was not in the list of option definitions
+	 *	was encountered
+	 * @retval OPT_NOOPT
+	 *	An argument that is not an option was encountered
+	 * @retval OPT_DASH
+	 *	A lone dash "-" was encountered
+	 * @retval OPT_LDASH
+	 *	A lone long dash "--" was encountered
+	 * @retval OPT_DONE
+	 *	All arguments have been processed, or argument processing
+	 *	has not yet started
+	 */
+	operator Enum() const {
+		return this->current ? this->current->enumval : Enum::OPT_DONE;
 	}
 
 	/**
