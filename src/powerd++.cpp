@@ -90,9 +90,14 @@ enum class AcLineState : unsigned int {
  */
 struct CoreGroup {
 	/**
-	 * The sysctl dev.cpu.%d.freq, if present.
+	 * The sysctl dev.cpu.%d.freq.
 	 */
 	sys::ctl::SysctlSync<mhz_t> freq{{}};
+
+	/**
+	 * The number of the core owning dev.cpu.%d.freq.
+	 */
+	coreid_t corei{0};
 
 	/**
 	 * The dev.cpu.%d.freq value for the current load sample.
@@ -392,6 +397,7 @@ void init() {
 			sys::ctl::Sysctl<> const ctl{name};
 			auto & group = g.groups[++groupi];
 			group.freq = {ctl};
+			group.corei = core;
 			/* create loads buffer */
 			group.loads = std::unique_ptr<mhz_t[]>{new mhz_t[g.samples]{}};
 		} catch (sys::sc_error<sys::ctl::error> e) {
@@ -699,16 +705,16 @@ void update_freq(Global::ACSet const & acstate) {
 		}
 		/* foreground output */
 		if (Foreground && Temperature) {
-			std::cout << "power: %7s, load: %4d MHz, %3d C, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
+			std::cout << "power: %7s, load: %4d MHz, %3d C, cpu.%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
 			             (acstate.name,
 			              (group.loadsum / g.samples),
-			              celsius(group.temp),
-			              groupi, group.sample_freq, wantfreq);
+			              celsius(group.temp), group.corei,
+			              group.sample_freq, wantfreq);
 		} else if (Foreground) {
-			std::cout << "power: %7s, load: %4d MHz, cpu%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
+			std::cout << "power: %7s, load: %4d MHz, cpu.%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
 			             (acstate.name,
-			              (group.loadsum / g.samples),
-			              groupi, group.sample_freq, wantfreq);
+			              (group.loadsum / g.samples), group.corei,
+			              group.sample_freq, wantfreq);
 		}
 	}
 	if (Foreground) { std::cout << std::flush; }
