@@ -1539,7 +1539,7 @@ extern "C" {
 /**
  * Intercept calls to sysctl().
  *
- * Uses the local \ref anonymous_namespace{loadplay.cpp}::sysctls
+ * Uses the local \ref anonymous_namespace{libloadplay.cpp}::sysctls
  * store.
  *
  * Falls back to the original under the following conditions:

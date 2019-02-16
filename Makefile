@@ -7,9 +7,9 @@ PREFIX?=   /usr/local
 DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
 
 BINS=      src/powerd++.cpp src/loadrec.cpp
-SOS=       src/loadplay.cpp
+SOS=       src/libloadplay.cpp
 SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
-TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/:C/^/lib/}
+TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/}
 TMP!=      cd ${.CURDIR} && \
            env MKDEP_CPP_OPTS="-MM -std=${STD}" mkdep ${SRCS}
 RELEASE!=  git tag -l --sort=-taggerdate 2>&- | head -n1 || :
@@ -20,7 +20,7 @@ all: ${TARGETS}
 .sinclude ".depend"
 
 # Building
-loadplay.o:
+libloadplay.o:
 	${CXX} ${CXXFLAGS} -fPIC -c ${.IMPSRC} -o ${.TARGET}
 
 # Linking
@@ -36,7 +36,7 @@ powerd++: ${.TARGET}.o clas.o
 loadrec: ${.TARGET}.o clas.o
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -o ${.TARGET}
 
-libloadplay.so: ${.TARGET:C/^lib//:C/\.so$//}.o
+libloadplay.so: ${.TARGET:C/\.so$//}.o
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -shared -o ${.TARGET}
 
 # Combinable build targets
