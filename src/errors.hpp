@@ -36,6 +36,7 @@ enum class Exit : int {
 	ESIGNAL,      /**< Failed to install signal handler */
 	ERANGEFMT,    /**< A user provided range is missing the separator */
 	ETEMPERATURE, /**< The provided value is not a valid temperature */
+	EEXCEPT,      /**< Untreated exception */
 	LENGTH        /**< Enum length */
 };
 
@@ -45,7 +46,8 @@ enum class Exit : int {
 const char * const ExitStr[]{
 	"OK", "ECLARG", "EOUTOFRANGE", "ELOAD", "EFREQ", "EMODE", "EIVAL",
 	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
-	"EDAEMON", "EWOPEN", "ESIGNAL", "ERANGEFMT", "ETEMPERATURE"
+	"EDAEMON", "EWOPEN", "ESIGNAL", "ERANGEFMT", "ETEMPERATURE",
+	"EEXCEPT"
 };
 
 static_assert(utility::to_value(Exit::LENGTH) == utility::countof(ExitStr),

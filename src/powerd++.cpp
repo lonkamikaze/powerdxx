@@ -481,7 +481,10 @@ void init() {
 			g.cores[i].temp = {{name}};
 			assert(g.cores[i].temp >= 0);
 		} catch (sys::sc_error<sys::ctl::error>) {
-			verbose("core temperature not accessible: %s"_fmt(name));
+			verbose("cannot access sysctl: "_s + name +
+			        "\n\ttemperature throttling: off");
+			g.temp_throttling = false;
+			break;
 		}
 	}
 
@@ -1246,30 +1249,28 @@ void run_daemon() try {
  *	An exit code
  * @see Exit
  */
-int main(int argc, char * argv[]) {
-	try {
-		read_args(argc, argv);
-		init();
-		show_settings();
-		init_loads();
-		run_daemon();
-	} catch (Exception & e) {
-		if (e.msg != "") {
-			std::cerr << "powerd++: " << e.msg << '\n';
-		}
-		return to_value(e.exitcode);
-	} catch (sys::sc_error<sys::ctl::error> e) {
-		std::cerr << "powerd++: untreated sysctl failure: " << e.c_str() << '\n';
-		throw;
-	} catch (sys::sc_error<sys::pid::error> e) {
-		std::cerr << "powerd++: untreated pidfile failure: " << e.c_str() << '\n';
-		throw;
-	} catch (sys::sc_error<sys::sig::error> e) {
-		std::cerr << "powerd++: untreated signal setup failure: " << e.c_str() << '\n';
-		throw;
-	} catch (...) {
-		std::cerr << "powerd++: untreated failure\n";
-		throw;
+int main(int argc, char * argv[]) try {
+	read_args(argc, argv);
+	init();
+	show_settings();
+	init_loads();
+	run_daemon();
+	return to_value(Exit::OK);
+} catch (Exception & e) {
+	if (e.msg != "") {
+		std::cerr << "powerd++: " << e.msg << '\n';
 	}
-	return 0;
+	return to_value(e.exitcode);
+} catch (sys::sc_error<sys::ctl::error> e) {
+	std::cerr << "powerd++: untreated sysctl failure: " << e.c_str() << '\n';
+	return to_value(Exit::EEXCEPT);
+} catch (sys::sc_error<sys::pid::error> e) {
+	std::cerr << "powerd++: untreated pidfile failure: " << e.c_str() << '\n';
+	return to_value(Exit::EEXCEPT);
+} catch (sys::sc_error<sys::sig::error> e) {
+	std::cerr << "powerd++: untreated signal setup failure: " << e.c_str() << '\n';
+	return to_value(Exit::EEXCEPT);
+} catch (...) {
+	std::cerr << "powerd++: untreated failure\n";
+	return to_value(Exit::EEXCEPT);
 }

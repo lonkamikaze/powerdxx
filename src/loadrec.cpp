@@ -352,23 +352,21 @@ void run() try {
  *	An exit code
  * @see Exit
  */
-int main(int argc, char * argv[]) {
-	try {
-		read_args(argc, argv);
-		init();
-		print_sysctls();
-		run();
-	} catch (Exception & e) {
-		if (e.msg != "") {
-			std::cerr << "loadrec: " << e.msg << '\n';
-		}
-		return to_value(e.exitcode);
-	} catch (sys::sc_error<sys::ctl::error> e) {
-		std::cerr << "loadrec: untreated sysctl failure: " << e.c_str() << '\n';
-		throw;
-	} catch (...) {
-		std::cerr << "loadrec: untreated failure\n";
-		throw;
+int main(int argc, char * argv[]) try {
+	read_args(argc, argv);
+	init();
+	print_sysctls();
+	run();
+	return to_value(Exit::OK);
+} catch (Exception & e) {
+	if (e.msg != "") {
+		std::cerr << "loadrec: " << e.msg << '\n';
 	}
+	return to_value(e.exitcode);
+} catch (sys::sc_error<sys::ctl::error> e) {
+	std::cerr << "loadrec: untreated sysctl failure: " << e.c_str() << '\n';
+	return to_value(Exit::EEXCEPT);
+} catch (...) {
+	std::cerr << "loadrec: untreated failure\n";
+	return to_value(Exit::EEXCEPT);
 }
-
