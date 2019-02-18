@@ -641,6 +641,19 @@ class Options {
 		}
 		return cmd + '\n' + ul;
 	}
+
+	/**
+	 * Returns the argument offset of the current parameter/argument.
+	 *
+	 * @warning
+	 *	This may return a value >= argc if the current state is
+	 *	Enum::OPT_DONE
+	 * @return
+	 *	The current argument index
+	 */
+	int offset() const {
+		return this->argi;
+	}
 };
 
 /**
