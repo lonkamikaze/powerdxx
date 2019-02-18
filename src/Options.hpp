@@ -414,7 +414,7 @@ class Options {
 	        char const * const usage,
 	        Option<Enum> const (& defs)[DefCount]) :
 	    argc{argc}, argv{argv}, usageStr{usage}, defs{defs},
-	    argi{1}, argp{nullptr}, current{nullptr} {}
+	    argi{0}, argp{nullptr}, current{nullptr} {}
 
 	/**
 	 * Updates the internal state by parsing the next option.
@@ -427,7 +427,9 @@ class Options {
 	 *	A self-reference
 	 */
 	Options & operator ()() {
-		/* point argi and argp to the appropriate places */
+		/*
+		 * point argi and argp to the appropriate places
+		 */
 		if (this->current) {
 			/* this is not the first call */
 			if (this->argp && this->argp[0] && this->argp[1]) {
@@ -448,13 +450,19 @@ class Options {
 				this->argp = nullptr;
 				this->argi += argCount(*this->current) + 1;
 			}
+		} else {
+			/* no current state, start with the first argument */
+			this->argi = 1;
+			this->argp = nullptr;
 		}
+
+		/*
+		 * match the current option
+		 */
 		/* ran out of options */
 		if (this->argi >= this->argc) {
 			/* reset state */
 			this->current = nullptr;
-			this->argi = 1;
-			this->argp = nullptr;
 			return *this;
 		}
 		/* continue short option chain */
