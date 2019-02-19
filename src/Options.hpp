@@ -597,47 +597,87 @@ class Options {
 
 	/**
 	 * Provide a string containing the entire command line, with the
-	 * indexed argument underlined.
+	 * indexed argument highlighted.
+	 *
+	 * The current implementation highlights arguments by underlining
+	 * them with `^~~~`.
 	 *
 	 * @param i
 	 *	The argument index, like operator []
+	 * @param n
+	 *	The number of arguments to highlight, highlights all
+	 *	remaining arguments if n <= 0
 	 * @return
 	 *	A string formatted to highlight the given argument
 	 */
-	std::string show(int const i = 0) const {
+	std::string show(int const i, int const n = 1) const {
 		/* select a whole argument */
 		char const * const select = (*this)[i];
 		/* if the current option (i == 0) is requested, pick
 		 * up the pointer to the current short option character */
 		char const * const argp = i == 0 ? this->argp : nullptr;
 		using std::string;
-		string cmd;  /* command */
-		string ul;   /* underline */
-		/* build cmd string and pad ul string */
+		string cmd;       /* command and arguments string */
+		string ul;        /* underlining string */
+		int hilight = 0;  /* #args left to underline */
+		/* build cmd and ul string */
 		for (size_t p = 0; p < this->argc; ++p) {
-			cmd += p ? " " : "";
 			/* build each argument character wise */
-			for (auto it = this->argv[p]; *it; ++it) {
+			for (auto it = this->argv[p];; ++it) {
+				/* underlining character */
+				char ulc = hilight ? '~' : ' ';
 				/* underline short option */
 				if (argp && it == argp) {
-					ul = string(cmd.length(), ' ');
-					ul += '^';
+					hilight = n > 0 ? n - 1 : -1;
+					ulc = '^';
 				}
 				/* underline long option / argument */
 				if (!argp && it == select) {
-					ul = string(cmd.length(), ' ');
-					ul += string(strlen(select), '^');
+					hilight = n > 0 ? n : -1;
+					ulc = '^';
 				}
-				/* add current character */
-				cmd += *it;
+				/* add current character,
+				 * continue to stay in the loop */
+				switch (*it) {
+				case 0:
+					/* end of argument,
+					 * add a space behind the argument */
+					cmd += ' ';
+					/* underline only if it's the first
+					 * character to underline */
+					ul += ulc == '^' ? '^' : ' ';
+					break;
+				case '\t':
+					/* symbolic tab */
+					cmd += "\\t";
+					ul += ulc += ulc;
+					continue;
+				case '\n':
+					/* symbolic newline */
+					cmd += "\\n";
+					ul += ulc += ulc;
+					continue;
+				case ' ':
+				case '\\':
+					/* escape */
+					cmd += '\\';
+					ul += ulc;
+					/*[[fallthrough]];*/
+				default:
+					/* regular characer */
+					cmd += *it;
+					ul += ulc;
+					continue;
+				}
+				break;
 			}
+			hilight > 0 && --hilight;
 		}
-		/* if nothing was underlined, the selected option must
-		 * be behind the command, e.g. if the last parameter
-		 * is missing an argument */
-		if (ul == "") {
-			ul = string(cmd.length(), ' ');
-			ul += " ^";
+		/* the selected option must be behind the command,
+		 * e.g. because the last parameter is missing an argument */
+		if (this->argi >= this->argc) {
+			cmd += ' ';
+			ul += '^';
 		}
 		return cmd + '\n' + ul;
 	}
