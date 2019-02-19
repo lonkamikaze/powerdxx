@@ -21,13 +21,14 @@
  * documented in nih::enum_has_members<>. Their presence is validated
  * at compile time.
  *
- * The enum values are returned when selecting the next option, in order
- * to do that a usage string and a list of definitions are needed:
+ * The enum values are returned when matching the next argument to
+ * a parameter. In order to do that a usage string and a list of
+ * parameter definitions are required:
  *
  * ~~~~{.cpp}
  * static char const * const USAGE = "[-hv] [-i file] [-o file] [command ...]";
  *
- * static nih::Option<MyOptions> const OPTIONS[]{
+ * static nih::Parameter<MyOptions> const PARAMETERS[]{
  * 	{MyOptions::USAGE,        'h', "help",    "",     "Show this help"},
  * 	{MyOptions::USAGE,         0,  "usage",   "",     ""},
  * 	{MyOptions::FILE_IN,      'i', "in",      "file", "Input file"},
@@ -36,20 +37,35 @@
  * };
  * ~~~~
  *
- * Every array entry defines an option consisting of the enum value that
- * represents it, a short and a long version (either of which are optional)
- * and a comma separated list of arguments. The final string appears in the
- * usage() output. The details are documented by nih::Option<>.
+ * Each entry in the array defines a parameter consisting of the following:
  *
- * Aliases are created by adding a definition that returns the same enum
- * value.
+ * | Field    | Meaning                                           |
+ * |----------|---------------------------------------------------|
+ * | `option` | The option symbol (enum value)                    |
+ * | `sparam` | An optional parameter character (short parameter) |
+ * | `lparam` | An optional long parameter string                 |
+ * | `args`   | A comma separated list of parameter arguments     |
+ * | `usage`  | A descriptive string                              |
  *
- * For the short version it does not matter whether `-ifile` or `-i file` is
- * provided, the long version must be `--in file`. Short options without
- * arguments may be directly followed by another short option, e.g. `-vofile`
- * is equivalent to `-v -o file`.
+ * Multiple parameters may be mapped to a single option (e.g. `--help`
+ * and `--usage`). Parameters without arguments are called flags. It
+ * is possible to map parameters with different numbers of arguments
+ * to a single option, but this is arguably semantically confusing
+ * and should not be done.
  *
- * The option definitions should be passed to nih::make_Options() to
+ * Multiple flags' parameter characters can be concatenated in an argument.
+ * A parameter with arguments' character can appear at the end of a
+ * character chain. The first argument to the parameter may be concatenated
+ * as well. E.g. `-v -i file`, `-vi file` and `-vifile` are all equivalent.
+ * Parameters' string representations always stand alone, they can
+ * neither be combined with each other nor with parameter characters.
+ * E.g. `--verbose --in file` is the equivalent parameter string
+ * representation.
+ *
+ * The usage string and the parameter usage strings are used to assemble
+ * the string provided by the nih::Options<>::usage() method.
+ *
+ * The parameter definitions should be passed to nih::make_Options() to
  * create the functor:
  *
  * ~~~~{.cpp}
@@ -61,7 +77,7 @@
  * 	char const * outfile = "-";
  * 	bool verbose = false;
  * 
- * 	auto getopt = nih::make_Options(argc, argv, USAGE, OPTIONS);
+ * 	auto getopt = nih::make_Options(argc, argv, USAGE, PARAMETERS);
  * 	while (true) switch (getopt()) { // get new option/argument
  * 	case MyOptions::USAGE:
  * 		std::cerr << getopt.usage(); // show usage
@@ -89,7 +105,7 @@
  * }
  * ~~~~
  *
- * Every call of the functor moves on to the next option or argument.
+ * Every call of the functor moves on to the next parameter or argument.
  * For non-option arguments it returns `OPT_NOOPT`.
  *
  * The `getopt[1]` calls return the first argument following the option. It
@@ -102,7 +118,7 @@
  * The `getopt[0]` calls return the command line argument that contains the
  * selected option. So in the `FILE_IN` case it could be any of `-i`, `--in`,
  * `-vi`, `-ifile` or `-vifile`. This is useful for the `OPT_UNKNOWN`
- * and `OPT_NOOPT` cases. The `getopt[1]` call on the other hand would always
+ * and `OPT_NOOPT` cases. The `getopt[1]` call on the other hand would
  * return `file` regardless of argument chaining.
  */
 
@@ -141,52 +157,52 @@ using void_t = void;
  * | OPT_LDASH   | Double dashes "--" were encountered                    |
  * | OPT_DONE    | All command line arguments have been processed         |
  *
- * @tparam Enum
+ * @tparam OptionT
  *	An enum or enum class representing the available options
  */
-template <class Enum, class = void>
+template <class OptionT, class = void>
 struct enum_has_members : /** @cond */ std::false_type {};
 
-template <class Enum>
-struct enum_has_members<Enum, void_t<decltype(Enum::OPT_UNKNOWN),
-                                     decltype(Enum::OPT_NOOPT),
-                                     decltype(Enum::OPT_DASH),
-                                     decltype(Enum::OPT_LDASH),
-                                     decltype(Enum::OPT_DONE)>> :
+template <class OptionT>
+struct enum_has_members<OptionT, void_t<decltype(OptionT::OPT_UNKNOWN),
+                                        decltype(OptionT::OPT_NOOPT),
+                                        decltype(OptionT::OPT_DASH),
+                                        decltype(OptionT::OPT_LDASH),
+                                        decltype(OptionT::OPT_DONE)>> :
     /** @endcond */ std::true_type {};
 
 /**
  * Container for an option definition.
  *
- * Aliases can be defined by creating definitions with the same enumval
+ * Aliases can be defined by creating definitions with the same option
  * member.
  *
- * The lopt, args and usage members have to be 0 terminated, using string
+ * The lparam, args and usage members have to be 0 terminated, using string
  * literals is safe.
  *
- * @tparam Enum
+ * @tparam OptionT
  *	An enum or enum class representing the available options
  */
-template <class Enum>
-struct Option {
+template <class OptionT>
+struct Parameter {
 	/**
 	 * The enum value to return for this option.
 	 */
-	Enum enumval;
+	OptionT option;
 
 	/**
-	 * The short version of this option.
+	 * The short version of this parameter.
 	 *
-	 * Set to 0 if no short option is available.
+	 * Set to 0 if no short parameter is available.
 	 */
-	char sopt;
+	char sparam;
 
 	/**
-	 * The long version of this option.
+	 * The long version of this parameter.
 	 *
-	 * Set to nullptr or "" if no long option is available.
+	 * Set to nullptr or "" if no long parameter is available.
 	 */
-	char const * lopt;
+	char const * lparam;
 
 	/**
 	 * A comma separated list of arguments.
@@ -204,15 +220,15 @@ struct Option {
 /**
  * Retrieves the count of arguments in an option definition.
  *
- * @tparam Enum
+ * @tparam OptionT
  *	An enum or enum class representing the available options
  * @param def
- *	The option definition
+ *	The parameter definition
  * @return
  *	The number of arguments specified in the given definition
  */
-template <class Enum>
-size_t argCount(Option<Enum> const & def) {
+template <class OptionT>
+size_t argCount(Parameter<OptionT> const & def) {
 	if (!def.args || !def.args[0]) { return 0; }
 	size_t argc = 1;
 	for (char const * pch = def.args; *pch; ++pch) {
@@ -230,15 +246,15 @@ size_t argCount(Option<Enum> const & def) {
  *
  * Check the `operator ()` and `operator []` for use.
  *
- * @tparam Enum
+ * @tparam OptionT
  *	An enum or enum class matching the requirements set by
  *	enum_has_members
  * @tparam DefCount
  *	The number of option definitions
  */
-template <class Enum, size_t DefCount>
+template <class OptionT, size_t DefCount>
 class Options {
-	static_assert(enum_has_members<Enum>::value,
+	static_assert(enum_has_members<OptionT>::value,
 	              "The enum must have the members OPT_UNKNOWN, OPT_NOOPT, OPT_DASH, OPT_LDASH and OPT_DONE");
 	private:
 	/**
@@ -259,34 +275,34 @@ class Options {
 	/**
 	 * A reference to the option definitions.
 	 */
-	Option<Enum> const (& defs)[DefCount];
+	Parameter<OptionT> const (& defs)[DefCount];
 
 	/**
 	 * The option definition to use for unknown options.
 	 */
-	Option<Enum> const opt_unknown{
-		Enum::OPT_UNKNOWN, 0, nullptr, nullptr, nullptr
+	Parameter<OptionT> const opt_unknown{
+		OptionT::OPT_UNKNOWN, 0, nullptr, nullptr, nullptr
 	};
 
 	/**
 	 * The option definition to use for non-options.
 	 */
-	Option<Enum> const opt_noopt{
-		Enum::OPT_NOOPT, 0, nullptr, nullptr, nullptr
+	Parameter<OptionT> const opt_noopt{
+		OptionT::OPT_NOOPT, 0, nullptr, nullptr, nullptr
 	};
 
 	/**
 	 * The option definition to use for a single dash.
 	 */
-	Option<Enum> const opt_dash{
-		Enum::OPT_DASH, 0, nullptr, nullptr, nullptr
+	Parameter<OptionT> const opt_dash{
+		OptionT::OPT_DASH, 0, nullptr, nullptr, nullptr
 	};
 
 	/**
 	 * The option definition to use for a single double-dash.
 	 */
-	Option<Enum> const opt_ldash{
-		Enum::OPT_LDASH, 0, nullptr, nullptr, nullptr
+	Parameter<OptionT> const opt_ldash{
+		OptionT::OPT_LDASH, 0, nullptr, nullptr, nullptr
 	};
 
 	/**
@@ -303,7 +319,7 @@ class Options {
 	/**
 	 * Points to the current option definition.
 	 */
-	Option<Enum> const * current;
+	Parameter<OptionT> const * current;
 
 	/**
 	 * Returns a pointer to the file name portion of the given string.
@@ -367,12 +383,12 @@ class Options {
 	 * @return
 	 *	An option definition by reference
 	 */
-	Option<Enum> const & get(char const ch) {
+	Parameter<OptionT> const & get(char const ch) {
 		if (!ch) {
 			return this->opt_dash;
 		}
 		for (auto const & def : this->defs) {
-			if (def.sopt == ch) {
+			if (def.sparam == ch) {
 				return def;
 			}
 		}
@@ -387,12 +403,12 @@ class Options {
 	 * @return
 	 *	An option definition by reference
 	 */
-	Option<Enum> const &  get(char const * const str) {
+	Parameter<OptionT> const &  get(char const * const str) {
 		if (!str[0]) {
 			return this->opt_ldash;
 		}
 		for (auto const & def : this->defs) {
-			if (match(str, def.lopt)) {
+			if (match(str, def.lparam)) {
 				return def;
 			}
 		}
@@ -408,11 +424,11 @@ class Options {
 	 * @param usage
 	 *	A usage string following "usage: progname "
 	 * @param defs
-	 *	An array of option definitions
+	 *	An array of parameter definitions
 	 */
 	Options(int const argc, char const * const * const argv,
 	        char const * const usage,
-	        Option<Enum> const (& defs)[DefCount]) :
+	        Parameter<OptionT> const (& defs)[DefCount]) :
 	    argc{argc}, argv{argv}, usageStr{usage}, defs{defs},
 	    argi{0}, argp{nullptr}, current{nullptr} {}
 
@@ -490,7 +506,7 @@ class Options {
 	 * Implicitly cast to the current option.
 	 *
 	 * @return
-	 *	An Enum member representing the current option
+	 *	An OptionT member representing the current option
 	 * @retval OPT_UNKNOWN
 	 *	An option that was not in the list of option definitions
 	 *	was encountered
@@ -504,8 +520,10 @@ class Options {
 	 *	All arguments have been processed, or argument processing
 	 *	has not yet started
 	 */
-	operator Enum() const {
-		return this->current ? this->current->enumval : Enum::OPT_DONE;
+	operator OptionT() const {
+		return this->current
+		       ? this->current->option
+		       : OptionT::OPT_DONE;
 	}
 
 	/**
@@ -556,40 +574,40 @@ class Options {
 		result << "usage: " << removePath(this->argv[0]) << ' '
 		       << this->usageStr << "\n\n" << std::left;
 
-		/* collect options and arguments in arrays because formatting
-		 * is only possible after all of them have been read */
-		std::string options[DefCount];
-		std::string arguments[DefCount];
-		size_t options_max = 0;   /* length of the longest option */
-		size_t arguments_max = 0; /* length of the longest argument */
-		size_t i = 0;             /* current array index */
+		/* collect parameters and arguments in arrays because
+		 * formatting is only possible after all of them have
+		 * been read */
+		std::string params[DefCount];
+		std::string args[DefCount];
+		size_t params_max = 0;  /* length of the longest option */
+		size_t args_max = 0;    /* length of the longest argument */
+		size_t i = 0;           /* current array index */
 		for (auto const & def : this->defs) {
 			/* get option */
-			if (def.sopt && def.lopt && def.lopt[0]) {
-				options[i] = std::string{'-'} + def.sopt +
-				             ", --" + def.lopt;
-			} else if (def.sopt) {
-				options[i] = std::string{'-'} + def.sopt;
-			} else if (def.lopt && def.lopt[0]) {
-				options[i] = std::string{"    --"} + def.lopt;
+			if (def.sparam && def.lparam && def.lparam[0]) {
+				params[i] = std::string{'-'} + def.sparam +
+				            ", --" + def.lparam;
+			} else if (def.sparam) {
+				params[i] = std::string{'-'} + def.sparam;
+			} else if (def.lparam && def.lparam[0]) {
+				params[i] = std::string{"    --"} + def.lparam;
 			}
-			options_max = options[i].length() > options_max ?
-			              options[i].length() : options_max;
+			params_max = params[i].length() > params_max
+			             ? params[i].length() : params_max;
 			/* get arguments */
-			arguments[i] = def.args;
-			for (char & ch : arguments[i]) {
+			args[i] = def.args;
+			for (char & ch : args[i]) {
 				ch = (ch == ',' ? ' ' : ch);
 			}
-			arguments_max = arguments[i].length() > arguments_max ?
-			                arguments[i].length() : arguments_max;
+			args_max = args[i].length() > args_max
+			           ? args[i].length() : args_max;
 			++i;
 		}
 		/* assemble all the definitions into the string with proper
 		 * column widths */
 		for (size_t i = 0; i < DefCount; ++i) {
-			result << "  " << std::setw(options_max) << options[i]
-			       << "  " << std::setw(arguments_max)
-			                 << arguments[i]
+			result << "  " << std::setw(params_max) << params[i]
+			       << "  " << std::setw(args_max) << args[i]
 			       << "  " << this->defs[i].usage << '\n';
 		}
 		return result.str();
@@ -687,7 +705,7 @@ class Options {
 	 *
 	 * @warning
 	 *	This may return a value >= argc if the current state is
-	 *	Enum::OPT_DONE
+	 *	OptionT::OPT_DONE
 	 * @return
 	 *	The current argument index
 	 */
@@ -700,7 +718,7 @@ class Options {
  * Wrapper around the Options<> constructor, that uses function template
  * matching to deduce template arguments.
  *
- * @tparam Enum
+ * @tparam OptionT
  *	An enum for all the available options
  * @tparam DefCount
  *	The number of option definitions
@@ -709,13 +727,14 @@ class Options {
  * @param usage
  *	A usage string that is used in the header of the usage output
  * @param defs
- *	An array of option definitions
+ *	An array of parameter definitions
  */
-template <class Enum, size_t DefCount>
-constexpr Options<Enum, DefCount>
+template <class OptionT, size_t DefCount>
+constexpr Options<OptionT, DefCount>
 make_Options(int const argc, char const * const * const argv,
-             char const * const usage, Option<Enum> const (&defs)[DefCount]) {
-	return Options<Enum, DefCount>{argc, argv, usage, defs};
+             char const * const usage,
+             Parameter<OptionT> const (&defs)[DefCount]) {
+	return Options<OptionT, DefCount>{argc, argv, usage, defs};
 }
 
 } /* namespace nih */

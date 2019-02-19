@@ -31,7 +31,7 @@
  */
 namespace {
 
-using nih::Option;
+using nih::Parameter;
 using nih::make_Options;
 
 using types::cptime_t;
@@ -907,9 +907,9 @@ enum class OE {
 char const * const USAGE = "[-hvf] [-abn mode] [-mM freq] [-FAB freq:freq] [-H temp:temp] [-p ival] [-s cnt] [-P file]";
 
 /**
- * Definitions of command line options.
+ * Definitions of command line parameters.
  */
-Option<OE> const OPTIONS[]{
+Parameter<OE> const PARAMETERS[]{
 	{OE::USAGE,           'h', "help",            "",          "Show usage and exit"},
 	{OE::FLAG_VERBOSE,    'v', "verbose",         "",          "Be verbose"},
 	{OE::FLAG_FOREGROUND, 'f', "foreground",      "",          "Stay in foreground"},
@@ -940,7 +940,7 @@ Option<OE> const OPTIONS[]{
  *	The command line arguments
  */
 void read_args(int const argc, char const * const argv[]) {
-	auto getopt = make_Options(argc, argv, USAGE, OPTIONS);
+	auto getopt = make_Options(argc, argv, USAGE, PARAMETERS);
 
 	auto & ac_on = g.acstates[to_value(AcLineState::ONLINE)];
 	auto & ac_batt = g.acstates[to_value(AcLineState::BATTERY)];

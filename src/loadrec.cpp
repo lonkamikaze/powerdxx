@@ -27,7 +27,7 @@
  */
 namespace {
 
-using nih::Option;
+using nih::Parameter;
 using nih::make_Options;
 
 using constants::ACLINE;
@@ -121,9 +121,9 @@ enum class OE {
 char const * const USAGE = "[-hv] [-d ival] [-p ival] [-o file]";
 
 /**
- * Definitions of command line options.
+ * Definitions of command line parameters.
  */
-Option<OE> const OPTIONS[]{
+Parameter<OE> const PARAMETERS[]{
 	{OE::USAGE,         'h', "help",     "",     "Show usage and exit"},
 	{OE::FLAG_VERBOSE,  'v', "verbose",  "",     "Be verbose"},
 	{OE::IVAL_DURATION, 'd', "duration", "ival", "The duration of the recording"},
@@ -165,7 +165,7 @@ void init() {
  *	The command line arguments
  */
 void read_args(int const argc, char const * const argv[]) {
-	auto getopt = make_Options(argc, argv, USAGE, OPTIONS);
+	auto getopt = make_Options(argc, argv, USAGE, PARAMETERS);
 
 	try {
 		while (true) switch (getopt()) {
