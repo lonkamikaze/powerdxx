@@ -638,9 +638,10 @@ class Options {
 		 * up the pointer to the current short option character */
 		char const * const argp = i == 0 ? this->argp : nullptr;
 		using std::string;
-		string cmd;       /* command and arguments string */
-		string ul;        /* underlining string */
-		int hilight = 0;  /* #args left to underline */
+		string cmd;          /* command and arguments string */
+		string ul;           /* underlining string */
+		int hilight = 0;     /* #args left to underline */
+		bool found = false;  /* whether argument i was found */
 		/* build cmd and ul string */
 		for (int p = 0; p < this->argc; ++p) {
 			/* build each argument character wise */
@@ -651,11 +652,13 @@ class Options {
 				if (argp && it == argp) {
 					hilight = n > 0 ? n - 1 : -1;
 					ulc = '^';
+					found = true;
 				}
 				/* underline long option / argument */
 				if (!argp && it == select) {
 					hilight = n > 0 ? n : -1;
 					ulc = '^';
+					found = true;
 				}
 				/* add current character,
 				 * continue to stay in the loop */
@@ -694,9 +697,10 @@ class Options {
 			}
 			hilight > 0 && --hilight;
 		}
-		/* the selected option must be behind the command,
-		 * e.g. because the last parameter is missing an argument */
-		if (this->argi >= this->argc) {
+		/* the selected argument must be behind the last argument,
+		 * e.g. because the last parameter is missing an argument
+		 * or the state is OPT_DONE */
+		if (!found) {
 			cmd += ' ';
 			ul += '^';
 		}
