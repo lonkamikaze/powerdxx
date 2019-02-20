@@ -157,7 +157,7 @@ types::ms clas::ival(char const * const str) {
 }
 
 size_t clas::samples(char const * const str) {
-	if (std::string{str} == str) {
+	if (std::string{str} == "") {
 		errors::fail(errors::Exit::ESAMPLES, 0,
 		             "sample count value missing");
 	}
