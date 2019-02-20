@@ -639,7 +639,7 @@ class Options {
 		string ul;        /* underlining string */
 		int hilight = 0;  /* #args left to underline */
 		/* build cmd and ul string */
-		for (size_t p = 0; p < this->argc; ++p) {
+		for (int p = 0; p < this->argc; ++p) {
 			/* build each argument character wise */
 			for (auto it = this->argv[p];; ++it) {
 				/* underlining character */
