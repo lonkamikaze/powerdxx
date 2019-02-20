@@ -358,21 +358,22 @@ class Options {
 	}
 
 	/**
-	 * Returns true if one of the given strings matches the beginning
-	 * of the other.
+	 * Returns true if the given string starts with the given prefix.
 	 *
-	 * @param lstr,rstr
+	 * @param str,prefix
 	 *	Two 0 terminated strings
 	 * @retval true
-	 *	The shorter string matches the beginning of the other string
+	 *	The string starts with the prefix
 	 * @retval false
-	 *	The strings do not match
+	 *	The string does not start with the prefix
 	 */
-	static bool bmatch(char const * const lstr, char const * const rstr) {
-		for (size_t i = 0; lstr[i] && rstr[i]; ++i) {
-			if (lstr[i] != rstr[i]) { return false; }
+	static bool bmatch(char const * const str,
+	                   char const * const prefix) {
+		size_t i = 0;
+		for (; str[i] && prefix[i]; ++i) {
+			if (str[i] != prefix[i]) { return false; }
 		}
-		return true;
+		return !prefix[i];
 	}
 
 	/**
@@ -384,9 +385,6 @@ class Options {
 	 *	An option definition by reference
 	 */
 	Parameter<OptionT> const & get(char const ch) {
-		if (!ch) {
-			return this->opt_dash;
-		}
 		for (auto const & def : this->defs) {
 			if (def.sparam == ch) {
 				return def;
@@ -403,10 +401,7 @@ class Options {
 	 * @return
 	 *	An option definition by reference
 	 */
-	Parameter<OptionT> const &  get(char const * const str) {
-		if (!str[0]) {
-			return this->opt_ldash;
-		}
+	Parameter<OptionT> const & get(char const * const str) {
 		for (auto const & def : this->defs) {
 			if (match(str, def.lparam)) {
 				return def;
@@ -488,11 +483,19 @@ class Options {
 		}
 		/* long option */
 		if (bmatch(this->argv[this->argi], "--")) {
+			if (!this->argv[this->argi][2]) {
+				this->current = &this->opt_ldash;
+				return *this;
+			}
 			this->current = &get(this->argv[this->argi] + 2);
 			return *this;
 		}
 		/* short option */
 		if (this->argv[this->argi][0] == '-') {
+			if (!this->argv[this->argi][1]) {
+				this->current = &this->opt_dash;
+				return *this;
+			}
 			this->argp = this->argv[this->argi] + 1;
 			this->current = &get(this->argp[0]);
 			return *this;
@@ -682,7 +685,7 @@ class Options {
 					ul += ulc;
 					/*[[fallthrough]];*/
 				default:
-					/* regular characer */
+					/* regular character */
 					cmd += *it;
 					ul += ulc;
 					continue;
