@@ -79,6 +79,27 @@ char const * filename(char const * const path) {
 	return path;
 }
 
+/**
+ * Executes the given command, substituting this process.
+ *
+ * This function is a wrapper around execvp(3) and does not return.
+ *
+ * @param file
+ *	The command to execute, looked up in PATH if no path is provided
+ * @param argv
+ *	The command line arguments of the command
+ * @throws errors::Exception{Exit::EEXEC}
+ */
+[[noreturn]] void execute(char const * const file, char * const argv[]) {
+	if (!file || !file[0]) {
+		fail(Exit::EEXEC, 0, "failed to execute empty command");
+	}
+	execvp(file, argv);
+	/* ^^ must not return */
+	fail(Exit::EEXEC, errno,
+	     "failed to execute %s: %s"_fmt(file, strerror(errno)));
+}
+
 } /* namespace */
 
 /**
@@ -111,11 +132,7 @@ int main(int argc, char * argv[]) try {
 			assert(getopt.offset() < argc &&
 			       "only OPT_DONE may violate this constraint");
 			/* forward the remainder of the arguments */
-			execvp(getopt[0], argv + getopt.offset());
-			/* ^^ must not return */
-			fail(Exit::EEXEC, errno,
-			     "failed to execute %s: %s"_fmt
-			     (getopt[0], strerror(errno)));
+			execute(getopt[0], argv + getopt.offset());
 			break;
 		case OE::OPT_UNKNOWN:
 		case OE::OPT_DASH:
