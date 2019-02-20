@@ -37,6 +37,8 @@ enum class Exit : int {
 	ERANGEFMT,    /**< A user provided range is missing the separator */
 	ETEMPERATURE, /**< The provided value is not a valid temperature */
 	EEXCEPT,      /**< Untreated exception */
+	EFILE,        /**< Not a valid file name */
+	EEXEC,        /**< Command execution failed */
 	LENGTH        /**< Enum length */
 };
 
@@ -47,7 +49,7 @@ const char * const ExitStr[]{
 	"OK", "ECLARG", "EOUTOFRANGE", "ELOAD", "EFREQ", "EMODE", "EIVAL",
 	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
 	"EDAEMON", "EWOPEN", "ESIGNAL", "ERANGEFMT", "ETEMPERATURE",
-	"EEXCEPT"
+	"EEXCEPT", "EFILE", "EEXEC"
 };
 
 static_assert(utility::to_value(Exit::LENGTH) == utility::countof(ExitStr),

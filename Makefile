@@ -6,7 +6,7 @@ PFLAGS=    -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-e
 PREFIX?=   /usr/local
 DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
 
-BINS=      src/powerd++.cpp src/loadrec.cpp
+BINS=      src/powerd++.cpp src/loadrec.cpp src/loadplay.cpp
 SOS=       src/libloadplay.cpp
 SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
 TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/}
@@ -33,7 +33,7 @@ libloadplay.o:
 powerd++: ${.TARGET}.o clas.o
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -lutil -o ${.TARGET}
 
-loadrec: ${.TARGET}.o clas.o
+loadrec loadplay: ${.TARGET}.o clas.o
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -o ${.TARGET}
 
 libloadplay.so: ${.TARGET:C/\.so$//}.o

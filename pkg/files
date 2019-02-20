@@ -1,7 +1,7 @@
 PROGRAM:%%OBJDIR%%/powerd++:%%PREFIX%%/sbin/powerd++
 SYMLINK:powerd++:%%PREFIX%%/sbin/powerdxx
 PROGRAM:%%OBJDIR%%/loadrec:%%PREFIX%%/bin/loadrec
-SCRIPT:%%CURDIR%%/loadplay.sh:%%PREFIX%%/bin/loadplay
+PROGRAM:%%OBJDIR%%/loadplay:%%PREFIX%%/bin/loadplay
 LIB:%%OBJDIR%%/libloadplay.so:%%PREFIX%%/lib/libloadplay.so
 MAN:%%CURDIR%%/README.md:%%DOCSDIR%%/README.md
 MAN:%%CURDIR%%/man/powerd++.8:%%PREFIX%%/man/man8/powerd++.8.gz
