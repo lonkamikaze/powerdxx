@@ -5,11 +5,27 @@
 #
 
 #
+# Get file name prefix for references.
+#
+filename != FILENAME {
+	filename = FILENAME
+	# strip path
+	"pwd" | getline path
+	path = path "/"
+	prefix = substr(filename, 1, length(path)) == path \
+	         ? substr(filename, length(path) + 1) \
+	         : filename
+	sub(/\.[^.]*$/, "", prefix)
+	gsub(/[^_a-z0-9]+/, "-", prefix)
+	prefix = "md_" prefix "_"
+}
+
+#
 # Substitute github references with doxygen references.
 #
 /\(#[_a-z0-9-]*\)/ {
 	gsub(/\(#[_a-z0-9-]*\)/, "<__REF__&__REF__>")
-	gsub(/<__REF__\(#/, "(@ref ")
+	gsub(/<__REF__\(#/, "(@ref " prefix)
 	gsub(/\)__REF__>/, ")")
 }
 
@@ -20,7 +36,7 @@
 line && (/^===*$/ || /^---*$/) {
 	id = tolower(line)
 	gsub(/[^_a-z0-9]+/, "-", id)
-	line = line " {#" id "}"
+	line = line " {#" prefix id "}"
 }
 
 #
