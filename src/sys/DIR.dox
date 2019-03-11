@@ -1,0 +1,7 @@
+/** \dir
+ * C++ wrappers for common C interfaces.
+ */
+
+/** \namespace sys
+ * Wrappers around native system interfaces.
+ */

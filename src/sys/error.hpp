@@ -8,9 +8,6 @@
 #include <cerrno>          /* errno */
 #include <cstring>         /* strerror() */
 
-/**
- * Wrappers around native system interfaces.
- */
 namespace sys {
 
 /**
