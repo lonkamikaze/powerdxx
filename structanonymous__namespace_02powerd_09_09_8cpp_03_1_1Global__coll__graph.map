@@ -1,18 +1,24 @@
 <map id="anonymous_namespace{powerd++.cpp}::Global" name="anonymous_namespace{powerd++.cpp}::Global">
-<area shape="rect" id="node1" title="A collection of all the gloabl, mutable states." alt="" coords="1180,271,1343,313"/>
-<area shape="rect" id="node2" title=" " alt="" coords="942,12,982,39"/>
-<area shape="rect" id="node3" href="$namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Global_1_1ACSet" title="Per AC line state settings." alt="" coords="497,113,660,169"/>
-<area shape="rect" id="node4" title=" " alt="" coords="9,301,68,328"/>
-<area shape="rect" id="node11" href="$namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core" title="Contains the management information for a single CPU core." alt="" coords="497,329,660,370"/>
-<area shape="rect" id="node14" title=" " alt="" coords="172,363,344,389"/>
-<area shape="rect" id="node5" title=" " alt="" coords="222,108,294,135"/>
-<area shape="rect" id="node8" title=" " alt="" coords="684,57,843,98"/>
-<area shape="rect" id="node6" href="$classsys_1_1ctl_1_1Once.html" title=" " alt="" coords="688,451,839,493"/>
-<area shape="rect" id="node7" title=" " alt="" coords="224,516,292,543"/>
-<area shape="rect" id="node9" href="$classsys_1_1ctl_1_1Sysctl.html" title="Represents a sysctl MIB address." alt="" coords="867,463,1057,489"/>
-<area shape="rect" id="node10" title=" " alt="" coords="869,320,1055,376"/>
-<area shape="rect" id="node12" href="$classsys_1_1ctl_1_1Sync.html" title=" " alt="" coords="177,413,339,440"/>
-<area shape="rect" id="node13" title=" " alt="" coords="5,439,72,465"/>
-<area shape="rect" id="node16" href="$classsys_1_1ctl_1_1Sync.html" title=" " alt="" coords="160,464,356,491"/>
-<area shape="rect" id="node15" title=" " alt="" coords="213,191,303,217"/>
+<area shape="rect" id="node1" title="A collection of all the gloabl, mutable states." alt="" coords="1700,358,1863,399"/>
+<area shape="rect" id="node2" title=" " alt="" coords="1462,7,1502,33"/>
+<area shape="rect" id="node3" title=" " alt="" coords="239,108,307,135"/>
+<area shape="rect" id="node7" href="$classsys_1_1ctl_1_1Once.html" title=" " alt="" coords="815,106,965,147"/>
+<area shape="rect" id="node9" href="$namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup" title="Contains the management information for a group of cores with a common clock frequency." alt="" coords="607,446,791,487"/>
+<area shape="rect" id="node4" href="$namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Global_1_1ACSet" title="Per AC line state settings." alt="" coords="989,253,1152,309"/>
+<area shape="rect" id="node5" title=" " alt="" coords="21,325,80,352"/>
+<area shape="rect" id="node12" title=" " alt="" coords="187,453,359,480"/>
+<area shape="rect" id="node13" href="$classutility_1_1Min.html" title=" " alt="" coords="202,275,345,301"/>
+<area shape="rect" id="node16" href="$classutility_1_1Max.html" title=" " alt="" coords="200,325,347,352"/>
+<area shape="rect" id="node6" title=" " alt="" coords="663,333,735,360"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1190,347,1349,389"/>
+<area shape="rect" id="node21" href="$namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core" title="Contains the management information for a single CPU core." alt="" coords="989,505,1152,546"/>
+<area shape="rect" id="node8" title=" " alt="" coords="1176,428,1363,484"/>
+<area shape="rect" id="node10" href="$classsys_1_1ctl_1_1Sync.html" title=" " alt="" coords="192,504,355,531"/>
+<area shape="rect" id="node11" title=" " alt="" coords="17,531,84,557"/>
+<area shape="rect" id="node22" href="$classsys_1_1ctl_1_1Sync.html" title=" " alt="" coords="387,553,583,580"/>
+<area shape="rect" id="node14" href="$classutility_1_1Min.html" title=" " alt="" coords="186,656,361,683"/>
+<area shape="rect" id="node15" title=" " alt="" coords="5,656,96,683"/>
+<area shape="rect" id="node17" href="$classutility_1_1Max.html" title=" " alt="" coords="184,605,363,632"/>
+<area shape="rect" id="node19" href="$classsys_1_1ctl_1_1Sysctl.html" title="Represents a sysctl MIB address." alt="" coords="1387,757,1577,784"/>
+<area shape="rect" id="node20" title=" " alt="" coords="1389,493,1575,549"/>
 </map>

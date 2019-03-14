@@ -1,0 +1,5 @@
+<map id="src/sys/env.hpp" name="src/sys/env.hpp">
+<area shape="rect" id="node1" title="Implements zero&#45;cost abstractions for the getenv(3) facilities." alt="" coords="87,5,201,32"/>
+<area shape="rect" id="node2" href="$libloadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD." alt="" coords="5,80,136,107"/>
+<area shape="rect" id="node3" href="$loadplay_8cpp.html" title="Implements the loadplay a bootstrapping tool for libloadplay." alt="" coords="160,80,277,107"/>
+</map>

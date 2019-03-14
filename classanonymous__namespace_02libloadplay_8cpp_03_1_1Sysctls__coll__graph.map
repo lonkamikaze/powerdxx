@@ -1,0 +1,10 @@
+<map id="anonymous_namespace{libloadplay.cpp}::Sysctls" name="anonymous_namespace{libloadplay.cpp}::Sysctls">
+<area shape="rect" id="node1" title="Singleton class representing the sysctl table for this library." alt="" coords="1143,68,1311,109"/>
+<area shape="rect" id="node2" title=" " alt="" coords="847,5,1038,76"/>
+<area shape="rect" id="node3" href="$structanonymous__namespace_02libloadplay_8cpp_03_1_1mib__t.html" title="Represents MIB, but wraps it to provide the necessary operators to use it as an std::map key." alt="" coords="553,65,716,107"/>
+<area shape="rect" id="node6" title=" " alt="" coords="837,100,1048,171"/>
+<area shape="rect" id="node4" title="STL class." alt="" coords="276,42,356,69"/>
+<area shape="rect" id="node7" href="$classanonymous__namespace_02libloadplay_8cpp_03_1_1SysctlValue.html" title="Instances of this class represents a specific sysctl value." alt="" coords="537,131,732,172"/>
+<area shape="rect" id="node5" title="STL class." alt="" coords="5,35,132,76"/>
+<area shape="rect" id="node8" href="$classanonymous__namespace_02libloadplay_8cpp_03_1_1Callback.html" title=" " alt="" coords="181,116,451,187"/>
+</map>

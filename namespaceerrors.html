@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.4.1</span>
    </div>
   </td>
  </tr>
@@ -106,6 +106,10 @@ Enumerations</h2></td></tr>
 <br />
 &#160;&#160;<a class="el" href="namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaaf81de44f6f20be7b49716d5fecd94067">Exit::ERANGEFMT</a>, 
 <a class="el" href="namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaaf4f94e1dbdb2aaf4dc622e9465fb1003">Exit::ETEMPERATURE</a>, 
+<a class="el" href="namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaa267aa3ee049d97b637e9bfe633cd4c48">Exit::EEXCEPT</a>, 
+<a class="el" href="namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaa6b24e9457c4296abf116bd709930dac7">Exit::EFILE</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaa0440aaf6da8dbca8fccc8e2ac2f65813">Exit::EEXEC</a>, 
 <a class="el" href="namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaaaddeac40406177897b3fccba88558f1c">Exit::LENGTH</a>
 <br />
  }</td></tr>
@@ -228,6 +232,12 @@ An error message. </td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="aa66e9dd0957a04da2a8e23e99ff349eaaf4f94e1dbdb2aaf4dc622e9465fb1003"></a>ETEMPERATURE&#160;</td><td class="fielddoc"><p>The provided value is not a valid temperature. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="aa66e9dd0957a04da2a8e23e99ff349eaa267aa3ee049d97b637e9bfe633cd4c48"></a>EEXCEPT&#160;</td><td class="fielddoc"><p>Untreated exception. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa66e9dd0957a04da2a8e23e99ff349eaa6b24e9457c4296abf116bd709930dac7"></a>EFILE&#160;</td><td class="fielddoc"><p>Not a valid file name. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa66e9dd0957a04da2a8e23e99ff349eaa0440aaf6da8dbca8fccc8e2ac2f65813"></a>EEXEC&#160;</td><td class="fielddoc"><p>Command execution failed. </p>
+</td></tr>
 <tr><td class="fieldname"><a id="aa66e9dd0957a04da2a8e23e99ff349eaaaddeac40406177897b3fccba88558f1c"></a>LENGTH&#160;</td><td class="fielddoc"><p>Enum length. </p>
 </td></tr>
 </table>
@@ -299,7 +309,7 @@ An error message. </td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">    <span class="stringliteral">&quot;OK&quot;</span>, <span class="stringliteral">&quot;ECLARG&quot;</span>, <span class="stringliteral">&quot;EOUTOFRANGE&quot;</span>, <span class="stringliteral">&quot;ELOAD&quot;</span>, <span class="stringliteral">&quot;EFREQ&quot;</span>, <span class="stringliteral">&quot;EMODE&quot;</span>, <span class="stringliteral">&quot;EIVAL&quot;</span>,</div><div class="line">    <span class="stringliteral">&quot;ESAMPLES&quot;</span>, <span class="stringliteral">&quot;ESYSCTL&quot;</span>, <span class="stringliteral">&quot;ENOFREQ&quot;</span>, <span class="stringliteral">&quot;ECONFLICT&quot;</span>, <span class="stringliteral">&quot;EPID&quot;</span>, <span class="stringliteral">&quot;EFORBIDDEN&quot;</span>,</div><div class="line">    <span class="stringliteral">&quot;EDAEMON&quot;</span>, <span class="stringliteral">&quot;EWOPEN&quot;</span>, <span class="stringliteral">&quot;ESIGNAL&quot;</span>, <span class="stringliteral">&quot;ERANGEFMT&quot;</span>, <span class="stringliteral">&quot;ETEMPERATURE&quot;</span></div><div class="line">}</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">    <span class="stringliteral">&quot;OK&quot;</span>, <span class="stringliteral">&quot;ECLARG&quot;</span>, <span class="stringliteral">&quot;EOUTOFRANGE&quot;</span>, <span class="stringliteral">&quot;ELOAD&quot;</span>, <span class="stringliteral">&quot;EFREQ&quot;</span>, <span class="stringliteral">&quot;EMODE&quot;</span>, <span class="stringliteral">&quot;EIVAL&quot;</span>,</div><div class="line">    <span class="stringliteral">&quot;ESAMPLES&quot;</span>, <span class="stringliteral">&quot;ESYSCTL&quot;</span>, <span class="stringliteral">&quot;ENOFREQ&quot;</span>, <span class="stringliteral">&quot;ECONFLICT&quot;</span>, <span class="stringliteral">&quot;EPID&quot;</span>, <span class="stringliteral">&quot;EFORBIDDEN&quot;</span>,</div><div class="line">    <span class="stringliteral">&quot;EDAEMON&quot;</span>, <span class="stringliteral">&quot;EWOPEN&quot;</span>, <span class="stringliteral">&quot;ESIGNAL&quot;</span>, <span class="stringliteral">&quot;ERANGEFMT&quot;</span>, <span class="stringliteral">&quot;ETEMPERATURE&quot;</span>,</div><div class="line">    <span class="stringliteral">&quot;EEXCEPT&quot;</span>, <span class="stringliteral">&quot;EFILE&quot;</span>, <span class="stringliteral">&quot;EEXEC&quot;</span></div><div class="line">}</div></div><!-- fragment -->
 <p>Printable strings for exit codes. </p>
 
 </div>

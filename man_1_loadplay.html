@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.4.1</span>
    </div>
   </td>
  </tr>
@@ -70,7 +70,7 @@ $(function() {
 loadplay(1)             FreeBSD General Commands Manual            loadplay(1)</pre><pre><b>NAME</b>
      <b>loadplay</b> – CPU load player</pre><pre><b>SYNOPSIS</b>
      <b>loadplay</b> <b>-h</b>
-     <b>loadplay</b> [<b>-i</b> <u>file</u>] [<b>-o</b> <u>file</u>] <u>command</u> <u>...</u></pre><pre><b>DESCRIPTION</b>
+     <b>loadplay</b> [<b>-i</b> <u>file</u>] [<b>-o</b> <u>file</u>] <u>command</u> [...]</pre><pre><b>DESCRIPTION</b>
      The <b>loadplay</b> command replays a load recording created with loadrec(1).
      The <u>command</u> can either be powerd(8) or powerd++(8), compatibility with
      other tools has not been tested.</pre><pre>   <b>OPTIONS</b>
@@ -78,11 +78,8 @@ loadplay(1)             FreeBSD General Commands Manual            loadplay(1)</
              Show usage and exit.</pre><pre>     <b>-i</b>, <b>--input</b> <u>file</u>
              Read load recording from <u>file</u> instead of <u>stdin</u>.</pre><pre>     <b>-o</b>, <b>--output</b> <u>file</u>
              Output statistics to <u>file</u> instead of <u>stdout</u>.</pre><pre><b>USAGE</b> <b>NOTES</b>
-     The <b>loadplay</b> command is a shell script that injects <u>libloadplay.so</u> into
-     <u>command</u>.  This library simulates the load from the input and outputs load
-     statistics.  If <u>command</u> generates output on <u>stdout</u>, it will be mixed into
-     the load statistics. So powerd(8) should be run without the <b>-v</b> flag and
-     powerd++(8) without the <b>-f</b> flag.</pre><pre>   <b>OUTPUT</b>
+     The <b>loadplay</b> command injects <u>libloadplay.so</u> into <u>command</u>.  This library
+     simulates the load from the input and outputs load statistics.</pre><pre>   <b>OUTPUT</b>
      The first line of output contains column headings, columns are separated
      by a single space.</pre><pre>     The Following columns are present, columns containing <b>%d</b> occur for each
      core simulated:</pre><pre>     <b>time[s]</b>
@@ -95,7 +92,7 @@ loadplay(1)             FreeBSD General Commands Manual            loadplay(1)</
      There is one sample for each recorded line. The duration of each frame
      depends on the recording, which defaults to 25 ms.  At this sample rate
      loads are dominated by noise, so a gliding average should be applied to
-     any load columns for further use, such as plotting.</pre><pre><b>IMPLEMENTATION</b>
+     any load columns for further use, such as plotting.</pre><pre><b>IMPLEMENTATION</b> <b>NOTES</b>
      The injected <u>libloadplay.so</u> works by intercepting system function calls
      and substituting the host environment with the recording. To achieve this
      the following function calls are intercepted:</pre><pre>     <b>•</b>   sysctl(3), sysctlnametomib(3), sysctlbyname(3)</pre><pre>     <b>•</b>   daemon(3)</pre><pre>     <b>•</b>   geteuid(2)</pre><pre>     <b>•</b>   pidfile_open(3), pidfile_write, pidfile_close(3), pidfile_remove(3),
@@ -118,11 +115,43 @@ loadplay(1)             FreeBSD General Commands Manual            loadplay(1)</
      frequencies to update <b>kern.cp</b><b><u>_</u></b><b>times</b>.  The host process reads this data
      and adjusts the clock frequencies, which in turn affects the next frame.</pre><pre>   <b>FINALISATION</b>
      After reading the last line of input the simulation thread sends a <b>SIGINT</b>
-     to the process to cause it to terminate.</pre><pre><b>FILES</b>
-     <u>/usr/local/lib/libloadplay.so</u> A library injected into <u>command</u> via the
-     LD_PRELOAD environment variable.</pre><pre><b>SEE</b> <b>ALSO</b>
-     loadrec(1), powerd(8), powerd++(8), rtld(1), signal(3)</pre><pre><b>AUTHORS</b>
-     Implementation and manual by Dominic Fandrey ⟨kami@freebsd.org⟩</pre><pre>FreeBSD 12.0-STABLE            13 January, 2019            FreeBSD 12.0-STABLE
+     to the process to cause it to terminate.</pre><pre><b>ENVIRONMENT</b>
+     LOADPLAY_IN
+             If set the file named is used for input instead of <u>stdin</u>.  This
+             only affects the input of <b>loadplay</b>, the host process is not
+             affected.</pre><pre>     LOADPLAY_OUT
+             If set the file named is used for output instead of <u>stdout</u>.  This
+             only affects the output of <b>loadplay</b>, the host process is not
+             affected.</pre><pre>     LD_PRELOAD
+             Used to inject <u>libloadplay.so</u> into the host process.</pre><pre><b>FILES</b>
+     <u>/usr/local/lib/libloadplay.so</u>
+             A library injected into <u>command</u> via the LD_PRELOAD environment
+             variable.</pre><pre><b>EXAMPLES</b>
+     Play a load recording with <b>loadplay</b>:</pre><pre>         &gt; loadplay -i loads/freq_tracking.load powerd++
+         time[s] cpu.0.rec.freq[MHz] cpu.0.rec.load[MHz] cpu.0.run.freq[MHz] cpu.0.run.load[MHz] cpu.1.rec.freq[MHz] cpu.1.rec.load[MHz] cpu.1.run.freq[MHz] cpu.1.run.load[MHz] cpu.2.rec.freq[MHz] cpu.2.rec.load[MHz] cpu.2.run.freq[MHz] cpu.2.run.load[MHz] cpu.3.rec.freq[MHz] cpu.3.rec.load[MHz] cpu.3.run.freq[MHz] cpu.3.run.load[MHz]
+         0.025 1700 1700.0 1700 1700.0 1700 0.0 1700 0.0 1700 1700.0 1700 1700.0 1700 850.0 1700 850.0
+         0.050 1700 1700.0 1700 1700.0 1700 1700.0 1700 1700.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+         0.075 1700 566.7 1700 566.6 1700 1700.0 1700 1700.0 1700 0.0 1700 0.0 1700 566.7 1700 566.6
+         0.100 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+         0.125 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+         0.150 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+         0.175 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+         0.200 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+         0.225 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+         0.250 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0
+         0.275 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0 1700 0.0</pre><pre>     Capture load and <b>loadplay</b> output simultaneously into two different files:</pre><pre>         &gt; loadplay -i loads/freq_tracking.load -o load.csv powerd++ -f &gt; load.out</pre><pre>     Capture and display <b>loadplay</b> output:</pre><pre>         &gt; loadplay -i loads/freq_tracking.load -o load.csv powerd++ -f | tee load.out
+         power:  online, load:  527 MHz, cpu0.freq: 1700 MHz, wanted: 1405 MHz
+         power:  online, load:  459 MHz, cpu0.freq: 1400 MHz, wanted: 1224 MHz
+         power:  online, load:  502 MHz, cpu0.freq: 1200 MHz, wanted: 1338 MHz
+         power:  online, load:  548 MHz, cpu0.freq: 1300 MHz, wanted: 1461 MHz
+         power:  online, load:  704 MHz, cpu0.freq: 1500 MHz, wanted: 1877 MHz
+         power:  online, load:  750 MHz, cpu0.freq: 1900 MHz, wanted: 2000 MHz
+         power:  online, load:  805 MHz, cpu0.freq: 2000 MHz, wanted: 2146 MHz
+         power:  online, load:  772 MHz, cpu0.freq: 2200 MHz, wanted: 2058 MHz
+         power:  online, load:  574 MHz, cpu0.freq: 2000 MHz, wanted: 1530 MHz
+         power:  online, load:  515 MHz, cpu0.freq: 1500 MHz, wanted: 1373 MHz</pre><pre><b>SEE</b> <b>ALSO</b>
+     loadrec(1), powerd(8), powerd++(8), rtld(1), signal(3), tee(1)</pre><pre><b>AUTHORS</b>
+     Implementation and manual by Dominic Fandrey &lt;<u>kami@freebsd.org</u>&gt;</pre><pre>FreeBSD 12.0-STABLE            20 February, 2019           FreeBSD 12.0-STABLE
 </pre> </div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->

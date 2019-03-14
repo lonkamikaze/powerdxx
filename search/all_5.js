@@ -1,10 +1,13 @@
 var searchData=
 [
   ['fahrenheit',['FAHRENHEIT',['../namespaceanonymous__namespace_02clas_8cpp_03.html#ad33ed495d1449d52604c62ca046bc8e9a2210fed95264f24655050c377638f48f',1,'anonymous_namespace{clas.cpp}']]],
-  ['fail',['fail',['../namespaceerrors.html#adf826b76260af44a6abde9f279cffacf',1,'errors::fail()'],['../namespaceanonymous__namespace_02loadplay_8cpp_03.html#ac11ace9a2c889224bdf040454d726505',1,'anonymous_namespace{loadplay.cpp}::fail()']]],
-  ['features',['FEATURES',['../namespaceanonymous__namespace_02loadplay_8cpp_03.html#abe7afc378ded5bb24357bac70c733ccc',1,'anonymous_namespace{loadplay.cpp}::FEATURES()'],['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a49272e8d3de0045a6930ad59f30a4b9a',1,'anonymous_namespace{loadrec.cpp}::FEATURES()']]],
+  ['fail',['fail',['../namespaceerrors.html#adf826b76260af44a6abde9f279cffacf',1,'errors::fail()'],['../namespaceanonymous__namespace_02libloadplay_8cpp_03.html#aa7ebcc9625a161ad713fa64d84931caf',1,'anonymous_namespace{libloadplay.cpp}::fail()']]],
+  ['features',['FEATURES',['../namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a9f00556ce85051c349543c24d8d8f3b6',1,'anonymous_namespace{libloadplay.cpp}::FEATURES()'],['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a49272e8d3de0045a6930ad59f30a4b9a',1,'anonymous_namespace{loadrec.cpp}::FEATURES()']]],
+  ['file_5fin',['FILE_IN',['../namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a6acec2db5293c31eb40c6df0974c82d7',1,'anonymous_namespace{loadplay.cpp}']]],
+  ['file_5fout',['FILE_OUT',['../namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a980324ddbe12575c7460d859ffb70d14',1,'anonymous_namespace{loadplay.cpp}']]],
   ['file_5foutput',['FILE_OUTPUT',['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a6aa15f8d333f87502d486d530bf032fea885582a6c40572e068a032acab58f5d7',1,'anonymous_namespace{loadrec.cpp}']]],
   ['file_5fpid',['FILE_PID',['../namespaceanonymous__namespace_02loadrec_8cpp_03.html#a6aa15f8d333f87502d486d530bf032fea7be9907a85a4d9729fd62934a2a5f576',1,'anonymous_namespace{loadrec.cpp}::FILE_PID()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fca7be9907a85a4d9729fd62934a2a5f576',1,'anonymous_namespace{powerd++.cpp}::FILE_PID()']]],
+  ['filename',['filename',['../namespaceanonymous__namespace_02loadplay_8cpp_03.html#ae8c04d034d1318017d4ba7e86a61ef40',1,'anonymous_namespace{loadplay.cpp}']]],
   ['fixme',['fixme',['../namespacefixme.html',1,'']]],
   ['fixme_2ehpp',['fixme.hpp',['../fixme_8hpp.html',1,'']]],
   ['flag_5fforeground',['FLAG_FOREGROUND',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fca576d3d085f2615add3e0d75cacd32b14',1,'anonymous_namespace{powerd++.cpp}']]],
@@ -13,8 +16,8 @@ var searchData=
   ['fmt',['fmt',['../classutility_1_1Formatter.html#a68f6cd1e0b43a6b37ce51b805b803ff1',1,'utility::Formatter']]],
   ['foreground',['foreground',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ac5b98a371f9d33d6c7ddc749847c177d',1,'anonymous_namespace{powerd++.cpp}::Global']]],
   ['formatter',['Formatter',['../classutility_1_1Formatter.html',1,'utility::Formatter&lt; BufSize &gt;'],['../classutility_1_1Formatter.html#a6226820a797a90a037de789f4fc6bc79',1,'utility::Formatter::Formatter()']]],
-  ['frame',['Frame',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Report_1_1Frame.html',1,'anonymous_namespace{loadplay.cpp}::Report::Frame'],['../classanonymous__namespace_02loadplay_8cpp_03_1_1Report_1_1Frame.html#a975582ddabb03f4b8635bbba5a393893',1,'anonymous_namespace{loadplay.cpp}::Report::Frame::Frame()'],['../classanonymous__namespace_02loadplay_8cpp_03_1_1Report.html#a373dcc4394ff9e24cdd822ff49a4849e',1,'anonymous_namespace{loadplay.cpp}::Report::frame()']]],
-  ['freq',['freq',['../namespaceanonymous__namespace_02loadplay_8cpp_03.html#abb7c78f2d3eef517f1453506f06a8b25',1,'anonymous_namespace{loadplay.cpp}::CoreReport::freq()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a583bccd0285da4734f675a4b7d15e353',1,'anonymous_namespace{powerd++.cpp}::Core::freq()'],['../namespaceconstants.html#a6c63a3844ed898f35845c38bf0d45aa0',1,'constants::FREQ()'],['../namespaceclas.html#aad02dca2fa02941e59aaca7c9768ea03',1,'clas::freq()']]],
+  ['frame',['Frame',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Report_1_1Frame.html',1,'anonymous_namespace{libloadplay.cpp}::Report::Frame'],['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Report_1_1Frame.html#a70ea8d8a1dac030cf88793a8906ffa27',1,'anonymous_namespace{libloadplay.cpp}::Report::Frame::Frame()'],['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Report.html#ac9b333aa9654ccd3a38223eb962844ee',1,'anonymous_namespace{libloadplay.cpp}::Report::frame()']]],
+  ['freq',['freq',['../namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a1b22148cdd3db2d49f598031fd0019d1',1,'anonymous_namespace{libloadplay.cpp}::CoreReport::freq()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a9ea8b547c9dd4fff61fbf0f48b7d25c0',1,'anonymous_namespace{powerd++.cpp}::CoreGroup::freq()'],['../namespaceconstants.html#a6c63a3844ed898f35845c38bf0d45aa0',1,'constants::FREQ()'],['../namespaceclas.html#aad02dca2fa02941e59aaca7c9768ea03',1,'clas::freq()']]],
   ['freq_5fdefault_5fmax',['FREQ_DEFAULT_MAX',['../namespaceconstants.html#afce96c9477ff79a2ed047dac7eb0d9a3',1,'constants']]],
   ['freq_5fdefault_5fmin',['FREQ_DEFAULT_MIN',['../namespaceconstants.html#a69b64e98f960e01ab3ee772f4eb1fc1f',1,'constants']]],
   ['freq_5flevels',['FREQ_LEVELS',['../namespaceconstants.html#af53230084ec615ccf6a2e3e6e8960788',1,'constants']]],
@@ -29,8 +32,8 @@ var searchData=
   ['freq_5frange_5fbatt',['FREQ_RANGE_BATT',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad88aa2b9c8ecf8e81ddfc147d30d42fcaa1d00feb31e2040cea093732770c2cda',1,'anonymous_namespace{powerd++.cpp}']]],
   ['freq_5ftracking',['FREQ_TRACKING',['../namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279ae8b8c25307c44b2ce50047ce2e13babd',1,'version']]],
   ['freq_5funset',['FREQ_UNSET',['../namespaceconstants.html#af18a3bba4b55d879b76ba30ab71574a7',1,'constants']]],
-  ['freqctl',['freqCtl',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Emulator.html#a6cd92568cfb8a9b7b9f55f979201b9af',1,'anonymous_namespace{loadplay.cpp}::Emulator::Core']]],
+  ['freqctl',['freqCtl',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Emulator.html#af8493d828785f325be49ed3299fbea10',1,'anonymous_namespace{libloadplay.cpp}::Emulator::Core']]],
   ['freqguard',['FreqGuard',['../classanonymous__namespace_02powerd_09_09_8cpp_03_1_1FreqGuard.html',1,'anonymous_namespace{powerd++.cpp}::FreqGuard'],['../classanonymous__namespace_02powerd_09_09_8cpp_03_1_1FreqGuard.html#ab02fbb60b5876c95f6325990eed27051',1,'anonymous_namespace{powerd++.cpp}::FreqGuard::FreqGuard()']]],
   ['freqs',['freqs',['../classanonymous__namespace_02powerd_09_09_8cpp_03_1_1FreqGuard.html#a66a417123d720520751e1e9c9196f90a',1,'anonymous_namespace{powerd++.cpp}::FreqGuard']]],
-  ['function_5ft',['function_t',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html#a364ff255cd352b44d6b61b788e865a8f',1,'anonymous_namespace{loadplay.cpp}::Callback']]]
+  ['function_5ft',['function_t',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Callback.html#a8ffa3cf5dfd49630fcbc129df66026df',1,'anonymous_namespace{libloadplay.cpp}::Callback']]]
 ];

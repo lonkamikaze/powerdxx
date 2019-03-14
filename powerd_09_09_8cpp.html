@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>powerd++: powerd++.cpp File Reference</title>
+<title>powerd++: src/powerd++.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.4.1</span>
    </div>
   </td>
  </tr>
@@ -60,6 +60,10 @@ $(function() {
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
@@ -102,6 +106,9 @@ Include dependency graph for powerd++.cpp:</div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup">anonymous_namespace{powerd++.cpp}::CoreGroup</a></td></tr>
+<tr class="memdesc:structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains the management information for a group of cores with a common clock frequency.  <a href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup">More...</a><br /></td></tr>
+<tr class="separator:structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core">anonymous_namespace{powerd++.cpp}::Core</a></td></tr>
 <tr class="memdesc:structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains the management information for a single CPU core.  <a href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core">More...</a><br /></td></tr>
 <tr class="separator:structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -228,13 +235,113 @@ Variables</h2></td></tr>
 char const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ae27fbc9e3a000977181628c80d44443e">anonymous_namespace{powerd++.cpp}::USAGE</a> = &quot;[-hvf] [-abn mode] [-mM freq] [-FAB freq:freq] [-H temp:temp] [-p ival] [-s cnt] [-P file]&quot;</td></tr>
 <tr class="memdesc:ae27fbc9e3a000977181628c80d44443e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The short usage string. <br /></td></tr>
 <tr class="separator:ae27fbc9e3a000977181628c80d44443e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d2b0f28efcc2b39fe33bab26cbbe768"><td class="memItemLeft" align="right" valign="top">Option&lt; OE &gt; const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a3d2b0f28efcc2b39fe33bab26cbbe768">anonymous_namespace{powerd++.cpp}::OPTIONS</a> []</td></tr>
-<tr class="memdesc:a3d2b0f28efcc2b39fe33bab26cbbe768"><td class="mdescLeft">&#160;</td><td class="mdescRight">Definitions of command line options.  <a href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a3d2b0f28efcc2b39fe33bab26cbbe768">More...</a><br /></td></tr>
-<tr class="separator:a3d2b0f28efcc2b39fe33bab26cbbe768"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a919ad6adfa87238ac1c75f093290f7"><td class="memItemLeft" align="right" valign="top">Parameter&lt; OE &gt; const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a7a919ad6adfa87238ac1c75f093290f7">anonymous_namespace{powerd++.cpp}::PARAMETERS</a> []</td></tr>
+<tr class="memdesc:a7a919ad6adfa87238ac1c75f093290f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Definitions of command line parameters.  <a href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a7a919ad6adfa87238ac1c75f093290f7">More...</a><br /></td></tr>
+<tr class="separator:a7a919ad6adfa87238ac1c75f093290f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implements powerd++ a drop in replacement for FreeBSD's powerd. </p>
 </div><hr/><h2 class="groupheader">Class Documentation</h2>
+<a name="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup" id="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup">&#9670;&nbsp;</a></span>anonymous_namespace{powerd++.cpp}::CoreGroup</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct anonymous_namespace{powerd++.cpp}::CoreGroup</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>Contains the management information for a group of cores with a common clock frequency. </p>
+</div><div class="dynheader">
+Collaboration diagram for anonymous_namespace{powerd++.cpp}::CoreGroup:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup__coll__graph.svg" width="662" height="396"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+<table class="fieldtable">
+<tr><th colspan="3">Class Members</th></tr>
+<tr><td class="fieldtype">
+<a id="a22204c84610381b8105c4b9326c58b6c"></a>coreid_t</td>
+<td class="fieldname">
+corei</td>
+<td class="fielddoc">
+The number of the core owning dev.cpu. <p>d.freq. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a9ea8b547c9dd4fff61fbf0f48b7d25c0"></a>SysctlSync&lt; mhz_t &gt;</td>
+<td class="fieldname">
+freq</td>
+<td class="fielddoc">
+The sysctl dev.cpu. <p>d.freq. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a62f9c3ed191aa24ef4989561b6167ebb"></a><a class="el" href="classutility_1_1Max.html">Max</a>&lt; mhz_t &gt;</td>
+<td class="fieldname">
+load</td>
+<td class="fielddoc">
+The maximum load reported by all cores in the group. <p>This is updated by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad453f73637a8282dbd1a0d382ca6fa42" title="Updates the cp_times ring buffer and computes the load average for each core.">update_loads()</a>. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="af9b21500a077339d740d4ad40072eb76"></a>unique_ptr&lt; mhz_t[]&gt;</td>
+<td class="fieldname">
+loads</td>
+<td class="fielddoc">
+A ring buffer of maximum load samples for this core group. <p>Each maximum load sample is weighted with the core frequency at which it was taken.</p>
+<p>This is updated by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad453f73637a8282dbd1a0d382ca6fa42" title="Updates the cp_times ring buffer and computes the load average for each core.">update_loads()</a>. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="ae497c6fb2168b82e97c37bfcbdb5aa5c"></a>mhz_t</td>
+<td class="fieldname">
+loadsum</td>
+<td class="fielddoc">
+The maximum load sum of all controlled cores. <p>This is updated by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad453f73637a8282dbd1a0d382ca6fa42" title="Updates the cp_times ring buffer and computes the load average for each core.">update_loads()</a>. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a98a9809bf3edc1a1c44ee5387c3959f0"></a><a class="el" href="classutility_1_1Min.html">Min</a>&lt; mhz_t &gt;</td>
+<td class="fieldname">
+max</td>
+<td class="fielddoc">
+The maximum group clock rate. <p>The least of all core maxima in the group. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="ac810f1b1ac22b152e61d0792ece9901e"></a><a class="el" href="classutility_1_1Max.html">Max</a>&lt; mhz_t &gt;</td>
+<td class="fieldname">
+min</td>
+<td class="fielddoc">
+The minimum group clock rate. <p>The greatest of all core minima in the group. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a75f65651841f906a024fda8489869493"></a>mhz_t</td>
+<td class="fieldname">
+sample_freq</td>
+<td class="fielddoc">
+The dev.cpu. <p>d.freq value for the current load sample.</p>
+<p>This is updated by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad453f73637a8282dbd1a0d382ca6fa42" title="Updates the cp_times ring buffer and computes the load average for each core.">update_loads()</a>. </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a id="a2e637b431852e2bf473908720308edfc"></a><a class="el" href="classutility_1_1Max.html">Max</a>&lt; decikelvin_t &gt;</td>
+<td class="fieldname">
+temp</td>
+<td class="fielddoc">
+The maximum temperature measurement taken in the group. </td></tr>
+<tr><td class="fieldtype">
+<a id="a6186b7ea497a1f9daa04c44eba468300"></a><a class="el" href="classutility_1_1Min.html">Min</a>&lt; decikelvin_t &gt;</td>
+<td class="fieldname">
+temp_crit</td>
+<td class="fielddoc">
+Critical core temperature in dK. </td></tr>
+<tr><td class="fieldtype">
+<a id="a852632499bd8f0c30b18da77e0749578"></a><a class="el" href="classutility_1_1Min.html">Min</a>&lt; decikelvin_t &gt;</td>
+<td class="fieldname">
+temp_high</td>
+<td class="fielddoc">
+High core temperature in dK. </td></tr>
+</table>
+
+</div>
+</div>
 <a name="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core" id="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core">&#9670;&nbsp;</a></span>anonymous_namespace{powerd++.cpp}::Core</h2>
 
@@ -250,7 +357,7 @@ char const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="
 </div><div class="dynheader">
 Collaboration diagram for anonymous_namespace{powerd++.cpp}::Core:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core__coll__graph.svg" width="666" height="442"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Core__coll__graph.svg" width="1054" height="492"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="fieldtable">
@@ -262,36 +369,17 @@ all</td>
 <td class="fielddoc">
 Count of all ticks. </td></tr>
 <tr><td class="fieldtype">
-<a id="af380dedd0698bb2af1c4069f5ad6761e"></a>coreid_t</td>
-<td class="fieldname">
-controller</td>
-<td class="fielddoc">
-The core that controls the frequency for this core. </td></tr>
-<tr><td class="fieldtype">
 <a id="a6ebf396fbdbca07e47dc730d8b3e0dfc"></a>cptime_t const  *</td>
 <td class="fieldname">
 cp_time</td>
 <td class="fielddoc">
 A pointer to the kern.cp_times section for this core. </td></tr>
 <tr><td class="fieldtype">
-<a id="a583bccd0285da4734f675a4b7d15e353"></a>SysctlSync&lt; mhz_t &gt;</td>
+<a id="a5e59010ea4e21463157c4f347b3ba00e"></a><a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup">CoreGroup</a> *</td>
 <td class="fieldname">
-freq</td>
+group</td>
 <td class="fielddoc">
-The sysctl kern.cpu.N.freq, if present. </td></tr>
-<tr><td class="fieldtype">
-<a id="a76d5f45a3ef390dcfec653f58051d313"></a>mhz_t</td>
-<td class="fieldname">
-group_loadsum</td>
-<td class="fielddoc">
-For the controlling core this is set to the group loadsum. <p>This is updated by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad453f73637a8282dbd1a0d382ca6fa42" title="Updates the cp_times ring buffer and computes the load average for each core.">update_loads()</a>. </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="acda8793ac228e63edf77fc9fd79c089d"></a>decikelvin_t</td>
-<td class="fieldname">
-group_maxtemp</td>
-<td class="fielddoc">
-For the controlling core this is set to the maximum temperature measurement taken in the group. </td></tr>
+The core that controls the frequency for this core. </td></tr>
 <tr><td class="fieldtype">
 <a id="a34eff7ff05e59994578e81ea0640a756"></a>cptime_t</td>
 <td class="fieldname">
@@ -299,58 +387,12 @@ idle</td>
 <td class="fielddoc">
 The idle ticks count. </td></tr>
 <tr><td class="fieldtype">
-<a id="abe27fc65d5919a8df334e2ff8490463f"></a>unique_ptr&lt; mhz_t[]&gt;</td>
-<td class="fieldname">
-loads</td>
-<td class="fielddoc">
-A ring buffer of load samples for this core. <p>Each load sample is weighted with the core frequency at which it was taken.</p>
-<p>This is updated by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad453f73637a8282dbd1a0d382ca6fa42" title="Updates the cp_times ring buffer and computes the load average for each core.">update_loads()</a>. </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a7fc56201fd02f790d294ee186db4e026"></a>mhz_t</td>
-<td class="fieldname">
-loadsum</td>
-<td class="fielddoc">
-The sum of all load samples. <p>This is updated by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad453f73637a8282dbd1a0d382ca6fa42" title="Updates the cp_times ring buffer and computes the load average for each core.">update_loads()</a>. </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a3c2aebe5f832c0a3cfb16d6ea412c3aa"></a>mhz_t</td>
-<td class="fieldname">
-max</td>
-<td class="fielddoc">
-The maximum core clock rate. </td></tr>
-<tr><td class="fieldtype">
-<a id="a7c01cb931c82edc8bb030e8150f89d64"></a>mhz_t</td>
-<td class="fieldname">
-min</td>
-<td class="fielddoc">
-The minimum core clock rate. </td></tr>
-<tr><td class="fieldtype">
-<a id="aab66109a42995d5f234f341817c2b90e"></a>mhz_t</td>
-<td class="fieldname">
-sample_freq</td>
-<td class="fielddoc">
-The kern.cpu.N.freq value for the current load sample. <p>This is updated by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad453f73637a8282dbd1a0d382ca6fa42" title="Updates the cp_times ring buffer and computes the load average for each core.">update_loads()</a>. </p>
-</td></tr>
-<tr><td class="fieldtype">
 <a id="ad0ee920a179221333da2061386cac18e"></a>SysctlSync&lt; decikelvin_t &gt;</td>
 <td class="fieldname">
 temp</td>
 <td class="fielddoc">
 The dev.cpu. <p>d.temperature sysctl, if present. </p>
 </td></tr>
-<tr><td class="fieldtype">
-<a id="a11be590a336d7816a3086f215a2b652a"></a>decikelvin_t</td>
-<td class="fieldname">
-temp_crit</td>
-<td class="fielddoc">
-Critical core temperature in dK. </td></tr>
-<tr><td class="fieldtype">
-<a id="a77899d256a13c3be48e6a6903709880c"></a>decikelvin_t</td>
-<td class="fieldname">
-temp_high</td>
-<td class="fielddoc">
-High core temperature in dK. </td></tr>
 </table>
 
 </div>
@@ -371,7 +413,7 @@ High core temperature in dK. </td></tr>
 </div><div class="dynheader">
 Collaboration diagram for anonymous_namespace{powerd++.cpp}::Global:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Global__coll__graph.svg" width="1348" height="548"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02powerd_09_09_8cpp_03_1_1Global__coll__graph.svg" width="1868" height="798"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="fieldtable">
@@ -437,6 +479,13 @@ FREQ_UNSET[3]</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
+<a id="a58616daf1f07045be8923487c70f0832"></a>unique_ptr&lt; <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup">CoreGroup</a>[]&gt;</td>
+<td class="fieldname">
+groups</td>
+<td class="fielddoc">
+This buffer is to be allocated with the number of core groups. <p>A core group is created by <a class="el" href="namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#ad5b554f80c2ae1967c804d468d14d82c" title="Perform initial tasks.">init()</a> for each core that has a dev.cpu.d.freq handle. </p>
+</td></tr>
+<tr><td class="fieldtype">
 <a id="a8b35c113b310c9079b5686a142615734"></a>struct anonymous_namespace{powerd++</td>
 <td class="fieldname">
 HADP[3]</td>
@@ -455,6 +504,12 @@ ncpu</td>
 <td class="fielddoc">
 The number of CPU cores or threads. </td></tr>
 <tr><td class="fieldtype">
+<a id="a9ea4a650da716ef6625d693998ba7341"></a>coreid_t</td>
+<td class="fieldname">
+ngroups</td>
+<td class="fielddoc">
+The number of frequency controlling core groups. </td></tr>
+<tr><td class="fieldtype">
 <a id="a7a30f70c0b22d74add519346b81cccd2"></a>struct anonymous_namespace{powerd++</td>
 <td class="fieldname">
 online[3]</td>
@@ -465,7 +520,7 @@ online[3]</td>
 <td class="fieldname">
 pidfilename</td>
 <td class="fielddoc">
-Name of an alternative pidfile. <p>If not given <a class="el" href="loadplay_8cpp.html#a2142be902525c0f4e400b856a257f236" title="Intercept calls to pidfile_open().">pidfile_open()</a> uses a default name. </p>
+Name of an alternative pidfile. <p>If not given <a class="el" href="libloadplay_8cpp.html#a2142be902525c0f4e400b856a257f236" title="Intercept calls to pidfile_open().">pidfile_open()</a> uses a default name. </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a id="a7e5a23328552cc52a51861a31c66177e"></a>size_t</td>
@@ -485,6 +540,18 @@ The number of load samples to take. </td></tr>
 signal</td>
 <td class="fielddoc">
 The last signal received, used for terminating. </td></tr>
+<tr><td class="fieldtype">
+<a id="a0cf002f136b7819020c2af82d140cd3e"></a>decikelvin_t</td>
+<td class="fieldname">
+temp_crit</td>
+<td class="fielddoc">
+User set critical core temperature in dK. </td></tr>
+<tr><td class="fieldtype">
+<a id="a7aad7ed79e29434c59d46baa0e2cd528"></a>decikelvin_t</td>
+<td class="fieldname">
+temp_high</td>
+<td class="fielddoc">
+User set high core temperature in dK. </td></tr>
 <tr><td class="fieldtype">
 <a id="af902e5102d9b18f8cbfc90d42ae89d56"></a>bool</td>
 <td class="fieldname">

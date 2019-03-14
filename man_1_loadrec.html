@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.4.1</span>
    </div>
   </td>
  </tr>
@@ -98,28 +98,29 @@ loadrec(1)              FreeBSD General Commands Manual             loadrec(1)</
          Stopping powerdxx.
          Waiting for PIDS: 63574.
          # powerd++ -M1700</pre><pre>     Run <b>loadrec</b> for a brief time to test it:</pre><pre>         &gt; loadrec -d.25s
+         usr.app.powerdxx.loadrec.features=1
          hw.machine=amd64
          hw.model=Intel(R) Core(TM) i7-4500U CPU @ 1.80GHz
          hw.ncpu=4
          hw.acpi.acline=1
          dev.cpu.0.freq=768
          dev.cpu.0.freq_levels=2401/15000 2400/15000 2300/14088 2200/13340 2000/11888 1900/11184 1800/10495 1700/9680 1500/8372 1400/7738 1300/7119 1200/6511 1100/5789 900/4643 800/4090 768/3550
-         0 57097728 0 8232192 594432 100574976 58932480 0 7773696 32256 99760896 56408064 0 8003328 115200 101972736 56011008 0 7926528 33024 102528768
-         25 2304 0 768 0 0 1536 0 1536 0 0 3072 0 0 0 0 2304 0 768 0 0
-         25 1536 0 768 0 0 1536 0 768 0 0 2304 0 0 0 0 1536 0 768 0 0
-         25 1536 0 768 0 0 2304 0 0 0 0 768 0 768 768 0 2304 0 0 0 0
-         25 1536 0 768 0 0 2304 0 0 0 0 2304 0 0 0 0 2304 0 0 0 0
-         25 2304 0 0 0 0 1536 0 768 0 0 2304 0 0 0 0 2304 0 0 0 0
-         25 3072 0 0 0 0 2304 0 768 0 0 3072 0 0 0 0 3072 0 0 0 0
-         25 768 0 1536 0 0 2304 0 0 0 0 1536 0 768 0 0 2304 0 0 0 0
-         25 2304 0 0 0 0 1536 0 0 768 0 2304 0 0 0 0 2304 0 0 0 0
-         25 1536 0 768 0 0 2304 0 0 0 0 2304 0 0 0 0 1536 0 768 0 0
-         25 1536 0 768 0 0 1536 0 768 0 0 2304 0 0 0 0 1536 0 768 0 0</pre><pre>     Printing the load creates significant load itself, so for the actual
+         0 768 768 768 768 728001 0 278439 54957 10215972 753315 0 245117 7838 10270972 767662 0 241991 37110 10230545 772745 0 235729 10307 10258490
+         25 768 768 768 768 0 0 0 0 3 2 0 0 0 1 0 0 0 0 3 0 0 0 0 4
+         25 768 768 768 768 0 0 0 0 3 1 0 0 0 2 0 0 0 0 3 1 0 0 0 2
+         25 768 768 768 768 0 0 1 0 2 1 0 2 0 0 0 0 0 0 3 0 0 1 0 2
+         25 768 768 768 768 3 0 0 0 1 1 0 2 0 1 1 0 3 0 0 2 0 2 0 0
+         25 768 768 768 768 0 0 0 0 3 0 0 1 0 2 0 0 0 0 3 3 0 0 0 0
+         25 768 768 768 768 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3 2 0 1 0 0
+         25 768 768 768 768 0 0 0 0 3 0 0 0 0 3 0 0 0 0 3 2 0 1 0 0
+         25 768 768 768 768 2 0 0 0 1 1 0 1 0 1 0 0 2 0 1 2 0 1 0 0
+         25 768 768 768 768 0 0 0 0 4 1 0 2 0 1 0 0 0 0 4 0 0 1 0 2
+         25 768 768 768 768 0 0 0 0 3 2 0 1 0 0 0 0 0 0 3 0 0 0 0 4</pre><pre>     Printing the load creates significant load itself, so for the actual
      measurement the output should be written to a file. Create your workload
      and start your measurement:</pre><pre>         &gt; loadrec -o video-session.load</pre><pre>     On the example setup <b>loadrec</b> produces a load of 0.001 (i.e. 0.1%), so its
      effect on the measurement is negligible.</pre><pre><b>SEE</b> <b>ALSO</b>
      cpufreq(4), loadplay(1), powerd(8), powerd++(8), sysctl(8)</pre><pre><b>AUTHORS</b>
-     Implementation and manual by Dominic Fandrey ⟨kami@freebsd.org⟩</pre><pre>FreeBSD 12.0-STABLE            27 December, 2018           FreeBSD 12.0-STABLE
+     Implementation and manual by Dominic Fandrey &lt;<u>kami@freebsd.org</u>&gt;</pre><pre>FreeBSD 12.0-STABLE            4 February, 2019            FreeBSD 12.0-STABLE
 </pre> </div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->

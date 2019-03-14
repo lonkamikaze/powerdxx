@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['addvalue',['addValue',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html#ae4c4601a064f1c7d2d3753ca1e7b3a62',1,'anonymous_namespace{loadplay.cpp}::Sysctls::addValue(mib_t const &amp;mib, std::string const &amp;value)'],['../classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html#ac4b567589dc8eebe33b65723679c501a',1,'anonymous_namespace{loadplay.cpp}::Sysctls::addValue(std::string const &amp;name, std::string const &amp;value)']]],
-  ['argcount',['argCount',['../namespacenih.html#aa0df8d37492796b1da67010c9d8a7329',1,'nih']]]
+  ['addvalue',['addValue',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Sysctls.html#a2464157e089a6c58632671e3eea368bd',1,'anonymous_namespace{libloadplay.cpp}::Sysctls::addValue(mib_t const &amp;mib, std::string const &amp;value)'],['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Sysctls.html#a0e0dcea55e901e96b2edc9e4cfe55ced',1,'anonymous_namespace{libloadplay.cpp}::Sysctls::addValue(std::string const &amp;name, std::string const &amp;value)']]],
+  ['argcount',['argCount',['../namespacenih.html#a0b4ab40714d75c7f2ec17a9471f060be',1,'nih']]]
 ];

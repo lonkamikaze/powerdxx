@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.4.1</span>
    </div>
   </td>
  </tr>
@@ -63,7 +63,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -74,257 +74,109 @@ $(function() {
 <p>File local scope.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html">Callback</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements a recursion safe std::function wrapper.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport">CoreFrameReport</a></td></tr>
-<tr class="memdesc:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport"><td class="mdescLeft">&#160;</td><td class="mdescRight">The report frame information for a single CPU pipeline.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport">More...</a><br /></td></tr>
-<tr class="separator:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">CoreReport</a></td></tr>
-<tr class="memdesc:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport"><td class="mdescLeft">&#160;</td><td class="mdescRight">The reported state of a single CPU pipeline.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">More...</a><br /></td></tr>
-<tr class="separator:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Emulator.html">Emulator</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instances of this class represent an emulator session.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Emulator.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Hold.html">Hold</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a referenced variable to a given value and restores it when going out of context.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Hold.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html">Main</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Singleton class representing the main execution environment.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html">mib_t</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents MIB, but wraps it to provide the necessary operators to use it as an std::map key.  <a href="structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Report.html">Report</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a mechanism to provide frame wise per core load information.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Report.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html">Sysctls</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Singleton class representing the sysctl table for this library.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html">SysctlValue</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instances of this class represents a specific sysctl value.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a05e99d32120edefb26bbb1c2f8187043"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043">OE</a> { <br />
+&#160;&#160;<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043ab63b7ec61354e7d4e86af259f6e73182">OE::USAGE</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a6acec2db5293c31eb40c6df0974c82d7">OE::FILE_IN</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a980324ddbe12575c7460d859ffb70d14">OE::FILE_OUT</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043aa28966bac17b8eef99c5afa5eb594130">OE::CMD</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043aef477e0fc504e9175bd3459e206a67cd">OE::OPT_NOOPT</a> = CMD, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a9854a8e7f5bc0b2ac8fbda3bacb9c093">OE::OPT_UNKNOWN</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043aae61767e0dd8621af34e0c02925428e7">OE::OPT_DASH</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a30a06c3929fcee8146f115bcd9bf5272">OE::OPT_LDASH</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a0f988ebd55646ceb570f46056c9428db">OE::OPT_DONE</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:a05e99d32120edefb26bbb1c2f8187043"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum for command line parsing.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043">More...</a><br /></td></tr>
+<tr class="separator:a05e99d32120edefb26bbb1c2f8187043"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ada70e2bea2fb87ba850052c762313eb2"><td class="memTemplParams" colspan="2">template&lt;size_t Size&gt; </td></tr>
-<tr class="memitem:ada70e2bea2fb87ba850052c762313eb2"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ada70e2bea2fb87ba850052c762313eb2">strcmp</a> (char const *const s1, char const (&amp;s2)[Size])</td></tr>
-<tr class="memdesc:ada70e2bea2fb87ba850052c762313eb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Safe wrapper around strncmp, which automatically determines the buffer size of s2.  <a href="#ada70e2bea2fb87ba850052c762313eb2">More...</a><br /></td></tr>
-<tr class="separator:ada70e2bea2fb87ba850052c762313eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7007632a4d53b774c358bcccbcd3332c"><td class="memItemLeft" align="right" valign="top">std::regex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a7007632a4d53b774c358bcccbcd3332c">operator&quot;&quot;_r</a> (char const *const str, size_t const len)</td></tr>
-<tr class="memdesc:a7007632a4d53b774c358bcccbcd3332c"><td class="mdescLeft">&#160;</td><td class="mdescRight">User defined literal for regular expressions.  <a href="#a7007632a4d53b774c358bcccbcd3332c">More...</a><br /></td></tr>
-<tr class="separator:a7007632a4d53b774c358bcccbcd3332c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6ea7dec05eecd452ef082a0ccf89396"><td class="memTemplParams" colspan="2">template&lt;&gt; </td></tr>
-<tr class="memitem:ac6ea7dec05eecd452ef082a0ccf89396"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ac6ea7dec05eecd452ef082a0ccf89396">SysctlValue::get&lt; std::string &gt;</a> () const</td></tr>
-<tr class="memdesc:ac6ea7dec05eecd452ef082a0ccf89396"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a copy of the value string.  <a href="#ac6ea7dec05eecd452ef082a0ccf89396">More...</a><br /></td></tr>
-<tr class="separator:ac6ea7dec05eecd452ef082a0ccf89396"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe8d8a5b6288bea0085cd554c27e12dd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#afe8d8a5b6288bea0085cd554c27e12dd">warn</a> (std::string const &amp;msg)</td></tr>
-<tr class="memdesc:afe8d8a5b6288bea0085cd554c27e12dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a warning.  <a href="#afe8d8a5b6288bea0085cd554c27e12dd">More...</a><br /></td></tr>
-<tr class="separator:afe8d8a5b6288bea0085cd554c27e12dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac11ace9a2c889224bdf040454d726505"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ac11ace9a2c889224bdf040454d726505">fail</a> (std::string const &amp;msg)</td></tr>
-<tr class="memdesc:ac11ace9a2c889224bdf040454d726505"><td class="mdescLeft">&#160;</td><td class="mdescRight">This prints an error message and sets sys_results to make the hijacked process fail.  <a href="#ac11ace9a2c889224bdf040454d726505">More...</a><br /></td></tr>
-<tr class="separator:ac11ace9a2c889224bdf040454d726505"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a776076fb258198c0acdb4a73a9af6c94"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a776076fb258198c0acdb4a73a9af6c94">operator&lt;&lt;</a> (std::ostream &amp;out, <a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">CoreReport</a> const &amp;core)</td></tr>
-<tr class="memdesc:a776076fb258198c0acdb4a73a9af6c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a core clock frequency and load.  <a href="#a776076fb258198c0acdb4a73a9af6c94">More...</a><br /></td></tr>
-<tr class="separator:a776076fb258198c0acdb4a73a9af6c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab078c8abf39c2556a9dfb1084dff72f7"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ab078c8abf39c2556a9dfb1084dff72f7">operator&lt;&lt;</a> (std::ostream &amp;out, <a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport">CoreFrameReport</a> const &amp;frame)</td></tr>
-<tr class="memdesc:ab078c8abf39c2556a9dfb1084dff72f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print recorded and running clock frequency and load for a frame.  <a href="#ab078c8abf39c2556a9dfb1084dff72f7">More...</a><br /></td></tr>
-<tr class="separator:ab078c8abf39c2556a9dfb1084dff72f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8c04d034d1318017d4ba7e86a61ef40"><td class="memItemLeft" align="right" valign="top">char const  *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ae8c04d034d1318017d4ba7e86a61ef40">filename</a> (char const *const path)</td></tr>
+<tr class="memdesc:ae8c04d034d1318017d4ba7e86a61ef40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs very rudimentary file name argument checks.  <a href="#ae8c04d034d1318017d4ba7e86a61ef40">More...</a><br /></td></tr>
+<tr class="separator:ae8c04d034d1318017d4ba7e86a61ef40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae8b2ee3af502ecf8764be42daf5b656"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#aae8b2ee3af502ecf8764be42daf5b656">execute</a> (char const *const file, char *const argv[])</td></tr>
+<tr class="memdesc:aae8b2ee3af502ecf8764be42daf5b656"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the given command, substituting this process.  <a href="#aae8b2ee3af502ecf8764be42daf5b656">More...</a><br /></td></tr>
+<tr class="separator:aae8b2ee3af502ecf8764be42daf5b656"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:abe7afc378ded5bb24357bac70c733ccc"><td class="memItemLeft" align="right" valign="top">constexpr flag_t const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#abe7afc378ded5bb24357bac70c733ccc">FEATURES</a></td></tr>
-<tr class="memdesc:abe7afc378ded5bb24357bac70c733ccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The set of supported features.  <a href="#abe7afc378ded5bb24357bac70c733ccc">More...</a><br /></td></tr>
-<tr class="separator:abe7afc378ded5bb24357bac70c733ccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af289bd1cdefd7b97fe1bb4ec3ba5b052"><td class="memItemLeft" align="right" valign="top"><a id="af289bd1cdefd7b97fe1bb4ec3ba5b052"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#af289bd1cdefd7b97fe1bb4ec3ba5b052">sys_results</a> = 0</td></tr>
-<tr class="memdesc:af289bd1cdefd7b97fe1bb4ec3ba5b052"><td class="mdescLeft">&#160;</td><td class="mdescRight">The success return value of intercepted functions. <br /></td></tr>
-<tr class="separator:af289bd1cdefd7b97fe1bb4ec3ba5b052"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae153907bf8974b25a6f69478de66c8b9"><td class="memItemLeft" align="right" valign="top">class anonymous_namespace{loadplay.cpp}::<a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html">Sysctls</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ae153907bf8974b25a6f69478de66c8b9">sysctls</a></td></tr>
-<tr class="memdesc:ae153907bf8974b25a6f69478de66c8b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sole instance of <a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html">Sysctls</a>.  <a href="#ae153907bf8974b25a6f69478de66c8b9">More...</a><br /></td></tr>
-<tr class="separator:ae153907bf8974b25a6f69478de66c8b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefd3b4a34236a15db6e9ab1db0986ff8"><td class="memItemLeft" align="right" valign="top">class anonymous_namespace{loadplay.cpp}::<a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html">Main</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#aefd3b4a34236a15db6e9ab1db0986ff8">main</a></td></tr>
-<tr class="memdesc:aefd3b4a34236a15db6e9ab1db0986ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sole instance of <a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html">Main</a>.  <a href="#aefd3b4a34236a15db6e9ab1db0986ff8">More...</a><br /></td></tr>
-<tr class="separator:aefd3b4a34236a15db6e9ab1db0986ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3218f348f9ec0d9e67b21e85e8485e9"><td class="memItemLeft" align="right" valign="top"><a id="ab3218f348f9ec0d9e67b21e85e8485e9"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ab3218f348f9ec0d9e67b21e85e8485e9">sysctl_fallback</a> = false</td></tr>
-<tr class="memdesc:ab3218f348f9ec0d9e67b21e85e8485e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set to activate fallback to the original sysctl functions. <br /></td></tr>
-<tr class="separator:ab3218f348f9ec0d9e67b21e85e8485e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ca2d32a5808b24c1a7cbc34cca64b1d"><td class="memItemLeft" align="right" valign="top"><a id="a3ca2d32a5808b24c1a7cbc34cca64b1d"></a>
+char const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a3ca2d32a5808b24c1a7cbc34cca64b1d">USAGE</a> = &quot;[-h] [-i file] [-o file] command [...]&quot;</td></tr>
+<tr class="memdesc:a3ca2d32a5808b24c1a7cbc34cca64b1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The short usage string. <br /></td></tr>
+<tr class="separator:a3ca2d32a5808b24c1a7cbc34cca64b1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4def5986412bb5d47ae7bb3b3d8ec9cf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacenih.html#structnih_1_1Parameter">Parameter</a>&lt; <a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043">OE</a> &gt; const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a4def5986412bb5d47ae7bb3b3d8ec9cf">PARAMETERS</a> []</td></tr>
+<tr class="memdesc:a4def5986412bb5d47ae7bb3b3d8ec9cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Definitions of command line parameters.  <a href="#a4def5986412bb5d47ae7bb3b3d8ec9cf">More...</a><br /></td></tr>
+<tr class="separator:a4def5986412bb5d47ae7bb3b3d8ec9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>File local scope. </p>
-</div><hr/><h2 class="groupheader">Class Documentation</h2>
-<a name="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport" id="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport">&#9670;&nbsp;</a></span>anonymous_namespace{loadplay.cpp}::CoreFrameReport</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a05e99d32120edefb26bbb1c2f8187043"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05e99d32120edefb26bbb1c2f8187043">&#9670;&nbsp;</a></span>OE</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">struct anonymous_namespace{loadplay.cpp}::CoreFrameReport</td>
+          <td class="memname">enum anonymous_namespace{loadplay.cpp}::<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043">OE</a></td>
         </tr>
       </table>
-</div><div class="memdoc">
-<div class="textblock"><p>The report frame information for a single CPU pipeline. </p>
-</div><div class="dynheader">
-Collaboration diagram for anonymous_namespace{loadplay.cpp}::CoreFrameReport:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport__coll__graph.svg" width="226" height="260"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
-<table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a id="af32d8b7fede82e67f36224ea1a3211d8"></a><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">CoreReport</a></td>
-<td class="fieldname">
-rec</td>
-<td class="fielddoc">
-The recorded core state. </td></tr>
-<tr><td class="fieldtype">
-<a id="ac16d324e5989109720384d812efd23cb"></a><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">CoreReport</a></td>
-<td class="fieldname">
-run</td>
-<td class="fielddoc">
-The running core state. </td></tr>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
 </table>
-
-</div>
-</div>
-<a name="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport" id="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">&#9670;&nbsp;</a></span>anonymous_namespace{loadplay.cpp}::CoreReport</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct anonymous_namespace{loadplay.cpp}::CoreReport</td>
-        </tr>
-      </table>
 </div><div class="memdoc">
-<div class="textblock"><p>The reported state of a single CPU pipeline. </p>
-</div><div class="dynheader">
-Collaboration diagram for anonymous_namespace{loadplay.cpp}::CoreReport:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport__coll__graph.svg" width="190" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
+
+<p>An enum for command line parsing. </p>
 <table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a id="abb7c78f2d3eef517f1453506f06a8b25"></a>mhz_t</td>
-<td class="fieldname">
-freq</td>
-<td class="fielddoc">
-The core clock frequency in [MHz]. </td></tr>
-<tr><td class="fieldtype">
-<a id="aa32ae93306d5dc6bbdff8efed54934a1"></a>double</td>
-<td class="fieldname">
-load</td>
-<td class="fielddoc">
-The core load as a fraction. </td></tr>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043ab63b7ec61354e7d4e86af259f6e73182"></a>USAGE&#160;</td><td class="fielddoc"><p>Print help. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043a6acec2db5293c31eb40c6df0974c82d7"></a>FILE_IN&#160;</td><td class="fielddoc"><p>Set input file instead of stdin. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043a980324ddbe12575c7460d859ffb70d14"></a>FILE_OUT&#160;</td><td class="fielddoc"><p>Set output file instead of stdout. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043aa28966bac17b8eef99c5afa5eb594130"></a>CMD&#160;</td><td class="fielddoc"><p>The command to execute. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043aef477e0fc504e9175bd3459e206a67cd"></a>OPT_NOOPT&#160;</td><td class="fielddoc"><p>Obligatory. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043a9854a8e7f5bc0b2ac8fbda3bacb9c093"></a>OPT_UNKNOWN&#160;</td><td class="fielddoc"><p>Obligatory. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043aae61767e0dd8621af34e0c02925428e7"></a>OPT_DASH&#160;</td><td class="fielddoc"><p>Obligatory. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043a30a06c3929fcee8146f115bcd9bf5272"></a>OPT_LDASH&#160;</td><td class="fielddoc"><p>Obligatory. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a05e99d32120edefb26bbb1c2f8187043a0f988ebd55646ceb570f46056c9428db"></a>OPT_DONE&#160;</td><td class="fielddoc"><p>Obligatory. </p>
+</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ac11ace9a2c889224bdf040454d726505"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac11ace9a2c889224bdf040454d726505">&#9670;&nbsp;</a></span>fail()</h2>
+<a id="aae8b2ee3af502ecf8764be42daf5b656"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae8b2ee3af502ecf8764be42daf5b656">&#9670;&nbsp;</a></span>execute()</h2>
 
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void anonymous_namespace{loadplay.cpp}::fail </td>
-          <td>(</td>
-          <td class="paramtype">std::string const &amp;&#160;</td>
-          <td class="paramname"><em>msg</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>This prints an error message and sets sys_results to make the hijacked process fail. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">msg</td><td>The error message </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a7007632a4d53b774c358bcccbcd3332c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7007632a4d53b774c358bcccbcd3332c">&#9670;&nbsp;</a></span>operator&quot;&quot;_r()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::regex anonymous_namespace{loadplay.cpp}::operator&quot;&quot;_r </td>
+          <td class="memname">void anonymous_namespace{loadplay.cpp}::execute </td>
           <td>(</td>
           <td class="paramtype">char const *const&#160;</td>
-          <td class="paramname"><em>str</em>, </td>
+          <td class="paramname"><em>file</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t const&#160;</td>
-          <td class="paramname"><em>len</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>User defined literal for regular expressions. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">str,len</td><td>The literal string and its length </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A regular expression </dd></dl>
-
-</div>
-</div>
-<a id="a776076fb258198c0acdb4a73a9af6c94"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a776076fb258198c0acdb4a73a9af6c94">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::ostream&amp; anonymous_namespace{loadplay.cpp}::operator&lt;&lt; </td>
-          <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>out</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">CoreReport</a> const &amp;&#160;</td>
-          <td class="paramname"><em>core</em>&#160;</td>
+          <td class="paramtype">char *const&#160;</td>
+          <td class="paramname"><em>argv</em>[]&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -334,219 +186,70 @@ The core load as a fraction. </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Print a core clock frequency and load. </p>
-<p>The clock frequency is printed at 1 MHz resolution, the load at 0.1 MHz.</p>
+<p>Executes the given command, substituting this process. </p>
+<p>This function is a wrapper around execvp(3) and does not return.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">out</td><td>The stream to print to </td></tr>
-    <tr><td class="paramname">core</td><td>The core information to print </td></tr>
+    <tr><td class="paramname">file</td><td>The command to execute, looked up in PATH if no path is provided </td></tr>
+    <tr><td class="paramname">argv</td><td>The command line arguments of the command </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to the out stream </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">errors::Exception{Exit::EEXEC}</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
-<a id="ab078c8abf39c2556a9dfb1084dff72f7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab078c8abf39c2556a9dfb1084dff72f7">&#9670;&nbsp;</a></span>operator&lt;&lt;() <span class="overload">[2/2]</span></h2>
+<a id="ae8c04d034d1318017d4ba7e86a61ef40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8c04d034d1318017d4ba7e86a61ef40">&#9670;&nbsp;</a></span>filename()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::ostream&amp; anonymous_namespace{loadplay.cpp}::operator&lt;&lt; </td>
-          <td>(</td>
-          <td class="paramtype">std::ostream &amp;&#160;</td>
-          <td class="paramname"><em>out</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport">CoreFrameReport</a> const &amp;&#160;</td>
-          <td class="paramname"><em>frame</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Print recorded and running clock frequency and load for a frame. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">out</td><td>The stream to print to </td></tr>
-    <tr><td class="paramname">frame</td><td>The frame information to print </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A reference to the out stream </dd></dl>
-
-</div>
-</div>
-<a id="ada70e2bea2fb87ba850052c762313eb2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ada70e2bea2fb87ba850052c762313eb2">&#9670;&nbsp;</a></span>strcmp()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;size_t Size&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">int anonymous_namespace{loadplay.cpp}::strcmp </td>
+          <td class="memname">char const* anonymous_namespace{loadplay.cpp}::filename </td>
           <td>(</td>
           <td class="paramtype">char const *const&#160;</td>
-          <td class="paramname"><em>s1</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"><em>path</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">char const (&amp;)&#160;</td>
-          <td class="paramname"><em>s2</em>[Size]&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
-<p>Safe wrapper around strncmp, which automatically determines the buffer size of s2. </p>
-<dl class="tparams"><dt>Template Parameters</dt><dd>
-  <table class="tparams">
-    <tr><td class="paramname">Size</td><td>The size of the buffer s2 </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Performs very rudimentary file name argument checks. </p>
+<ul>
+<li>Fail on empty path</li>
+<li>Return nullptr on '-'</li>
+</ul>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">s1,s2</td><td>The strings to compare </td></tr>
+    <tr><td class="paramname">path</td><td>The file path to check </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="retval"><dt>Return values</dt><dd>
-  <table class="retval">
-    <tr><td class="paramname">0</td><td>Strings are equal </td></tr>
-    <tr><td class="paramname">!0</td><td>Strings are not equal </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="ac6ea7dec05eecd452ef082a0ccf89396"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac6ea7dec05eecd452ef082a0ccf89396">&#9670;&nbsp;</a></span>SysctlValue::get&lt; std::string &gt;()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;&gt; </div>
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string anonymous_namespace{loadplay.cpp}::<a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html#a6924d6ca18699d9d86876eef321cae92">SysctlValue::get</a>&lt; std::string &gt; </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Returns a copy of the value string. </p>
-<dl class="section return"><dt>Returns</dt><dd>The value </dd></dl>
-
-</div>
-</div>
-<a id="afe8d8a5b6288bea0085cd554c27e12dd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afe8d8a5b6288bea0085cd554c27e12dd">&#9670;&nbsp;</a></span>warn()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void anonymous_namespace{loadplay.cpp}::warn </td>
-          <td>(</td>
-          <td class="paramtype">std::string const &amp;&#160;</td>
-          <td class="paramname"><em>msg</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Print a warning. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">msg</td><td>The warning message </td></tr>
-  </table>
-  </dd>
-</dl>
+<dl class="section return"><dt>Returns</dt><dd>The given path or nullptr if the given path is '-' </dd></dl>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="abe7afc378ded5bb24357bac70c733ccc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe7afc378ded5bb24357bac70c733ccc">&#9670;&nbsp;</a></span>FEATURES</h2>
+<a id="a4def5986412bb5d47ae7bb3b3d8ec9cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4def5986412bb5d47ae7bb3b3d8ec9cf">&#9670;&nbsp;</a></span>PARAMETERS</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr flag_t const anonymous_namespace{loadplay.cpp}::FEATURES</td>
+          <td class="memname"><a class="el" href="namespacenih.html#structnih_1_1Parameter">Parameter</a>&lt;<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043">OE</a>&gt; const anonymous_namespace{loadplay.cpp}::PARAMETERS[]</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">    1_FREQ_TRACKING</div><div class="line">}</div></div><!-- fragment -->
-<p>The set of supported features. </p>
-<p>This value is used to ensure correct input data interpretation. </p>
-
-</div>
-</div>
-<a id="aefd3b4a34236a15db6e9ab1db0986ff8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefd3b4a34236a15db6e9ab1db0986ff8">&#9670;&nbsp;</a></span>main</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">class anonymous_namespace{loadplay.cpp}::<a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html">Main</a>  anonymous_namespace{loadplay.cpp}::main</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sole instance of <a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html">Main</a>. </p>
-
-</div>
-</div>
-<a id="ae153907bf8974b25a6f69478de66c8b9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae153907bf8974b25a6f69478de66c8b9">&#9670;&nbsp;</a></span>sysctls</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">class anonymous_namespace{loadplay.cpp}::<a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html">Sysctls</a>  anonymous_namespace{loadplay.cpp}::sysctls</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sole instance of <a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html">Sysctls</a>. </p>
+<b>Initial value:</b><div class="fragment"><div class="line">{</div><div class="line">    {<a class="code" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a3ca2d32a5808b24c1a7cbc34cca64b1d">OE::USAGE</a>,    <span class="charliteral">&#39;h&#39;</span>, <span class="stringliteral">&quot;help&quot;</span>,   <span class="stringliteral">&quot;&quot;</span>,              <span class="stringliteral">&quot;Show usage and exit&quot;</span>},</div><div class="line">    {OE::FILE_IN,  <span class="charliteral">&#39;i&#39;</span>, <span class="stringliteral">&quot;input&quot;</span>,  <span class="stringliteral">&quot;file&quot;</span>,          <span class="stringliteral">&quot;Input file (load recording)&quot;</span>},</div><div class="line">    {OE::FILE_OUT, <span class="charliteral">&#39;o&#39;</span>, <span class="stringliteral">&quot;output&quot;</span>, <span class="stringliteral">&quot;file&quot;</span>,          <span class="stringliteral">&quot;Output file (replay stats)&quot;</span>},</div><div class="line">    {OE::CMD,       0 , <span class="stringliteral">&quot;&quot;</span>,       <span class="stringliteral">&quot;command,[...]&quot;</span>, <span class="stringliteral">&quot;The command to execute&quot;</span>},</div><div class="line">}</div><div class="ttc" id="namespaceanonymous__namespace_02loadplay_8cpp_03_html_a3ca2d32a5808b24c1a7cbc34cca64b1d"><div class="ttname"><a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a3ca2d32a5808b24c1a7cbc34cca64b1d">anonymous_namespace{loadplay.cpp}::USAGE</a></div><div class="ttdeci">char const  *const USAGE</div><div class="ttdoc">The short usage string.</div><div class="ttdef"><b>Definition:</b> loadplay.cpp:49</div></div>
+</div><!-- fragment -->
+<p>Definitions of command line parameters. </p>
 
 </div>
 </div>

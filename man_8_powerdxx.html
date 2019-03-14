@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.4.1</span>
    </div>
   </td>
  </tr>
@@ -97,31 +97,31 @@ powerd++(8)             FreeBSD System Manager's Manual            powerd++(8)</
              deg. Rankine. A value without a unit is treated as deg. Celsius.</pre><pre>     <u>ival</u>    A time interval can be given in seconds or milliseconds.
                    s, ms
              An interval without a unit is treated as milliseconds.</pre><pre>     <u>cnt</u>     A positive integer.</pre><pre>     <u>file</u>    A file name.</pre><pre>   <b>OPTIONS</b>
-     The following options are supported:</pre><pre>     <b>-h</b>, <b>&ndash;help</b>
-             Show usage and exit</pre><pre>     <b>-v</b>, <b>&ndash;verbose</b>
-             Be verbose and produce initial diagnostics on <u>stderr</u>.</pre><pre>     <b>-f</b>, <b>&ndash;foreground</b>
-             Stay in foreground, produce an event log on <u>stdout</u>.</pre><pre>     <b>-a</b>, <b>&ndash;ac</b> <u>mode</u>
-             Mode to use while the AC power line is connected (default hadp).</pre><pre>     <b>-b</b>, <b>&ndash;batt</b> <u>mode</u>
-             Mode to use while battery powered (default adp).</pre><pre>     <b>-n</b>, <b>&ndash;unknown</b> <u>mode</u>
-             Mode to use while the power line state is unknown (default hadp).</pre><pre>     <b>-m</b>, <b>&ndash;min</b> <u>freq</u>
-             The lowest CPU clock frequency to use (default 0Hz).</pre><pre>     <b>-M</b>, <b>&ndash;max</b> <u>freq</u>
-             The highest CPU clock frequency to use (default 1THz).</pre><pre>     <b>&ndash;min-ac</b> <u>freq</u>
-             The lowest CPU clock frequency to use on AC power.</pre><pre>     <b>&ndash;max-ac</b> <u>freq</u>
-             The highest CPU clock frequency to use on AC power.</pre><pre>     <b>&ndash;min-batt</b> <u>freq</u>
-             The lowest CPU clock frequency to use on battery power.</pre><pre>     <b>&ndash;max-batt</b> <u>freq</u>
-             The highest CPU clock frequency to use on battery power.</pre><pre>     <b>-F</b>, <b>&ndash;freq-range</b> <u>freq:freq</u>
+     The following options are supported:</pre><pre>     <b>-h</b>, <b>--help</b>
+             Show usage and exit</pre><pre>     <b>-v</b>, <b>--verbose</b>
+             Be verbose and produce initial diagnostics on <u>stderr</u>.</pre><pre>     <b>-f</b>, <b>--foreground</b>
+             Stay in foreground, produce an event log on <u>stdout</u>.</pre><pre>     <b>-a</b>, <b>--ac</b> <u>mode</u>
+             Mode to use while the AC power line is connected (default hadp).</pre><pre>     <b>-b</b>, <b>--batt</b> <u>mode</u>
+             Mode to use while battery powered (default adp).</pre><pre>     <b>-n</b>, <b>--unknown</b> <u>mode</u>
+             Mode to use while the power line state is unknown (default hadp).</pre><pre>     <b>-m</b>, <b>--min</b> <u>freq</u>
+             The lowest CPU clock frequency to use (default 0Hz).</pre><pre>     <b>-M</b>, <b>--max</b> <u>freq</u>
+             The highest CPU clock frequency to use (default 1THz).</pre><pre>     <b>--min-ac</b> <u>freq</u>
+             The lowest CPU clock frequency to use on AC power.</pre><pre>     <b>--max-ac</b> <u>freq</u>
+             The highest CPU clock frequency to use on AC power.</pre><pre>     <b>--min-batt</b> <u>freq</u>
+             The lowest CPU clock frequency to use on battery power.</pre><pre>     <b>--max-batt</b> <u>freq</u>
+             The highest CPU clock frequency to use on battery power.</pre><pre>     <b>-F</b>, <b>--freq-range</b> <u>freq:freq</u>
              A pair of frequency values representing the minimum and maximum
-             CPU clock frequency.</pre><pre>     <b>-A</b>, <b>&ndash;freq-range-ac</b> <u>freq:freq</u>
+             CPU clock frequency.</pre><pre>     <b>-A</b>, <b>--freq-range-ac</b> <u>freq:freq</u>
              A pair of frequency values representing the minimum and maximum
-             CPU clock frequency on AC power.</pre><pre>     <b>-B</b>, <b>&ndash;freq-range-batt</b> <u>freq:freq</u>
+             CPU clock frequency on AC power.</pre><pre>     <b>-B</b>, <b>--freq-range-batt</b> <u>freq:freq</u>
              A pair of frequency values representing the minimum and maximum
-             CPU clock frequency on battery power.</pre><pre>     <b>-H</b>, <b>&ndash;hitemp-range</b> <u>temp:temp</u>
+             CPU clock frequency on battery power.</pre><pre>     <b>-H</b>, <b>--hitemp-range</b> <u>temp:temp</u>
              Set the high to critical temperature range, enables temperature
-             based throttling.</pre><pre>     <b>-p</b>, <b>&ndash;poll</b> <u>ival</u>
+             based throttling.</pre><pre>     <b>-p</b>, <b>--poll</b> <u>ival</u>
              The polling interval that is used to take load samples and update
-             the CPU clock (default 0.5s).</pre><pre>     <b>-s</b>, <b>&ndash;samples</b> <u>cnt</u>
+             the CPU clock (default 0.5s).</pre><pre>     <b>-s</b>, <b>--samples</b> <u>cnt</u>
              The number of load samples to use to calculate the current load.
-             The default is 4.</pre><pre>     <b>-P</b>, <b>&ndash;pid</b> <u>file</u>
+             The default is 4.</pre><pre>     <b>-P</b>, <b>--pid</b> <u>file</u>
              Use an alternative pidfile, the default is <u>/var/run/powerd.pid</u>.
              The default ensures that powerd(8) and <b>powerd++</b> are not run
              simultaneously.</pre><pre>     <b>-i</b>, <b>-r</b> <u>load</u>
@@ -171,7 +171,7 @@ powerd++(8)             FreeBSD System Manager's Manual            powerd++(8)</
      this means, that high load on a single core will cause an increase in the
      clock frequency. Unlike powerd(8) it also means that moderate load over
      all cores allows a decrease of the clock frequency.</pre><pre>     The <b>powerd++</b> daemon steers the clock frequency to match a load target,
-     e.g. if there was a 25% load on 2 GHz and the load target was 50%, the
+     e.g. if there was a 25% load at 2 GHz and the load target was 50%, the
      frequency would be set to 1 GHz.</pre><pre>   <b>Temperature</b> <b>Based</b> <b>Throttling</b>
      If temperature based throttling is active and the temperature is above
      the high temperature boundary (the critical temperature minus 10 deg.
@@ -184,20 +184,21 @@ powerd++(8)             FreeBSD System Manager's Manual            powerd++(8)</
      The signals HUP and TERM cause an orderly shutdown of <b>powerd++</b>.  An
      orderly shutdown means the pidfile is removed and the clock frequencies
      are restored to their original values.</pre><pre><b>FILES</b>
-     <u>/var/run/powerd.pid</u> Common pidfile with powerd(8).
-     <u>/usr/local/etc/rc.d/powerdxx</u> Service file, enable in rc.conf(5).</pre><pre><b>EXAMPLES</b>
+     <u>/var/run/powerd.pid</u>
+             Common pidfile with powerd(8).</pre><pre>     <u>/usr/local/etc/rc.d/powerdxx</u>
+             Service file, enable in rc.conf(5).</pre><pre><b>EXAMPLES</b>
      Run in foreground, minimum clock frequency 800 MHz:
            powerd++ -fm800</pre><pre>     Report configuration before detaching into the background:
            powerd++ -v</pre><pre>     Target 75% load on battery power and run at 2.4 GHz on AC power:
            powerd++ -b .75 -a 2.4ghz</pre><pre>     Target 25% load on AC power:
            powerd++ -a 25%</pre><pre>     Use the same load sampling powerd(8) does:
-           powerd++ -s2 -p.25s</pre><pre>     Limit CPU clock frequencies to a range from 800 MHz to 1.8 GHz:
+           powerd++ -s1 -p.25s</pre><pre>     Limit CPU clock frequencies to a range from 800 MHz to 1.8 GHz:
            powerd++ -F800:1.8ghz</pre><pre><b>DIAGNOSTICS</b>
      The <b>powerd++</b> daemon exits 0 on receiving an INT or TERM signal, and &gt;0 if
      an error occurs.</pre><pre><b>COMPATIBILITY</b>
      So far <b>powerd++</b> requires ACPI to detect the current power line state.</pre><pre><b>SEE</b> <b>ALSO</b>
      cpufreq(4), powerd(8), loadrec(1), loadplay(1)</pre><pre><b>AUTHORS</b>
-     Implementation and manual by Dominic Fandrey ⟨kami@freebsd.org⟩</pre><pre>FreeBSD 12.0-STABLE               9 May, 2017              FreeBSD 12.0-STABLE
+     Implementation and manual by Dominic Fandrey &lt;<u>kami@freebsd.org</u>&gt;</pre><pre>FreeBSD 12.0-STABLE               9 May, 2017              FreeBSD 12.0-STABLE
 </pre> </div></div><!-- PageDoc -->
 </div><!-- contents -->
 <!-- start footer part -->

@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.15"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>powerd++: loadplay.cpp File Reference</title>
+<title>powerd++: src/loadplay.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.4.1</span>
    </div>
   </td>
  </tr>
@@ -60,11 +60,15 @@ $(function() {
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
+</div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -72,316 +76,88 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.  
+<p>Implements the loadplay a bootstrapping tool for libloadplay.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &quot;<a class="el" href="utility_8hpp_source.html">utility.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="constants_8hpp_source.html">constants.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="fixme_8hpp_source.html">fixme.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="version_8hpp_source.html">version.hpp</a>&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="Options_8hpp_source.html">Options.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="errors_8hpp_source.html">errors.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="utility_8hpp_source.html">utility.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="env_8hpp_source.html">sys/env.hpp</a>&quot;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
-<code>#include &lt;iomanip&gt;</code><br />
-<code>#include &lt;unordered_map&gt;</code><br />
-<code>#include &lt;map&gt;</code><br />
-<code>#include &lt;string&gt;</code><br />
-<code>#include &lt;regex&gt;</code><br />
-<code>#include &lt;sstream&gt;</code><br />
-<code>#include &lt;memory&gt;</code><br />
-<code>#include &lt;thread&gt;</code><br />
-<code>#include &lt;exception&gt;</code><br />
-<code>#include &lt;mutex&gt;</code><br />
-<code>#include &lt;chrono&gt;</code><br />
-<code>#include &lt;vector&gt;</code><br />
-<code>#include &lt;algorithm&gt;</code><br />
-<code>#include &lt;cstring&gt;</code><br />
-<code>#include &lt;cassert&gt;</code><br />
-<code>#include &lt;csignal&gt;</code><br />
-<code>#include &lt;sys/types.h&gt;</code><br />
-<code>#include &lt;sys/sysctl.h&gt;</code><br />
-<code>#include &lt;sys/resource.h&gt;</code><br />
-<code>#include &lt;libutil.h&gt;</code><br />
-<code>#include &lt;dlfcn.h&gt;</code><br />
 <code>#include &lt;unistd.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for loadplay.cpp:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="loadplay_8cpp__incl.svg" width="2460" height="262"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="loadplay_8cpp__incl.svg" width="800" height="262"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html">anonymous_namespace{loadplay.cpp}::mib_t</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents MIB, but wraps it to provide the necessary operators to use it as an std::map key.  <a href="structanonymous__namespace_02loadplay_8cpp_03_1_1mib__t.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html">anonymous_namespace{loadplay.cpp}::Callback&lt; FunctionArgs &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements a recursion safe std::function wrapper.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Callback.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html">anonymous_namespace{loadplay.cpp}::SysctlValue</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instances of this class represents a specific sysctl value.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html">anonymous_namespace{loadplay.cpp}::Sysctls</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Singleton class representing the sysctl table for this library.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">anonymous_namespace{loadplay.cpp}::CoreReport</a></td></tr>
-<tr class="memdesc:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport"><td class="mdescLeft">&#160;</td><td class="mdescRight">The reported state of a single CPU pipeline.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">More...</a><br /></td></tr>
-<tr class="separator:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport">anonymous_namespace{loadplay.cpp}::CoreFrameReport</a></td></tr>
-<tr class="memdesc:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport"><td class="mdescLeft">&#160;</td><td class="mdescRight">The report frame information for a single CPU pipeline.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport">More...</a><br /></td></tr>
-<tr class="separator:structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Report.html">anonymous_namespace{loadplay.cpp}::Report</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a mechanism to provide frame wise per core load information.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Report.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Report_1_1Frame.html">anonymous_namespace{loadplay.cpp}::Report::Frame</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a frame of the report.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Report_1_1Frame.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Emulator.html">anonymous_namespace{loadplay.cpp}::Emulator</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instances of this class represent an emulator session.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Emulator.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Emulator.html#structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core">anonymous_namespace{loadplay.cpp}::Emulator::Core</a></td></tr>
-<tr class="memdesc:structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core"><td class="mdescLeft">&#160;</td><td class="mdescRight">Per core information.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Emulator.html#structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core">More...</a><br /></td></tr>
-<tr class="separator:structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html">anonymous_namespace{loadplay.cpp}::Main</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Singleton class representing the main execution environment.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Hold.html">anonymous_namespace{loadplay.cpp}::Hold&lt; T &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets a referenced variable to a given value and restores it when going out of context.  <a href="classanonymous__namespace_02loadplay_8cpp_03_1_1Hold.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
 Namespaces</h2></td></tr>
 <tr class="memitem:namespaceanonymous__namespace_02loadplay_8cpp_03"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html">anonymous_namespace{loadplay.cpp}</a></td></tr>
 <tr class="memdesc:namespaceanonymous__namespace_02loadplay_8cpp_03"><td class="mdescLeft">&#160;</td><td class="mdescRight">File local scope. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a05e99d32120edefb26bbb1c2f8187043"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043">anonymous_namespace{loadplay.cpp}::OE</a> { <br />
+&#160;&#160;<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043ab63b7ec61354e7d4e86af259f6e73182">anonymous_namespace{loadplay.cpp}::OE::USAGE</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a6acec2db5293c31eb40c6df0974c82d7">anonymous_namespace{loadplay.cpp}::OE::FILE_IN</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a980324ddbe12575c7460d859ffb70d14">anonymous_namespace{loadplay.cpp}::OE::FILE_OUT</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043aa28966bac17b8eef99c5afa5eb594130">anonymous_namespace{loadplay.cpp}::OE::CMD</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043aef477e0fc504e9175bd3459e206a67cd">anonymous_namespace{loadplay.cpp}::OE::OPT_NOOPT</a> = CMD, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a9854a8e7f5bc0b2ac8fbda3bacb9c093">anonymous_namespace{loadplay.cpp}::OE::OPT_UNKNOWN</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043aae61767e0dd8621af34e0c02925428e7">anonymous_namespace{loadplay.cpp}::OE::OPT_DASH</a>, 
+<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a30a06c3929fcee8146f115bcd9bf5272">anonymous_namespace{loadplay.cpp}::OE::OPT_LDASH</a>, 
+<br />
+&#160;&#160;<a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043a0f988ebd55646ceb570f46056c9428db">anonymous_namespace{loadplay.cpp}::OE::OPT_DONE</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:a05e99d32120edefb26bbb1c2f8187043"><td class="mdescLeft">&#160;</td><td class="mdescRight">An enum for command line parsing.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a05e99d32120edefb26bbb1c2f8187043">More...</a><br /></td></tr>
+<tr class="separator:a05e99d32120edefb26bbb1c2f8187043"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ada70e2bea2fb87ba850052c762313eb2"><td class="memTemplParams" colspan="2">template&lt;size_t Size&gt; </td></tr>
-<tr class="memitem:ada70e2bea2fb87ba850052c762313eb2"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ada70e2bea2fb87ba850052c762313eb2">anonymous_namespace{loadplay.cpp}::strcmp</a> (char const *const s1, char const (&amp;s2)[Size])</td></tr>
-<tr class="memdesc:ada70e2bea2fb87ba850052c762313eb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Safe wrapper around strncmp, which automatically determines the buffer size of s2.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ada70e2bea2fb87ba850052c762313eb2">More...</a><br /></td></tr>
-<tr class="separator:ada70e2bea2fb87ba850052c762313eb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7007632a4d53b774c358bcccbcd3332c"><td class="memItemLeft" align="right" valign="top">std::regex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a7007632a4d53b774c358bcccbcd3332c">anonymous_namespace{loadplay.cpp}::operator&quot;&quot;_r</a> (char const *const str, size_t const len)</td></tr>
-<tr class="memdesc:a7007632a4d53b774c358bcccbcd3332c"><td class="mdescLeft">&#160;</td><td class="mdescRight">User defined literal for regular expressions.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a7007632a4d53b774c358bcccbcd3332c">More...</a><br /></td></tr>
-<tr class="separator:a7007632a4d53b774c358bcccbcd3332c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6ea7dec05eecd452ef082a0ccf89396"><td class="memTemplParams" colspan="2">template&lt;&gt; </td></tr>
-<tr class="memitem:ac6ea7dec05eecd452ef082a0ccf89396"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ac6ea7dec05eecd452ef082a0ccf89396">anonymous_namespace{loadplay.cpp}::SysctlValue::get&lt; std::string &gt;</a> () const</td></tr>
-<tr class="memdesc:ac6ea7dec05eecd452ef082a0ccf89396"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a copy of the value string.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ac6ea7dec05eecd452ef082a0ccf89396">More...</a><br /></td></tr>
-<tr class="separator:ac6ea7dec05eecd452ef082a0ccf89396"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afe8d8a5b6288bea0085cd554c27e12dd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#afe8d8a5b6288bea0085cd554c27e12dd">anonymous_namespace{loadplay.cpp}::warn</a> (std::string const &amp;msg)</td></tr>
-<tr class="memdesc:afe8d8a5b6288bea0085cd554c27e12dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a warning.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#afe8d8a5b6288bea0085cd554c27e12dd">More...</a><br /></td></tr>
-<tr class="separator:afe8d8a5b6288bea0085cd554c27e12dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac11ace9a2c889224bdf040454d726505"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ac11ace9a2c889224bdf040454d726505">anonymous_namespace{loadplay.cpp}::fail</a> (std::string const &amp;msg)</td></tr>
-<tr class="memdesc:ac11ace9a2c889224bdf040454d726505"><td class="mdescLeft">&#160;</td><td class="mdescRight">This prints an error message and sets sys_results to make the hijacked process fail.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ac11ace9a2c889224bdf040454d726505">More...</a><br /></td></tr>
-<tr class="separator:ac11ace9a2c889224bdf040454d726505"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a776076fb258198c0acdb4a73a9af6c94"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a776076fb258198c0acdb4a73a9af6c94">anonymous_namespace{loadplay.cpp}::operator&lt;&lt;</a> (std::ostream &amp;out, CoreReport const &amp;core)</td></tr>
-<tr class="memdesc:a776076fb258198c0acdb4a73a9af6c94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a core clock frequency and load.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a776076fb258198c0acdb4a73a9af6c94">More...</a><br /></td></tr>
-<tr class="separator:a776076fb258198c0acdb4a73a9af6c94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab078c8abf39c2556a9dfb1084dff72f7"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ab078c8abf39c2556a9dfb1084dff72f7">anonymous_namespace{loadplay.cpp}::operator&lt;&lt;</a> (std::ostream &amp;out, CoreFrameReport const &amp;frame)</td></tr>
-<tr class="memdesc:ab078c8abf39c2556a9dfb1084dff72f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print recorded and running clock frequency and load for a frame.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ab078c8abf39c2556a9dfb1084dff72f7">More...</a><br /></td></tr>
-<tr class="separator:ab078c8abf39c2556a9dfb1084dff72f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad972ce2a8b2b31fabc47aaf1e57b1bfc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#ad972ce2a8b2b31fabc47aaf1e57b1bfc">sysctl</a> (const int *name, u_int namelen, void *oldp, size_t *oldlenp, const void *newp, size_t newlen)</td></tr>
-<tr class="memdesc:ad972ce2a8b2b31fabc47aaf1e57b1bfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functions to intercept.  <a href="#ad972ce2a8b2b31fabc47aaf1e57b1bfc">More...</a><br /></td></tr>
-<tr class="separator:ad972ce2a8b2b31fabc47aaf1e57b1bfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82981a06c02396e0e6f4114ace7bbab4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#a82981a06c02396e0e6f4114ace7bbab4">sysctlnametomib</a> (const char *name, int *mibp, size_t *sizep)</td></tr>
-<tr class="memdesc:a82981a06c02396e0e6f4114ace7bbab4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#a82981a06c02396e0e6f4114ace7bbab4" title="Intercept calls to sysctlnametomib().">sysctlnametomib()</a>.  <a href="#a82981a06c02396e0e6f4114ace7bbab4">More...</a><br /></td></tr>
-<tr class="separator:a82981a06c02396e0e6f4114ace7bbab4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bc752f04c43c918c1a4de437703e67e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#a4bc752f04c43c918c1a4de437703e67e">sysctlbyname</a> (const char *name, void *oldp, size_t *oldlenp, const void *newp, size_t newlen)</td></tr>
-<tr class="memdesc:a4bc752f04c43c918c1a4de437703e67e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#a4bc752f04c43c918c1a4de437703e67e" title="Intercept calls to sysctlbyname().">sysctlbyname()</a>.  <a href="#a4bc752f04c43c918c1a4de437703e67e">More...</a><br /></td></tr>
-<tr class="separator:a4bc752f04c43c918c1a4de437703e67e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa10914f5d815f5943722ae8be203eeff"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#aa10914f5d815f5943722ae8be203eeff">daemon</a> (int, int)</td></tr>
-<tr class="memdesc:aa10914f5d815f5943722ae8be203eeff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#aa10914f5d815f5943722ae8be203eeff" title="Intercept calls to daemon().">daemon()</a>.  <a href="#aa10914f5d815f5943722ae8be203eeff">More...</a><br /></td></tr>
-<tr class="separator:aa10914f5d815f5943722ae8be203eeff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b9a6dcf4e1d237f5607256dad93e26a"><td class="memItemLeft" align="right" valign="top">uid_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#a8b9a6dcf4e1d237f5607256dad93e26a">geteuid</a> (void)</td></tr>
-<tr class="memdesc:a8b9a6dcf4e1d237f5607256dad93e26a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#a8b9a6dcf4e1d237f5607256dad93e26a" title="Intercept calls to geteuid().">geteuid()</a>.  <a href="#a8b9a6dcf4e1d237f5607256dad93e26a">More...</a><br /></td></tr>
-<tr class="separator:a8b9a6dcf4e1d237f5607256dad93e26a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2142be902525c0f4e400b856a257f236"><td class="memItemLeft" align="right" valign="top">pidfh *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#a2142be902525c0f4e400b856a257f236">pidfile_open</a> (const char *, mode_t, pid_t *)</td></tr>
-<tr class="memdesc:a2142be902525c0f4e400b856a257f236"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#a2142be902525c0f4e400b856a257f236" title="Intercept calls to pidfile_open().">pidfile_open()</a>.  <a href="#a2142be902525c0f4e400b856a257f236">More...</a><br /></td></tr>
-<tr class="separator:a2142be902525c0f4e400b856a257f236"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a997be1ed42ba47290ef37df12ebf5cc3"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#a997be1ed42ba47290ef37df12ebf5cc3">pidfile_write</a> (pidfh *)</td></tr>
-<tr class="memdesc:a997be1ed42ba47290ef37df12ebf5cc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#a997be1ed42ba47290ef37df12ebf5cc3" title="Intercept calls to pidfile_write().">pidfile_write()</a>.  <a href="#a997be1ed42ba47290ef37df12ebf5cc3">More...</a><br /></td></tr>
-<tr class="separator:a997be1ed42ba47290ef37df12ebf5cc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1a046d5ef4b75fa859a7cf342c57c34"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#af1a046d5ef4b75fa859a7cf342c57c34">pidfile_close</a> (pidfh *)</td></tr>
-<tr class="memdesc:af1a046d5ef4b75fa859a7cf342c57c34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#af1a046d5ef4b75fa859a7cf342c57c34" title="Intercept calls to pidfile_close().">pidfile_close()</a>.  <a href="#af1a046d5ef4b75fa859a7cf342c57c34">More...</a><br /></td></tr>
-<tr class="separator:af1a046d5ef4b75fa859a7cf342c57c34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedfdf0b29a3e52a8458c1a39d70e3c9c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#aedfdf0b29a3e52a8458c1a39d70e3c9c">pidfile_remove</a> (pidfh *)</td></tr>
-<tr class="memdesc:aedfdf0b29a3e52a8458c1a39d70e3c9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#aedfdf0b29a3e52a8458c1a39d70e3c9c" title="Intercept calls to pidfile_remove().">pidfile_remove()</a>.  <a href="#aedfdf0b29a3e52a8458c1a39d70e3c9c">More...</a><br /></td></tr>
-<tr class="separator:aedfdf0b29a3e52a8458c1a39d70e3c9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11ca38ed96d5eca57df0f8cce8f05d63"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#a11ca38ed96d5eca57df0f8cce8f05d63">pidfile_fileno</a> (pidfh const *)</td></tr>
-<tr class="memdesc:a11ca38ed96d5eca57df0f8cce8f05d63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intercept calls to <a class="el" href="loadplay_8cpp.html#a11ca38ed96d5eca57df0f8cce8f05d63" title="Intercept calls to pidfile_fileno().">pidfile_fileno()</a>.  <a href="#a11ca38ed96d5eca57df0f8cce8f05d63">More...</a><br /></td></tr>
-<tr class="separator:a11ca38ed96d5eca57df0f8cce8f05d63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8c04d034d1318017d4ba7e86a61ef40"><td class="memItemLeft" align="right" valign="top">char const  *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ae8c04d034d1318017d4ba7e86a61ef40">anonymous_namespace{loadplay.cpp}::filename</a> (char const *const path)</td></tr>
+<tr class="memdesc:ae8c04d034d1318017d4ba7e86a61ef40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs very rudimentary file name argument checks.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ae8c04d034d1318017d4ba7e86a61ef40">More...</a><br /></td></tr>
+<tr class="separator:ae8c04d034d1318017d4ba7e86a61ef40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae8b2ee3af502ecf8764be42daf5b656"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#aae8b2ee3af502ecf8764be42daf5b656">anonymous_namespace{loadplay.cpp}::execute</a> (char const *const file, char *const argv[])</td></tr>
+<tr class="memdesc:aae8b2ee3af502ecf8764be42daf5b656"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes the given command, substituting this process.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#aae8b2ee3af502ecf8764be42daf5b656">More...</a><br /></td></tr>
+<tr class="separator:aae8b2ee3af502ecf8764be42daf5b656"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="loadplay_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> (int argc, char *argv[])</td></tr>
+<tr class="memdesc:a0ddf1224851353fc92bfbff6f499fa97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse command line arguments and execute the given command.  <a href="#a0ddf1224851353fc92bfbff6f499fa97">More...</a><br /></td></tr>
+<tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:abe7afc378ded5bb24357bac70c733ccc"><td class="memItemLeft" align="right" valign="top">constexpr flag_t const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#abe7afc378ded5bb24357bac70c733ccc">anonymous_namespace{loadplay.cpp}::FEATURES</a></td></tr>
-<tr class="memdesc:abe7afc378ded5bb24357bac70c733ccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The set of supported features.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#abe7afc378ded5bb24357bac70c733ccc">More...</a><br /></td></tr>
-<tr class="separator:abe7afc378ded5bb24357bac70c733ccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af289bd1cdefd7b97fe1bb4ec3ba5b052"><td class="memItemLeft" align="right" valign="top"><a id="af289bd1cdefd7b97fe1bb4ec3ba5b052"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#af289bd1cdefd7b97fe1bb4ec3ba5b052">anonymous_namespace{loadplay.cpp}::sys_results</a> = 0</td></tr>
-<tr class="memdesc:af289bd1cdefd7b97fe1bb4ec3ba5b052"><td class="mdescLeft">&#160;</td><td class="mdescRight">The success return value of intercepted functions. <br /></td></tr>
-<tr class="separator:af289bd1cdefd7b97fe1bb4ec3ba5b052"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae153907bf8974b25a6f69478de66c8b9"><td class="memItemLeft" align="right" valign="top">class anonymous_namespace{loadplay.cpp}::Sysctls&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ae153907bf8974b25a6f69478de66c8b9">anonymous_namespace{loadplay.cpp}::sysctls</a></td></tr>
-<tr class="memdesc:ae153907bf8974b25a6f69478de66c8b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sole instance of <a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Sysctls.html">Sysctls</a>.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ae153907bf8974b25a6f69478de66c8b9">More...</a><br /></td></tr>
-<tr class="separator:ae153907bf8974b25a6f69478de66c8b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefd3b4a34236a15db6e9ab1db0986ff8"><td class="memItemLeft" align="right" valign="top">class anonymous_namespace{loadplay.cpp}::Main&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#aefd3b4a34236a15db6e9ab1db0986ff8">anonymous_namespace{loadplay.cpp}::main</a></td></tr>
-<tr class="memdesc:aefd3b4a34236a15db6e9ab1db0986ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sole instance of <a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html">Main</a>.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#aefd3b4a34236a15db6e9ab1db0986ff8">More...</a><br /></td></tr>
-<tr class="separator:aefd3b4a34236a15db6e9ab1db0986ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab3218f348f9ec0d9e67b21e85e8485e9"><td class="memItemLeft" align="right" valign="top"><a id="ab3218f348f9ec0d9e67b21e85e8485e9"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ab3218f348f9ec0d9e67b21e85e8485e9">anonymous_namespace{loadplay.cpp}::sysctl_fallback</a> = false</td></tr>
-<tr class="memdesc:ab3218f348f9ec0d9e67b21e85e8485e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set to activate fallback to the original sysctl functions. <br /></td></tr>
-<tr class="separator:ab3218f348f9ec0d9e67b21e85e8485e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ca2d32a5808b24c1a7cbc34cca64b1d"><td class="memItemLeft" align="right" valign="top"><a id="a3ca2d32a5808b24c1a7cbc34cca64b1d"></a>
+char const  *const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a3ca2d32a5808b24c1a7cbc34cca64b1d">anonymous_namespace{loadplay.cpp}::USAGE</a> = &quot;[-h] [-i file] [-o file] command [...]&quot;</td></tr>
+<tr class="memdesc:a3ca2d32a5808b24c1a7cbc34cca64b1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The short usage string. <br /></td></tr>
+<tr class="separator:a3ca2d32a5808b24c1a7cbc34cca64b1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4def5986412bb5d47ae7bb3b3d8ec9cf"><td class="memItemLeft" align="right" valign="top">Parameter&lt; OE &gt; const&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a4def5986412bb5d47ae7bb3b3d8ec9cf">anonymous_namespace{loadplay.cpp}::PARAMETERS</a> []</td></tr>
+<tr class="memdesc:a4def5986412bb5d47ae7bb3b3d8ec9cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Definitions of command line parameters.  <a href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#a4def5986412bb5d47ae7bb3b3d8ec9cf">More...</a><br /></td></tr>
+<tr class="separator:a4def5986412bb5d47ae7bb3b3d8ec9cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD. </p>
-<p>This library reads instructions from std::cin and outputs statistics about the hijacked process on std::cout. </p>
-</div><hr/><h2 class="groupheader">Class Documentation</h2>
-<a name="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport" id="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">&#9670;&nbsp;</a></span>anonymous_namespace{loadplay.cpp}::CoreReport</h2>
+<div class="textblock"><p>Implements the loadplay a bootstrapping tool for libloadplay. </p>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="a0ddf1224851353fc92bfbff6f499fa97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ddf1224851353fc92bfbff6f499fa97">&#9670;&nbsp;</a></span>main()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">struct anonymous_namespace{loadplay.cpp}::CoreReport</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="textblock"><p>The reported state of a single CPU pipeline. </p>
-</div><div class="dynheader">
-Collaboration diagram for anonymous_namespace{loadplay.cpp}::CoreReport:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport__coll__graph.svg" width="190" height="142"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
-<table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a id="abb7c78f2d3eef517f1453506f06a8b25"></a>mhz_t</td>
-<td class="fieldname">
-freq</td>
-<td class="fielddoc">
-The core clock frequency in [MHz]. </td></tr>
-<tr><td class="fieldtype">
-<a id="aa32ae93306d5dc6bbdff8efed54934a1"></a>double</td>
-<td class="fieldname">
-load</td>
-<td class="fielddoc">
-The core load as a fraction. </td></tr>
-</table>
-
-</div>
-</div>
-<a name="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport" id="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport">&#9670;&nbsp;</a></span>anonymous_namespace{loadplay.cpp}::CoreFrameReport</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct anonymous_namespace{loadplay.cpp}::CoreFrameReport</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="textblock"><p>The report frame information for a single CPU pipeline. </p>
-</div><div class="dynheader">
-Collaboration diagram for anonymous_namespace{loadplay.cpp}::CoreFrameReport:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02loadplay_8cpp_03_1_1CoreFrameReport__coll__graph.svg" width="226" height="260"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
-<table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a id="af32d8b7fede82e67f36224ea1a3211d8"></a><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">CoreReport</a></td>
-<td class="fieldname">
-rec</td>
-<td class="fielddoc">
-The recorded core state. </td></tr>
-<tr><td class="fieldtype">
-<a id="ac16d324e5989109720384d812efd23cb"></a><a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#structanonymous__namespace_02loadplay_8cpp_03_1_1CoreReport">CoreReport</a></td>
-<td class="fieldname">
-run</td>
-<td class="fielddoc">
-The running core state. </td></tr>
-</table>
-
-</div>
-</div>
-<a name="structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core" id="structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core">&#9670;&nbsp;</a></span>anonymous_namespace{loadplay.cpp}::Emulator::Core</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">struct anonymous_namespace{loadplay.cpp}::Emulator::Core</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<div class="textblock"><p>Per core information. </p>
-</div><div class="dynheader">
-Collaboration diagram for anonymous_namespace{loadplay.cpp}::Emulator::Core:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="structanonymous__namespace_02loadplay_8cpp_03_1_1Emulator_1_1Core__coll__graph.svg" width="1060" height="155"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
-</div>
-<center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
-<table class="fieldtable">
-<tr><th colspan="3">Class Members</th></tr>
-<tr><td class="fieldtype">
-<a id="a8f4d3bb57c58d4ade05cf4a98c835929"></a>cptime_t</td>
-<td class="fieldname">
-carryLoadCycles</td>
-<td class="fielddoc">
-The load cycles carried over to the next frame in [kcycles]. <p>This is determined at the beginning of frame and used to calculated the simulation load at the beginning of the next frame. </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a6cd92568cfb8a9b7b9f55f979201b9af"></a><a class="el" href="classanonymous__namespace_02loadplay_8cpp_03_1_1SysctlValue.html">SysctlValue</a> *</td>
-<td class="fieldname">
-freqCtl</td>
-<td class="fielddoc">
-The sysctl handler. <p>The constructor ensures this points to a valid handler. </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a6740eb645e8ad31db7a49182576f8a04"></a>mhz_t</td>
-<td class="fieldname">
-recFreq</td>
-<td class="fielddoc">
-The recorded clock frequency. <p>If FREQ_TRACKING is enabled this is updated at during the preliminary stage and used at the beginning of frame stage. </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="ab3e1b3344950c395010bb2c5341f6a82"></a>mhz_t</td>
-<td class="fieldname">
-runFreq</td>
-<td class="fielddoc">
-The clock frequency the simulation is running at. <p>Updated at the end of frame and used in the next frame. </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="ad894aafa0a4e9d54126fa5ff0359a338"></a>cptime_t</td>
-<td class="fieldname">
-runLoadCycles</td>
-<td class="fielddoc">
-The load cycles simulated for this frame in [kcycles]. <p>This is determined at the beginning of frame and used to calculate the reported load at the end of frame. </p>
-</td></tr>
-</table>
-
-</div>
-</div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="aa10914f5d815f5943722ae8be203eeff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa10914f5d815f5943722ae8be203eeff">&#9670;&nbsp;</a></span>daemon()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int daemon </td>
+          <td class="memname">int main </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname">, </td>
+          <td class="paramname"><em>argc</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname">&#160;</td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>argv</em>[]&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -391,349 +167,15 @@ The load cycles simulated for this frame in [kcycles]. <p>This is determined at 
       </table>
 </div><div class="memdoc">
 
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#aa10914f5d815f5943722ae8be203eeff" title="Intercept calls to daemon().">daemon()</a>. </p>
-<p>Prevents process from separating from the controlling terminal.</p>
-<dl class="section return"><dt>Returns</dt><dd>The value of sys_results </dd></dl>
-
-</div>
-</div>
-<a id="a8b9a6dcf4e1d237f5607256dad93e26a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b9a6dcf4e1d237f5607256dad93e26a">&#9670;&nbsp;</a></span>geteuid()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uid_t geteuid </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#a8b9a6dcf4e1d237f5607256dad93e26a" title="Intercept calls to geteuid().">geteuid()</a>. </p>
-<p>Tells the asking process that it is running as root.</p>
-<dl class="section return"><dt>Returns</dt><dd>Always returns 0 </dd></dl>
-
-</div>
-</div>
-<a id="af1a046d5ef4b75fa859a7cf342c57c34"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af1a046d5ef4b75fa859a7cf342c57c34">&#9670;&nbsp;</a></span>pidfile_close()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int pidfile_close </td>
-          <td>(</td>
-          <td class="paramtype">pidfh *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#af1a046d5ef4b75fa859a7cf342c57c34" title="Intercept calls to pidfile_close().">pidfile_close()</a>. </p>
-<dl class="section return"><dt>Returns</dt><dd>The value of sys_results </dd></dl>
-
-</div>
-</div>
-<a id="a11ca38ed96d5eca57df0f8cce8f05d63"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11ca38ed96d5eca57df0f8cce8f05d63">&#9670;&nbsp;</a></span>pidfile_fileno()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int pidfile_fileno </td>
-          <td>(</td>
-          <td class="paramtype">pidfh const *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#a11ca38ed96d5eca57df0f8cce8f05d63" title="Intercept calls to pidfile_fileno().">pidfile_fileno()</a>. </p>
-<dl class="section return"><dt>Returns</dt><dd>The value of sys_results </dd></dl>
-
-</div>
-</div>
-<a id="a2142be902525c0f4e400b856a257f236"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2142be902525c0f4e400b856a257f236">&#9670;&nbsp;</a></span>pidfile_open()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">pidfh* pidfile_open </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">mode_t&#160;</td>
-          <td class="paramname">, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">pid_t *&#160;</td>
-          <td class="paramname">&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#a2142be902525c0f4e400b856a257f236" title="Intercept calls to pidfile_open().">pidfile_open()</a>. </p>
-<p>Prevents pidfile locking and creation by the hijacked process.</p>
-<dl class="section return"><dt>Returns</dt><dd>A dummy pointer </dd></dl>
-
-</div>
-</div>
-<a id="aedfdf0b29a3e52a8458c1a39d70e3c9c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aedfdf0b29a3e52a8458c1a39d70e3c9c">&#9670;&nbsp;</a></span>pidfile_remove()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int pidfile_remove </td>
-          <td>(</td>
-          <td class="paramtype">pidfh *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#aedfdf0b29a3e52a8458c1a39d70e3c9c" title="Intercept calls to pidfile_remove().">pidfile_remove()</a>. </p>
-<dl class="section return"><dt>Returns</dt><dd>The value of sys_results </dd></dl>
-
-</div>
-</div>
-<a id="a997be1ed42ba47290ef37df12ebf5cc3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a997be1ed42ba47290ef37df12ebf5cc3">&#9670;&nbsp;</a></span>pidfile_write()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int pidfile_write </td>
-          <td>(</td>
-          <td class="paramtype">pidfh *&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#a997be1ed42ba47290ef37df12ebf5cc3" title="Intercept calls to pidfile_write().">pidfile_write()</a>. </p>
-<dl class="section return"><dt>Returns</dt><dd>The value of sys_results </dd></dl>
-
-</div>
-</div>
-<a id="ad972ce2a8b2b31fabc47aaf1e57b1bfc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad972ce2a8b2b31fabc47aaf1e57b1bfc">&#9670;&nbsp;</a></span>sysctl()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int sysctl </td>
-          <td>(</td>
-          <td class="paramtype">const int *&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">u_int&#160;</td>
-          <td class="paramname"><em>namelen</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>oldp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t *&#160;</td>
-          <td class="paramname"><em>oldlenp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>newp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>newlen</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Functions to intercept. </p>
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#ad972ce2a8b2b31fabc47aaf1e57b1bfc" title="Functions to intercept.">sysctl()</a>.</p>
-<p>Uses the local <a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ae153907bf8974b25a6f69478de66c8b9">anonymous_namespace{loadplay::cpp}::sysctls</a> store.</p>
-<p>Falls back to the original under the following conditions:</p>
-<ul>
-<li>sysctl_fallback is set</li>
-<li>kern.usrstack is requested</li>
-<li>vm.* is requested</li>
-</ul>
-<p>The call may fail for 3 reasons:</p>
-<ol type="1">
-<li>The <a class="el" href="namespaceanonymous__namespace_02loadplay_8cpp_03.html#ac11ace9a2c889224bdf040454d726505" title="This prints an error message and sets sys_results to make the hijacked process fail.">fail()</a> function was called and sys_results was assigned -1</li>
-<li>A target buffer was too small (errno == ENOMEM)</li>
-<li>The given sysctl is not in the sysctls store (errno == ENOENT)</li>
-</ol>
+<p>Parse command line arguments and execute the given command. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">name,namelen,oldp,oldlenp,newp,newlen</td><td>Please refer to sysctl(3) </td></tr>
+    <tr><td class="paramname">argc,argv</td><td>The command line arguments </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="retval"><dt>Return values</dt><dd>
-  <table class="retval">
-    <tr><td class="paramname">0</td><td>The call succeeded </td></tr>
-    <tr><td class="paramname">-1</td><td>The call failed </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a4bc752f04c43c918c1a4de437703e67e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4bc752f04c43c918c1a4de437703e67e">&#9670;&nbsp;</a></span>sysctlbyname()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int sysctlbyname </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>oldp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t *&#160;</td>
-          <td class="paramname"><em>oldlenp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const void *&#160;</td>
-          <td class="paramname"><em>newp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t&#160;</td>
-          <td class="paramname"><em>newlen</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#a4bc752f04c43c918c1a4de437703e67e" title="Intercept calls to sysctlbyname().">sysctlbyname()</a>. </p>
-<p>Falls back on the original <a class="el" href="loadplay_8cpp.html#a4bc752f04c43c918c1a4de437703e67e" title="Intercept calls to sysctlbyname().">sysctlbyname()</a> for the following names:</p>
-<ul>
-<li>kern.smp.cpus</li>
-</ul>
-<p>May fail for the same reasons as <a class="el" href="loadplay_8cpp.html#ad972ce2a8b2b31fabc47aaf1e57b1bfc" title="Functions to intercept.">sysctl()</a>.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">name,oldp,oldlenp,newp,newlen</td><td>Please refer to sysctl(3) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="retval"><dt>Return values</dt><dd>
-  <table class="retval">
-    <tr><td class="paramname">0</td><td>The call succeeded </td></tr>
-    <tr><td class="paramname">-1</td><td>The call failed </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a82981a06c02396e0e6f4114ace7bbab4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82981a06c02396e0e6f4114ace7bbab4">&#9670;&nbsp;</a></span>sysctlnametomib()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">int sysctlnametomib </td>
-          <td>(</td>
-          <td class="paramtype">const char *&#160;</td>
-          <td class="paramname"><em>name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int *&#160;</td>
-          <td class="paramname"><em>mibp</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t *&#160;</td>
-          <td class="paramname"><em>sizep</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Intercept calls to <a class="el" href="loadplay_8cpp.html#a82981a06c02396e0e6f4114ace7bbab4" title="Intercept calls to sysctlnametomib().">sysctlnametomib()</a>. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">name,mibp,sizep</td><td>Please refer to sysctl(3) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="retval"><dt>Return values</dt><dd>
-  <table class="retval">
-    <tr><td class="paramname">0</td><td>The call succeeded </td></tr>
-    <tr><td class="paramname">-1</td><td>The call failed </td></tr>
-  </table>
-  </dd>
-</dl>
+<dl class="section return"><dt>Returns</dt><dd>An exit code </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>Exit </dd></dl>
 
 </div>
 </div>

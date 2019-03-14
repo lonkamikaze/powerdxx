@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['bgthread',['bgthread',['../classanonymous__namespace_02loadplay_8cpp_03_1_1Main.html#a23b983977334a213d7e6a3f1792018be',1,'anonymous_namespace{loadplay.cpp}::Main']]]
+  ['bgthread',['bgthread',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Main.html#a0036ef0431e5630f7947cd5cea4cec94',1,'anonymous_namespace{libloadplay.cpp}::Main']]]
 ];

@@ -1,5 +1,5 @@
-<map id="loadrec.cpp" name="loadrec.cpp">
-<area shape="rect" id="node1" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="954,5,1043,32"/>
+<map id="src/loadrec.cpp" name="src/loadrec.cpp">
+<area shape="rect" id="node1" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="943,5,1054,32"/>
 <area shape="rect" id="node2" href="$Options_8hpp.html" title="This file provides nih::Options&lt;&gt;, a substitute for getopt(3)." alt="" coords="175,80,267,107"/>
 <area shape="rect" id="node8" href="$types_8hpp.html" title="A collection of type aliases." alt="" coords="942,155,1021,181"/>
 <area shape="rect" id="node9" title=" " alt="" coords="920,229,981,256"/>
