@@ -8,110 +8,308 @@
      \/ multi-core CPU clock daemon for FreeBSD®
 ```
 
-The `powerd++` daemon is a drop-in replacement for FreeBSD's native
-`powerd(8)`. It monitors CPU load and core temperatures to adjust
-the CPU clock, avoiding some of the pitfalls of `powerd`.
+The powerd++ daemon is a drop-in replacement for FreeBSD's native
+powerd. Its purpose is to reduce the energy consumption of CPUs for
+the following benefits:
 
-What Pitfalls?
---------------
+- Avoid unnecessary fan noise from portable devices
+- Improve the battery runtime of portable devices
+- Improve hardware lifetime by reducing thermal stress
+- Energy conservation
 
-At the time `powerd++` was first created (February 2016), `powerd`
-exhibited some unhealthy behaviours on multi-core machines.
+[code]:       https://github.com/lonkamikaze/powerdxx
+[releases]:   https://github.com/lonkamikaze/powerdxx/releases
+[issues]:     https://github.com/lonkamikaze/powerdxx/issues
+[HTML]:       https://lonkamikaze.github.io/powerdxx
+[PDF]:        https://lonkamikaze.github.io/powerdxx/refman.pdf
 
-In order to make sure that single core loads do not suffer from the
-use of `powerd` it was designed to use the sum load of all cores
-as the current load rating. A side effect of this is that it causes
-`powerd` to never clock down on systems with even moderate numbers
-of cores. E.g. on a quad-core system with hyper threading a background
-load of 12.5% per core suffices to score a 100% load rating.
+**Contents**
 
-The more cores are added, the worse it gets. Even on a dual core
-machine (with HT) having a browser and an e-mail client open, suffices
-to keep the load rating above 100% for most of the time, even without
-user activity. Thus `powerd` never does its job of saving energy
-by reducing the clock frequency.
+1. [Using powerd++](#using-powerd-)
+   1. [Packages](#packages)
+   2. [Running powerd++](#running-powerd-)
+   3. [Manuals](#manuals)
+   4. [Tuning](#tuning)
+   5. [Reporting Issues / Requesting Features](#reporting-issues-requesting-features)
+2. [Building/Installing](#building-installing)
+   1. [Building](#building)
+   2. [Installing](#installing)
+   3. [Documentation](#documentation)
+3. [Development](#development)
+   2. [Design](#design)
+   3. [License](#license)
 
-Advantages of powerd++
-----------------------
+Using powerd++
+==============
 
-The `powerd++` implementation addresses this issue and more:
+Powerd++ offers the following features:
 
-- `powerd++` groups cores with a common clock frequency together and
-  handles each group's load and target frequency separately. I.e. the
-  moment FreeBSD starts offering individual clock settings on the
-  CPU, core or thread level, `powerd++` already supports it.
-- `powerd++` takes the highest load within a group of cores to rate
-  the load. This approach responds well to single core loads as well
-  as evenly distributed loads.
-- `powerd++` sets the clock frequency according to a load target, i.e.
-  it jumps right to the clock rate it will stay in if the load does
-  not change.
-- `powerd++` supports taking the average load over more than two
-  samples, this makes it more robust against small load spikes, but
-  sacrifices less responsiveness than just increasing the polling
-  interval would. Because only the oldest and the newest sample are
-  required for calculating the average, this approach does not even
-  cause additional runtime cost!
-- `powerd++` parses command line arguments as floating point numbers,
-  allowing expressive commands like `powerd++ --batt 1.2ghz`.
-- `powerd++` supports temperature based throttling.
+- Load target based clock frequency control
+- Tunable sampling with moving average filter
+- Load recording and replay tooling for benchmarking, tuning and
+  reporting issues
+- Command line compatibility with [powerd(8)]
+- Temperature based throttling
+- Expressive command line arguments with units, ranges and argument
+  chaining
+- Helpful error messages
+- Comprehensive manual pages
+
+[powerd(8)]:  https://www.freebsd.org/cgi/man.cgi?query=powerd
+
+Packages
+--------
+
+The [FreeBSD] port is `sysutils/powerdxx`, the package name `powerdxx`.
+
+[FreeBSD]:    https://www.freebsd.org/
+
+Running powerd++
+----------------
+
+It is not intended to run powerd++ simultaneously with powerd.
+To prevent this powerd++ uses the same default pidfile as powerd:
+
+```
+# service powerdxx onestart
+Starting powerdxx.
+powerd++: (ECONFLICT) a power daemon is already running under PID: 59866
+/usr/local/etc/rc.d/powerdxx: WARNING: failed to start powerdxx
+```
+
+So if powerd is already setup, it first needs to be disabled:
+
+```
+# service powerd stop
+Stopping powerd.
+Waiting for PIDS: 50127.
+# service powerd disable
+powerd disabled in /etc/rc.conf
+```
+
+Afterwards powerd++ can be enabled:
+
+```
+# service powerdxx enable
+powerdxx enabled in /etc/rc.conf
+# service powerdxx start
+Starting powerdxx.
+```
+
+Manuals
+-------
+
+Comprehensive manual pages exist for powerd++ and its accompanying
+tools loadrec and loadplay:
+
+```
+> man powerd++ loadrec loadplay
+```
+
+The current version of the manual pages may be read directly from
+the repository:
+
+```
+> man man/*
+```
+
+The manual pages as of the last release can also be
+[read online](https://lonkamikaze.github.io/powerdxx/pages.html).
+
+Tuning
+------
+
+Three parameters affect the responsiveness of powerd++:
+
+- The load target (refer to `-a`, `-b` and `-n`)
+- The polling interval (refer to `-p`)
+- The sample count (refer to `-s`)
+
+The key to tuning powerd++ is the `-f` flag, which keeps powerd++
+in foreground and causes it to report its activity.
+This allows directly observing the effects of a parameter set.
+
+Observing the defaults in action may be a good start:
+
+```
+# powerd++ -f
+power:  online, load:  693 MHz,  42 C, cpu.0.freq: 2401 MHz, wanted: 1848 MHz
+power:  online, load:  475 MHz,  43 C, cpu.0.freq: 1800 MHz, wanted: 1266 MHz
+power:  online, load:  271 MHz,  43 C, cpu.0.freq: 1300 MHz, wanted:  722 MHz
+power:  online, load:   64 MHz,  43 C, cpu.0.freq:  768 MHz, wanted:  170 MHz
+power:  online, load:   55 MHz,  42 C, cpu.0.freq:  768 MHz, wanted:  146 MHz
+power:  online, load:   57 MHz,  42 C, cpu.0.freq:  768 MHz, wanted:  152 MHz
+power:  online, load:   60 MHz,  44 C, cpu.0.freq:  768 MHz, wanted:  160 MHz
+power:  online, load:   67 MHz,  42 C, cpu.0.freq:  768 MHz, wanted:  178 MHz
+...
+```
+
+Note, the immediate high load is due to the load buffer being filled
+under the assumption that the past load fits the current clock frequency
+when powerd++ starts.
+
+Reporting Issues / Requesting Features
+--------------------------------------
+
+Please report issues and feature requests on [GitHub][issues] or
+to <kamikaze@bsdforen.de>.
+
+If powerd++ behaves in some unexpected or undesired manner, please
+mention all the command line flags (e.g. from `/etc/rc.conf`
+`powerdxx_flags`) and provide a load recording:
+
+```
+> loadrec -o myissue.load
+```
+
+The default recording duration is 30 s. Do not omit the `-o` parameter,
+printing the output on the terminal may create significant load and
+impact the recorded load significantly.
+
+Before submitting the report, try to reproduce the behaviour using
+the recorded load:
+
+```
+> loadplay -i myissue.load -o /dev/null powerd++ -f
+power:  online, load:  224 MHz, cpu.0.freq:  768 MHz, wanted:  597 MHz
+power:  online, load:  155 MHz, cpu.0.freq:  768 MHz, wanted:  413 MHz
+power:  online, load:   85 MHz, cpu.0.freq:  768 MHz, wanted:  226 MHz
+power:  online, load:   29 MHz, cpu.0.freq:  768 MHz, wanted:   77 MHz
+power:  online, load:   23 MHz, cpu.0.freq:  768 MHz, wanted:   61 MHz
+...
+```
+
+Building/Installing
+===================
+
+The `Makefile` offers a set of targets, it is written for FreeBSD's
+[make(1)](https://www.freebsd.org/cgi/man.cgi?query=make):
+
+| Target    | Description                                  |
+|-----------|----------------------------------------------|
+| all       | Build everything                             |
+| debug     | Build with `CXXFLAGS=-O0 -g -DEBUG`          |
+| paranoid  | Turn on undefined behaviour canaries         |
+| install   | Install tools and manuals                    |
+| deinstall | Deinstall tools and manuals                  |
+| clean     | Clear build directory `obj/`                 |
+| doc       | Build HTML documentation                     |
+| gh-pages  | Build and publish HTML and PDF documentation |
 
 Building
 --------
 
-Download the repository and run `make`:
+The `all` target is the default target that is called implicitly if
+make is run without arguments:
 
-    > make
-    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic -c src/powerd++.cpp -o powerd++.o
-    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic -c src/clas.cpp -o clas.o
-    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic powerd++.o clas.o -lutil -o powerd++
-    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic -c src/loadrec.cpp -o loadrec.o
-    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic loadrec.o clas.o -o loadrec
-    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic -fPIC -c src/loadplay.cpp -o loadplay.o
-    c++ -O2 -pipe  -std=c++14 -Wall -Werror -pedantic loadplay.o -lpthread -shared -o libloadplay.so
+```
+> make
+c++  -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -c src/powerd++.cpp -o powerd++.o
+c++  -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -c src/clas.cpp -o clas.o
+c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic powerd++.o clas.o -lutil -o powerd++
+c++  -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -c src/loadrec.cpp -o loadrec.o
+c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic loadrec.o clas.o -o loadrec
+c++  -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -c src/loadplay.cpp -o loadplay.o
+c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic loadplay.o clas.o -o loadplay
+c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -fPIC -c src/libloadplay.cpp -o libloadplay.o
+c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic libloadplay.o -lpthread -shared -o libloadplay.so
+>
+```
+
+The `debug` and `paranoid` flags perform the same build as the `all`
+target, but with different/additional `CXXFLAGS`. The `debug` and
+`paranoid` targets can be combined.
+
+Installing
+----------
+
+The installer installs the tools and manual pages according to a recipe
+in `pkg/files`. The following variables can be passed to `make install`
+or `make deinstall` to affect the install destination:
+
+| Variable  | Default                        |
+|-----------|--------------------------------|
+| `DESTDIR` |                                |
+| `PREFIX`  | `/usr/local`                   |
+| `DOCSDIR` | `${PREFIX}/share/doc/powerdxx` |
+
+`DESTDIR` can be used to install powerd++ into a chroot or jail, e.g.
+to put it into the staging area when building a package using the
+FreeBSD ports. Unlike `PREFIX` and `DOCSDIR` it does not affect the
+installed files themselves.
 
 Documentation
 -------------
 
-The manual pages can be read with the following commands:
+Building the documentation requires `doxygen` 1.8.15 or later, building
+the PDF version of the documentation requires `xelatex` as provided
+by the tex-xetex package.
 
-    > man man/powerd++.8 man/loadrec.1 man/loadplay.1
+The `doc` target populates `doc/html` and `doc/latex`, to create the
+PDF documentation `doc/latex/refman.pdf` must be built.
 
-Load Recording and Replay
--------------------------
+The `gh-pages` target builds the HTML and PDF documentation and drops
+it into the `gh-pages` submodule for publishing on [github.io][HTML].
 
-In addition to the `powerd++` daemon this repository also comes with
-the tools `loadrec` and `loadplay`. They can be used to record loads
-and test both `powerd` and `powerd++` under reproducible load conditions.
+Development
+===========
 
-This is great for tuning, testing, bug reports and creating fancy
-plots.
+The following table provides an overview of repository contents:
 
-FAQ
----
+| File/Folder   | Contents                                   |
+|---------------|--------------------------------------------|
+| `doc/`        | Output directory for doxygen documentation |
+| `doxy/`       | Doxygen configuration and filter scripts   |
+| `gh-pages/`   | Submodule for publishing the documentation |
+| `man/`        | Manual pages written using mdoc(7) markup  |
+| `obj/`        | Build output                               |
+| `pkg/`        | Installer scripts and instructions         |
+| `src/`        | C++ source files                           |
+| `src/sys/`    | C++ wrappers for common C interfaces       |
+| `powerd++.rc` | Init script / service description          |
+| `LICENSE.md`  | ISC license                                |
+| `Makefile`    | Build instructions                         |
+| `README.md`   | Project overview                           |
 
-- **Why C++?** The `powerd++` code is not object oriented, but it uses
-  some *C++* and *C++11* features to avoid common pitfalls of writing
-  *C* code. E.g. there is a small *RAII* wrapper around the pidfile
-  facilities (`pidfile_open()`, `pidfile_write()`, `pidfile_remove()`),
-  turning the use of pidfiles into a fire and forget affair. Templated
-  wrappers around calls like `sysctl()` use array references to infer
-  buffer sizes at compile time, taking the burden of safely passing
-  these buffer sizes on to the command away from the programmer.
-  The `std::unique_ptr<>` template obsoletes memory cleanup code,
-  providing the liberty of using exceptions without worrying about
-  memory leaks.
-- **Why does powerd++ show a high load when top shows a high idle time?**
-  By default `top` shows the load percentage over all cores/threads,
-  `powerd++` uses the load of a single core/thread (the one with the
-  highest load). This keeps `powerd++` from starving single threaded
-  processes, because they only have a small impact on overall load.
-  An effect that increases with the number of cores/threads. E.g. 80%
-  load on a quad core CPU with hyper threading only has an overall
-  load impact of 10%. Use `top -P` to monitor idle times per core/thread.
+Design
+------
 
-LICENSE
+The life cycle of the powerd++ process goes through three stages:
+
+1. Command line argument parsing
+2. Initialisation and optionally printing the detected/configured parameters
+3. Clock frequency control
+
+The first stage is designed to maximise usability by providing both,
+the compact short option syntax (e.g. `-vfbhadp`) as well as the more
+self-descriptive long option syntax
+(e.g. `--verbose --foreground --batt hiadaptive`).
+
+The second stage is designed to trigger all known error conditions
+in order to fail before calling daemon(3) at the start of the third
+stage. Both the first and second stage are meant to provide specific,
+helpful error messages.
+
+The third stage tracks the CPU load and performs clock frequency
+control. It is designed to provide its functionality with as little
+runtime as possible. This is achieved by:
+
+- Using integer arithmetic only
+- Minimising branching
+
+The latter is achieved by using function templates to roll out possible
+runtime state combinations as multiple functions. A single, central
+switch/case selects the correct function each cycle. This basically
+rolls out multiple code paths through a single function into multiple
+functions with a single code path.
+
+The trade-off made is for runtime over code size. With every bit
+of state rolled out like this the number of functions that need to
+be generated doubles, thus this approach is limited to the few bits
+of state that control the most expensive functionality, e.g. the
+foreground mode.
+
+License
 -------
 
-For those who care about this stuff, this project is available under
-the [ISC license](LICENSE.md).
+This project is published under the [ISC license](LICENSE.md).
