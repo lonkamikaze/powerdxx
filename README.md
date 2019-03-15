@@ -36,8 +36,8 @@ the following benefits:
    2. [Installing](#installing)
    3. [Documentation](#documentation)
 3. [Development](#development)
-   2. [Design](#design)
-   3. [License](#license)
+   1. [Design](#design)
+   2. [License](#license)
 
 Using powerd++
 ==============
