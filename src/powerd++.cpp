@@ -1066,8 +1066,6 @@ void read_args(int const argc, char const * const argv[]) {
 		case OE::OPT_DONE:
 			e.msg += "\n\n";
 			e.msg += getopt.show(0);
-			e.msg += "\n\n";
-			e.msg += getopt.usage();
 			break;
 		}
 		throw;

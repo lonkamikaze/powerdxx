@@ -125,11 +125,11 @@
 #ifndef _POWERDXX_NIH_OPTIONS_HPP_
 #define _POWERDXX_NIH_OPTIONS_HPP_
 
-#include <cstddef>     /* size_t */
-#include <iomanip>     /* std::left, std::setw */
-#include <sstream>     /* std::ostringstream, std::string */
-#include <type_traits> /* std::true_type, std::void_t */
-#include <cassert>     /* assert() */
+#include "utility.hpp"  /* utility::literals */
+
+#include <cstddef>      /* size_t */
+#include <type_traits>  /* std::true_type, std::void_t */
+#include <cassert>      /* assert() */
 
 /**
  * Not invented here namespace, for code that substitutes already commonly
@@ -567,47 +567,41 @@ class Options {
 	 *	A usage string for printing on the CLI
 	 */
 	std::string usage() const {
-		std::ostringstream result;
-		result << "usage: " << removePath(this->argv[0]) << ' '
-		       << this->usageStr << "\n\n" << std::left;
+		using namespace utility::literals;
+		auto result = "usage: %s %s\n\n"_fmt
+		    (removePath(this->argv[0]), this->usageStr);
 
-		/* collect parameters and arguments in arrays because
-		 * formatting is only possible after all of them have
-		 * been read */
-		std::string params[DefCount];
-		std::string args[DefCount];
-		size_t params_max = 0;  /* length of the longest option */
+		/* get column sizes */
+		size_t lparam_max = 0;  /* length of the longest option */
 		size_t args_max = 0;    /* length of the longest argument */
-		size_t i = 0;           /* current array index */
+		for (auto const & def : this->defs) {
+			if (def.lparam) {
+				auto const len = std::string{def.lparam}.size();
+				lparam_max =
+				    lparam_max >= len ? lparam_max : len;
+			}
+			auto const len = std::string{def.args}.size();
+			args_max = args_max >= len ? args_max : len;
+		}
+		/* print columns */
 		for (auto const & def : this->defs) {
 			/* get option */
-			if (def.sparam && def.lparam && def.lparam[0]) {
-				params[i] = std::string{'-'} + def.sparam +
-				            ", --" + def.lparam;
-			} else if (def.sparam) {
-				params[i] = std::string{'-'} + def.sparam;
-			} else if (def.lparam && def.lparam[0]) {
-				params[i] = std::string{"    --"} + def.lparam;
-			}
-			params_max = params[i].length() > params_max
-			             ? params[i].length() : params_max;
+			auto const sparam = def.sparam ? def.sparam : ' ';
+			auto const sdash = def.sparam ? '-' : ' ';
+			auto const lparam = def.lparam ? def.lparam : "";
+			auto const ldash = lparam[0] ? '-' : ' ';
+			auto const sep = def.sparam && lparam[0] ? ',' : ' ';
+			result += "  %c%c%c %c%c%-*s  "_fmt
+			    (sdash, sparam, sep,
+			     ldash, ldash, lparam_max, lparam);
 			/* get arguments */
-			args[i] = def.args;
-			for (char & ch : args[i]) {
-				ch = (ch == ',' ? ' ' : ch);
+			auto len = args_max;
+			for (auto it = def.args; it && *it; ++it, --len) {
+				result += *it == ',' ? ' ' : *it;
 			}
-			args_max = args[i].length() > args_max
-			           ? args[i].length() : args_max;
-			++i;
+			result += "%-*s  %s\n"_fmt(len, "", def.usage);
 		}
-		/* assemble all the definitions into the string with proper
-		 * column widths */
-		for (size_t i = 0; i < DefCount; ++i) {
-			result << "  " << std::setw(params_max) << params[i]
-			       << "  " << std::setw(args_max) << args[i]
-			       << "  " << this->defs[i].usage << '\n';
-		}
-		return result.str();
+		return result;
 	}
 
 	/**

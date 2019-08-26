@@ -160,8 +160,7 @@ int main(int argc, char * argv[]) try {
 		case OE::OPT_DASH:
 		case OE::OPT_LDASH:
 		case OE::OPT_DONE:
-			e.msg += "\n\n"_s += getopt.show(0) += "\n\n"_s
-			      += getopt.usage();
+			e.msg += "\n\n"_s += getopt.show(0);
 			break;
 		}
 		throw;
