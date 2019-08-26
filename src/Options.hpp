@@ -128,7 +128,7 @@
 #include <cstddef>     /* size_t */
 #include <iomanip>     /* std::left, std::setw */
 #include <sstream>     /* std::ostringstream, std::string */
-#include <type_traits> /* std::true_type */
+#include <type_traits> /* std::true_type, std::void_t */
 #include <cassert>     /* assert() */
 
 /**
@@ -136,12 +136,6 @@
  * available functionality.
  */
 namespace nih {
-
-/**
- * See std::void_t in C++17 \<type_traits\>.
- */
-template <class...>
-using void_t = void;
 
 /**
  * Tests whether the given enum provides all the required definitions.
@@ -164,11 +158,11 @@ template <class OptionT, class = void>
 struct enum_has_members : /** @cond */ std::false_type {};
 
 template <class OptionT>
-struct enum_has_members<OptionT, void_t<decltype(OptionT::OPT_UNKNOWN),
-                                        decltype(OptionT::OPT_NOOPT),
-                                        decltype(OptionT::OPT_DASH),
-                                        decltype(OptionT::OPT_LDASH),
-                                        decltype(OptionT::OPT_DONE)>> :
+struct enum_has_members<OptionT, std::void_t<decltype(OptionT::OPT_UNKNOWN),
+                                             decltype(OptionT::OPT_NOOPT),
+                                             decltype(OptionT::OPT_DASH),
+                                             decltype(OptionT::OPT_LDASH),
+                                             decltype(OptionT::OPT_DONE)>> :
     /** @endcond */ std::true_type {};
 
 /**
