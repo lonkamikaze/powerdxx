@@ -15,7 +15,6 @@
 
 #include "utility.hpp"
 #include "constants.hpp"
-#include "fixme.hpp"
 #include "version.hpp"
 #include "sys/env.hpp"
 #include "sys/io.hpp"
@@ -63,8 +62,6 @@ using types::ms;
 using types::cptime_t;
 using types::mhz_t;
 using types::coreid_t;
-
-using fixme::to_string;
 
 using version::LOADREC_FEATURES;
 using version::flag_t;
@@ -650,7 +647,7 @@ class SysctlValue {
 	 */
 	template <typename T>
 	void set(T const & value) {
-		this->set(to_string(value));
+		this->set(std::to_string(value));
 	}
 
 	/**
