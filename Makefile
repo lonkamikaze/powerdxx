@@ -12,7 +12,9 @@ SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
 TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/}
 TMP!=      cd ${.CURDIR} && \
            env MKDEP_CPP_OPTS="-MM -std=${STD}" mkdep ${SRCS}
-RELEASE!=  git tag -l --sort=-taggerdate 2>&- | head -n1 || :
+RELEASE!=  git tag -l --sort=-taggerdate 2>&- | head -n1 || date -uI
+COMMITS!=  git rev-list --count HEAD "^${RELEASE}" 2>&- || echo 0
+VERSION=   ${RELEASE}${COMMITS:C/^/c/:Nc0}
 
 # Build
 all: ${TARGETS}
@@ -66,7 +68,7 @@ clean:
 doc::
 	rm -rf ${.TARGET}/*
 	cd "${.CURDIR}" && (cat doxy/doxygen.conf; \
-		echo PROJECT_NUMBER='"${RELEASE}"') | \
+		echo PROJECT_NUMBER='"${VERSION}"') | \
 		env PREFIX="${PREFIX}" doxygen -
 
 doc/latex/refman.pdf: doc
