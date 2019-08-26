@@ -12,10 +12,9 @@
 #include "clas.hpp"
 #include "version.hpp"
 
+#include "sys/io.hpp"
 #include "sys/sysctl.hpp"
 
-#include <iostream>  /* std::cout, std::cerr */
-#include <fstream>   /* std::ofstream */
 #include <chrono>    /* std::chrono::steady_clock::now() */
 #include <thread>    /* std::this_thread::sleep_until() */
 #include <memory>    /* std::unique_ptr */
@@ -53,6 +52,16 @@ using clas::ival;
 using sys::ctl::make_Sysctl;
 using sys::ctl::make_Once;
 
+namespace io = sys::io;
+
+/**
+ * Output file type alias.
+ *
+ * @tparam Ownership
+ *	The io::ownership type of the file
+ */
+template <auto Ownership> using ofile = io::file<Ownership, io::write>;
+
 using version::LOADREC_FEATURES;
 using version::flag_t;
 using namespace version::literals;
@@ -76,16 +85,9 @@ struct {
 	ms interval{25};      /**< Recording sample interval in ms. */
 
 	/**
-	 * The output file stream to use if an outfilename is provided
-	 * on the CLI.
+	 * The output stream either io::fout (stdout) or a file.
 	 */
-	std::ofstream outfile{};
-
-	/**
-	 * A pointer to the stream to use for output, either std::cout
-	 * or outfile.
-	 */
-	std::ostream * out = &std::cout;
+	ofile<io::link> fout = io::fout;
 
 	/**
 	 * The user provided output file name.
@@ -133,14 +135,18 @@ Parameter<OE> const PARAMETERS[]{
 };
 
 /**
- * Outputs the given message on stderr if g.verbose is set.
+ * Outputs the given printf style message on stderr if g.verbose is set.
  *
+ * @tparam MsgTs
+ *	The message argument types
  * @param msg
  *	The message to output
  */
-inline void verbose(std::string const & msg) {
+template <typename... MsgTs>
+inline void verbose(MsgTs &&... msg) {
 	if (g.verbose) {
-		std::cerr << "loadrec: " << msg << '\n';
+		io::ferr.print("loadrec: ");
+		io::ferr.printf(std::forward<MsgTs>(msg)...);
 	}
 }
 
@@ -149,12 +155,12 @@ inline void verbose(std::string const & msg) {
  */
 void init() {
 	if (g.outfilename) {
-		g.outfile.open(g.outfilename);
-		if (!g.outfile.good()) {
+		static ofile<io::own> outfile{g.outfilename, "wb"};
+		if (!outfile) {
 			fail(Exit::EWOPEN, errno,
 			     "could not open file for writing: "_s + g.outfilename);
 		}
-		g.out = &g.outfile;
+		g.fout = outfile;
 	}
 }
 
@@ -170,7 +176,7 @@ void read_args(int const argc, char const * const argv[]) {
 	try {
 		while (true) switch (getopt()) {
 		case OE::USAGE:
-			std::cerr << getopt.usage();
+			io::ferr.printf("%s", getopt.usage().c_str());
 			throw Exception{Exit::OK, 0, ""};
 		case OE::FLAG_VERBOSE:
 			g.verbose = true;
@@ -234,23 +240,27 @@ void print_sysctls() {
 	try {
 		hw_acpi_acline = {ACLINE};
 	} catch (sys::sc_error<sys::ctl::error>) {
-		verbose("cannot read "_s + ACLINE);
+		verbose("cannot read %s\n", ACLINE);
 	}
-	*g.out << "%s=%ld\n"_fmt(LOADREC_FEATURES, FEATURES)
-	       << "hw.machine=" << make_Sysctl(CTL_HW, HW_MACHINE).get<char>().get() << '\n'
-	       << "hw.model=" << make_Sysctl(CTL_HW, HW_MODEL).get<char>().get() << '\n'
-	       << "hw.ncpu=" << g.ncpu << '\n'
-	       << ACLINE << '=' << make_Once(1U, hw_acpi_acline) << '\n';
+	g.fout.printf("%s=%ld\n"
+	              "hw.machine=%s\n"
+	              "hw.model=%s\n"
+	              "hw.ncpu=%d\n"
+	              "%s=%d\n",
+	              LOADREC_FEATURES, FEATURES,
+	              make_Sysctl(CTL_HW, HW_MACHINE).get<char>().get(),
+	              make_Sysctl(CTL_HW, HW_MODEL).get<char>().get(),
+	              g.ncpu,
+	              ACLINE, make_Once(1U, hw_acpi_acline));
 
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		char mibname[40];
 		sprintf_safe(mibname, FREQ, i);
 		try {
 			sys::ctl::Sysctl<> ctl{mibname};
-			*g.out << mibname << '='
-			       << make_Once(0, ctl) << '\n';
+			g.fout.printf("%s=%d\n", mibname, make_Once(0, ctl));
 		} catch (sys::sc_error<sys::ctl::error> e) {
-			verbose("cannot access sysctl: "_s + mibname);
+			verbose("cannot access sysctl: %s\n", mibname);
 			if (i == 0) {
 				fail(Exit::ENOFREQ, e,
 				     "at least the first CPU core must report its clock frequency");
@@ -259,8 +269,7 @@ void print_sysctls() {
 		sprintf_safe(mibname, FREQ_LEVELS, i);
 		try {
 			sys::ctl::Sysctl<> ctl{mibname};
-			*g.out << mibname << '='
-			       << ctl.get<char>().get() << '\n';
+			g.fout.printf("%s=%s\n", mibname, ctl.get<char>().get());
 		} catch (sys::sc_error<sys::ctl::error>) {
 			/* do nada */
 		}
@@ -317,25 +326,24 @@ void run() try {
 	auto const takeAndPrintSample = [&]() {
 		cp_times_ctl.get(&cp_times[sample * columns],
 		                 sizeof(cptime_t) * columns);
-		*g.out << std::chrono::duration_cast<ms>(time - last).count();
+		g.fout.printf("%lld", std::chrono::duration_cast<ms>(time - last).count());
 		for (coreid_t i = 0; i < cores; ++i) {
-			*g.out << ' ' << static_cast<mhz_t>(corefreqs[i]);
+			g.fout.printf(" %u", static_cast<mhz_t>(corefreqs[i]));
 		}
 		for (size_t i = 0; i < columns; ++i) {
-			*g.out << ' '
-			       << cp_times[sample * columns + i] -
-			          cp_times[((sample + 1) % 2) * columns + i];
+			g.fout.printf(" %lu", cp_times[sample * columns + i] -
+			                      cp_times[((sample + 1) % 2) * columns + i]);
 		}
+		g.fout.putc('\n');
 	};
 	while (time < stop) {
 		takeAndPrintSample();
-		*g.out << '\n';
 		sample = (sample + 1) % 2;
 		last = time;
 		std::this_thread::sleep_until(time += g.interval);
 	}
 	takeAndPrintSample();
-	*g.out << std::endl;
+	g.fout.flush();
 } catch (sys::sc_error<sys::ctl::error> e) {
 	fail(Exit::ESYSCTL, e, "failed to access sysctl: "_s + CP_TIMES);
 }
@@ -360,13 +368,13 @@ int main(int argc, char * argv[]) try {
 	return to_value(Exit::OK);
 } catch (Exception & e) {
 	if (e.msg != "") {
-		std::cerr << "loadrec: " << e.msg << '\n';
+		io::ferr.printf("loadrec: %s\n", e.msg.c_str());
 	}
 	return to_value(e.exitcode);
 } catch (sys::sc_error<sys::ctl::error> e) {
-	std::cerr << "loadrec: untreated sysctl failure: " << e.c_str() << '\n';
+	io::ferr.printf("loadrec: untreated sysctl failure: %s\n", e.c_str());
 	return to_value(Exit::EEXCEPT);
 } catch (...) {
-	std::cerr << "loadrec: untreated failure\n";
+	io::ferr.print("loadrec: untreated failure\n");
 	return to_value(Exit::EEXCEPT);
 }

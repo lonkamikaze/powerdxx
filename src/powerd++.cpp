@@ -14,8 +14,8 @@
 #include "sys/sysctl.hpp"
 #include "sys/pidfile.hpp"
 #include "sys/signal.hpp"
+#include "sys/io.hpp"
 
-#include <iostream>  /* std::cout, std::cerr */
 #include <locale>    /* std::tolower() */
 #include <memory>    /* std::unique_ptr */
 #include <algorithm> /* std::min(), std::max() */
@@ -73,6 +73,8 @@ using constants::POWERD_PIDFILE;
 using constants::ADP;
 using constants::HADP;
 using constants::HITEMP_OFFSET;
+
+namespace io = sys::io;
 
 /**
  * The available AC line states.
@@ -329,14 +331,18 @@ static_assert(countof(g.acstates) == to_value(AcLineState::LENGTH),
               "There must be a configuration tuple for each state");
 
 /**
- * Outputs the given message on stderr if g.verbose is set.
+ * Outputs the given printf style message on stderr if g.verbose is set.
  *
+ * @tparam MsgTs
+ *	The message argument types
  * @param msg
  *	The message to output
  */
-inline void verbose(std::string const & msg) {
+template <typename... MsgTs>
+inline void verbose(MsgTs &&... msg) {
 	if (g.verbose) {
-		std::cerr << "powerd++: " << msg << '\n';
+		io::ferr.print("powerd++: ");
+		io::ferr.printf(std::forward<MsgTs>(msg)...);
 	}
 }
 
@@ -365,7 +371,7 @@ void init() {
 	try {
 		g.acline_ctl = {ACLINE};
 	} catch (sys::sc_error<sys::ctl::error>) {
-		verbose("cannot read "_s + ACLINE);
+		verbose("cannot read %s\n", ACLINE);
 	}
 
 	/*
@@ -406,7 +412,7 @@ void init() {
 					fail(Exit::ENOFREQ, e, "cannot access "_s + name + ", at least the first CPU core must support frequency updates");
 				}
 			} else {
-				verbose("cannot access sysctl: "_s + name);
+				verbose("cannot access sysctl: %s\n", name);
 				sysctl_fail(e);
 			}
 		}
@@ -473,7 +479,7 @@ void init() {
 	}
 	if (!g.temp_throttling) {
 		verbose("could not determine critical temperature\n"
-		        "\ttemperature throttling: off");
+		        "\ttemperature throttling: off\n");
 	} else for (coreid_t i = 0; i < g.ncpu; ++i) {
 		char name[40];
 		sprintf_safe(name, TEMPERATURE, i);
@@ -481,8 +487,9 @@ void init() {
 			g.cores[i].temp = {{name}};
 			assert(g.cores[i].temp >= 0);
 		} catch (sys::sc_error<sys::ctl::error>) {
-			verbose("cannot access sysctl: "_s + name +
-			        "\n\ttemperature throttling: off");
+			verbose("cannot access sysctl: %s\n"
+			        "\ttemperature throttling: off\n",
+			        name);
 			g.temp_throttling = false;
 			break;
 		}
@@ -518,11 +525,12 @@ void init() {
 			group->max = max;
 		} catch (sys::sc_error<sys::ctl::error>) {
 			if (g.temp_throttling) {
-				verbose("cannot access sysctl: "_s + name +
-				        "\n\ttemperature throttling: off");
+				verbose("cannot access sysctl: %s\n"
+				        "\ttemperature throttling: off\n",
+				        name);
 				g.temp_throttling = false;
 			} else {
-				verbose("cannot access sysctl: "_s + name);
+				verbose("cannot access sysctl: %s\n", name);
 			}
 		}
 	}
@@ -624,9 +632,9 @@ void update_loads() {
 		if (Temperature) try {
 			group.temp = core.temp;
 		} catch (sys::sc_error<sys::ctl::error> e) {
-			verbose("access to core %d temperature failed"_fmt(corei));
+			verbose("access to core %d temperature failed\n", corei);
 			if (g.temp_throttling) {
-				verbose("turn off temperature based throttling");
+				verbose("turn off temperature based throttling\n");
 				g.temp_throttling = false;
 			}
 		}
@@ -708,19 +716,19 @@ void update_freq(Global::ACSet const & acstate) {
 		}
 		/* foreground output */
 		if (Foreground && Temperature) {
-			std::cout << "power: %7s, load: %4d MHz, %3d C, cpu.%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
-			             (acstate.name,
-			              (group.loadsum / g.samples),
-			              celsius(group.temp), group.corei,
-			              group.sample_freq, wantfreq);
+			io::fout.printf("power: %7s, load: %4d MHz, %3d C, cpu.%d.freq: %4d MHz, wanted: %4d MHz\n",
+			                acstate.name,
+			                (group.loadsum / g.samples),
+			                celsius(group.temp), group.corei,
+			                group.sample_freq, wantfreq);
 		} else if (Foreground) {
-			std::cout << "power: %7s, load: %4d MHz, cpu.%d.freq: %4d MHz, wanted: %4d MHz\n"_fmt
-			             (acstate.name,
-			              (group.loadsum / g.samples), group.corei,
-			              group.sample_freq, wantfreq);
+			io::fout.printf("power: %7s, load: %4d MHz, cpu.%d.freq: %4d MHz, wanted: %4d MHz\n",
+			                acstate.name,
+			                (group.loadsum / g.samples), group.corei,
+			                group.sample_freq, wantfreq);
 		}
 	}
-	if (Foreground) { std::cout << std::flush; }
+	if (Foreground) { io::fout.flush(); }
 }
 
 /**
@@ -949,7 +957,7 @@ void read_args(int const argc, char const * const argv[]) {
 	try {
 		while (true) switch (getopt()) {
 		case OE::USAGE:
-			std::cerr << getopt.usage();
+			io::ferr.printf("%s", getopt.usage().c_str());
 			throw Exception{Exit::OK, 0, ""};
 		case OE::FLAG_VERBOSE:
 			g.verbose = true;
@@ -1073,58 +1081,60 @@ void show_settings() {
 	if (!g.verbose) {
 		return;
 	}
-	std::cerr << "Terminal Output\n"
-	             "\tverbose:               yes\n"
-	             "\tforeground:            %s\n"
-	             "Load Sampling\n"
-	             "\tload samples:          %d\n"
-	             "\tpolling interval:      %d ms\n"
-	             "\tload average over:     %d ms\n"
-	             "Frequency Limits\n"_fmt
-	             (g.foreground ? "yes" : "no",
-	              g.samples, g.interval.count(),
-	              g.samples * g.interval.count());
+	io::ferr.printf("Terminal Output\n"
+	                "\tverbose:               yes\n"
+	                "\tforeground:            %s\n"
+	                "Load Sampling\n"
+	                "\tload samples:          %d\n"
+	                "\tpolling interval:      %d ms\n"
+	                "\tload average over:     %d ms\n"
+	                "Frequency Limits\n",
+	                g.foreground ? "yes" : "no",
+	                g.samples, g.interval.count(),
+	                g.samples * g.interval.count());
 	for (auto const & acstate : g.acstates) {
-		std::cerr << "\t%-22s [%d MHz, %d MHz]\n"_fmt
-		             ((""_s + acstate.name + ':').c_str(),
-		              acstate.freq_min, acstate.freq_max);
+		io::ferr.printf("\t%-22s [%d MHz, %d MHz]\n",
+		                (""_s + acstate.name + ':').c_str(),
+		                acstate.freq_min, acstate.freq_max);
 	}
-	std::cerr << "CPU Cores\n"
-	             "\tCPU cores:             %d\n"
-	             "Core Groups\n"_fmt(g.ncpu);
+	io::ferr.printf("CPU Cores\n"
+	                "\tCPU cores:             %d\n"
+	                "Core Groups\n", g.ncpu);
 	assert(g.groups && g.ngroups);
 	auto * group = &g.groups[0];
 	for (coreid_t b = 0, e = 1; e <= g.ncpu; ++e) {
 		if (e == g.ncpu || group != g.cores[e].group) {
-			std::cerr << "\t%3d:                   [%d, %d]\n"_fmt(b, b, e - 1);
+			io::ferr.printf("\t%3d:                   [%d, %d]\n", b, b, e - 1);
 			b = e;
 			group = g.cores[e].group;
 		}
 	}
-	std::cerr << "Core Group Frequency Limits\n";
+	io::ferr.print("Core Group Frequency Limits\n");
 	for (coreid_t i = 0; i < g.ngroups; ++i) {
-		std::cerr << "\t%3d:                   [%d MHz, %d MHz]\n"_fmt
-		             (i, g.groups[i].min, g.groups[i].max);
+		io::ferr.printf("\t%3d:                   [%d MHz, %d MHz]\n",
+		                i, g.groups[i].min, g.groups[i].max);
 	}
-	std::cerr << "Load Targets\n";
+	io::ferr.print("Load Targets\n");
 	for (auto const & acstate : g.acstates) {
-		std::cerr << "\t%-22s"_fmt
-		             ((""_s + acstate.name + " power target:").c_str())
-		          << (acstate.target_load
-		              ? " %2d %% load\n"_fmt((acstate.target_load * 100 + 512) / 1024)
-		              : " %4d MHz\n"_fmt(acstate.target_freq));
+		io::ferr.printf("\t%-22s",
+		                (""_s + acstate.name + " power target:").c_str());
+		if (acstate.target_load) {
+			io::ferr.printf(" %2d %% load\n", (acstate.target_load * 100 + 512) / 1024);
+		} else {
+			io::ferr.printf(" %4d MHz\n", acstate.target_freq);
+		}
 	}
-	std::cerr << "Temperature Throttling\n";
+	io::ferr.print("Temperature Throttling\n");
 	if (g.temp_throttling) {
-		std::cerr << "\tactive:                yes\n";
+		io::ferr.print("\tactive:                yes\n");
 		for (coreid_t i = 0; i < g.ngroups; ++i) {
 			auto const & group = g.groups[i];
-			std::cerr << "\t%3d:                   [%d C, %d C]\n"_fmt
-			             (i, celsius(group.temp_high),
-			              celsius(group.temp_crit));
+			io::ferr.printf("\t%3d:                   [%d C, %d C]\n",
+			                i, celsius(group.temp_high),
+			                celsius(group.temp_crit));
 		}
 	} else {
-		std::cerr << "\tactive:                no\n";
+		io::ferr.print("\tactive:                no\n");
 	}
 }
 
@@ -1226,7 +1236,7 @@ void run_daemon() try {
 		update_freq();
 	}
 
-	verbose("signal %d received, exiting ..."_fmt(g.signal));
+	verbose("signal %d received, exiting ...\n", g.signal);
 } catch (pid_t otherpid) {
 	fail(Exit::ECONFLICT, EEXIST,
 	     "a power daemon is already running under PID: %d"_fmt(otherpid));
@@ -1258,19 +1268,19 @@ int main(int argc, char * argv[]) try {
 	return to_value(Exit::OK);
 } catch (Exception & e) {
 	if (e.msg != "") {
-		std::cerr << "powerd++: " << e.msg << '\n';
+		io::ferr.printf("powerd++: %s\n", e.msg.c_str());
 	}
 	return to_value(e.exitcode);
 } catch (sys::sc_error<sys::ctl::error> e) {
-	std::cerr << "powerd++: untreated sysctl failure: " << e.c_str() << '\n';
+	io::ferr.printf("powerd++: untreated sysctl failure: %s\n", e.c_str());
 	return to_value(Exit::EEXCEPT);
 } catch (sys::sc_error<sys::pid::error> e) {
-	std::cerr << "powerd++: untreated pidfile failure: " << e.c_str() << '\n';
+	io::ferr.printf("powerd++: untreated pidfile failure: %s\n", e.c_str());
 	return to_value(Exit::EEXCEPT);
 } catch (sys::sc_error<sys::sig::error> e) {
-	std::cerr << "powerd++: untreated signal setup failure: " << e.c_str() << '\n';
+	io::ferr.printf("powerd++: untreated signal setup failure: %s\n", e.c_str());
 	return to_value(Exit::EEXCEPT);
 } catch (...) {
-	std::cerr << "powerd++: untreated failure\n";
+	io::ferr.print("powerd++: untreated failure\n");
 	return to_value(Exit::EEXCEPT);
 }

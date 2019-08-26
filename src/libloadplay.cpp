@@ -2,8 +2,8 @@
  * Implements a library intended to be injected into a clock frequency
  * deamon via LD_PRELOAD.
  *
- * This library reads instructions from std::cin and outputs statistics
- * about the hijacked process on std::cout.
+ * This library reads instructions from io::fin (stdin) and outputs
+ * statistics about the hijacked process on io::fout (stdout).
  *
  * The following environment variables affect the operation of loadplay:
  *
@@ -18,10 +18,8 @@
 #include "fixme.hpp"
 #include "version.hpp"
 #include "sys/env.hpp"
+#include "sys/io.hpp"
 
-#include <iostream>  /* std::cin, std::cout, std::cerr */
-#include <fstream>   /* std::ifstream, std::ofstream */
-#include <iomanip>   /* std::fixed, std::setprecision */
 #include <unordered_map>
 #include <map>
 #include <string>
@@ -72,6 +70,24 @@ using version::LOADREC_FEATURES;
 using version::flag_t;
 using namespace version::literals;
 
+namespace io = sys::io;
+
+/**
+ * Output file type alias.
+ *
+ * @tparam Ownership
+ *	The io::ownership type of the file
+ */
+template <auto Ownership> using ofile = io::file<Ownership, io::write>;
+
+/**
+ * Input file type alias.
+ *
+ * @tparam Ownership
+ *	The io::ownership type of the file
+ */
+template <auto Ownership> using ifile = io::file<Ownership, io::read>;
+
 /**
  * The set of supported features.
  *
@@ -112,7 +128,7 @@ inline std::regex operator "" _r(char const * const str, size_t const len) {
 }
 
 /**
- * Calls fprintf(stderr, ...) if built with -DEBUG.
+ * Calls io::ferr.printf(...) if built with -DEBUG.
  *
  * @tparam ArgTs
  *	The argument types to forward
@@ -122,7 +138,7 @@ inline std::regex operator "" _r(char const * const str, size_t const len) {
 template <typename ... ArgTs>
 constexpr void dprintf(ArgTs && ... args) {
 #ifdef EBUG
-	fprintf(stderr, std::forward<ArgTs>(args) ...);
+	io::ferr.printf(std::forward<ArgTs>(args) ...);
 #endif
 }
 
@@ -675,23 +691,37 @@ std::string SysctlValue::get<std::string>() const {
 /**
  * Print a debugging message if built with -DEBUG.
  *
+ * @tparam MsgTs
+ *	The message argument types
  * @param msg
- *	The warning message
+ *	The debugging message
+ * @return
+ *	An output file handle for extending the message
  */
-inline void debug(std::string const & msg) {
+template <typename... MsgTs>
+inline ofile<io::link> debug(MsgTs &&... msg) {
 #ifdef EBUG
-	std::cerr << "libloadplay: DEBUG: " << msg << std::endl;
+	io::ferr.print("libloadplay: DEBUG: ");
+	return io::ferr.printf(std::forward<MsgTs>(msg)...);
+#else
+	return ofile<io::link>{nullptr};
 #endif
 }
 
 /**
  * Print a warning.
  *
+ * @tparam MsgTs
+ *	The message argument types
  * @param msg
  *	The warning message
+ * @return
+ *	An output file handle for extending the message
  */
-inline void warn(std::string const & msg) {
-	std::cerr << "libloadplay: WARNING: " << msg << std::endl;
+template <typename... MsgTs>
+inline ofile<io::link> warn(MsgTs &&... msg) {
+	io::ferr.print("libloadplay: WARNING: ");
+	return io::ferr.printf(std::forward<MsgTs>(msg)...);
 }
 
 /**
@@ -703,12 +733,18 @@ int sys_results = 0;
  * This prints an error message and sets sys_results to make the hijacked
  * process fail.
  *
+ * @tparam MsgTs
+ *	The message argument types
  * @param msg
  *	The error message
+ * @return
+ *	An output file handle for extending the message
  */
-inline void fail(std::string const & msg) {
+template <typename... MsgTs>
+inline ofile<io::link> fail(MsgTs &&... msg) {
 	sys_results = -1;
-	std::cerr << "libloadplay: ERROR:   " << msg << std::endl;
+	io::ferr.print("libloadplay: ERROR:   ");
+	return io::ferr.printf(std::forward<MsgTs>(msg)...);
 }
 
 /**
@@ -790,7 +826,8 @@ class Sysctls {
 			try {
 				mib = this->mibs.at(baseName);
 			} catch (std::out_of_range &) {
-				return warn("unsupported sysctl: "_s + name);
+				warn("unsupported sysctl: %s\n", name.c_str());
+				return;
 			}
 			/* get mib numbers */
 			std::smatch match;
@@ -865,23 +902,6 @@ struct CoreReport {
 };
 
 /**
- * Print a core clock frequency and load.
- *
- * The clock frequency is printed at 1 MHz resolution, the load at
- * 0.1 MHz.
- *
- * @param out
- *	The stream to print to
- * @param core
- *	The core information to print
- * @return
- *	A reference to the out stream
- */
-std::ostream & operator <<(std::ostream & out, CoreReport const & core) {
-	return out << " %d %.1f"_fmt(core.freq, core.load * core.freq);
-}
-
-/**
  * The report frame information for a single CPU pipeline.
  */
 struct CoreFrameReport {
@@ -899,15 +919,21 @@ struct CoreFrameReport {
 /**
  * Print recorded and running clock frequency and load for a frame.
  *
- * @param out
+ * The clock frequency is printed at 1 MHz resolution, the load at
+ * 0.1 MHz.
+ *
+ * @param fout
  *	The stream to print to
  * @param frame
  *	The frame information to print
  * @return
  *	A reference to the out stream
  */
-std::ostream & operator <<(std::ostream & out, CoreFrameReport const & frame) {
-	return out << frame.rec << frame.run;
+ofile<io::link>
+operator <<(ofile<io::link> fout, CoreFrameReport const & frame) {
+	return fout.printf(" %d %.1f %d %.1f",
+	                   frame.rec.freq, frame.rec.load * frame.rec.freq,
+	                   frame.run.freq, frame.run.load * frame.run.freq);
 }
 
 /**
@@ -918,7 +944,7 @@ class Report {
 	/**
 	 * The output stream to report to.
 	 */
-	std::ostream & out;
+	ofile<io::link> fout;
 
 	/**
 	 * The number of cpu cores to provide reports for.
@@ -939,19 +965,20 @@ class Report {
 	/**
 	 * Construct a report.
 	 *
-	 * @param out
+	 * @param fout
 	 *	The stream to output to
 	 * @param ncpu
 	 *	The number of CPU cores to report
 	 */
-	Report(std::ostream & out, coreid_t const ncpu) :
-	    out{out}, ncpu{ncpu}, time{}, cores{new CoreFrameReport[ncpu]{}} {
-		out << "time[s]";
+	Report(ofile<io::link> fout, coreid_t const ncpu) :
+	    fout{fout}, ncpu{ncpu}, time{}, cores{new CoreFrameReport[ncpu]{}} {
+		fout.print("time[s]");
 		for (coreid_t i = 0; i < ncpu; ++i) {
-			out << " cpu.%d.rec.freq[MHz] cpu.%d.rec.load[MHz] cpu.%d.run.freq[MHz] cpu.%d.run.load[MHz]"_fmt
-			       (i, i, i, i);
+			fout.printf(" cpu.%d.rec.freq[MHz] cpu.%d.rec.load[MHz]"
+			            " cpu.%d.run.freq[MHz] cpu.%d.run.load[MHz]",
+			            i, i, i, i);
 		}
-		out << std::endl;
+		fout.putc('\n').flush();
 	}
 
 	/**
@@ -1013,13 +1040,13 @@ class Report {
 		 * Finalises the frame by outputting it.
 		 */
 		~Frame() {
-			auto & out = this->report.out;
-			out << "%d.%03d"_fmt(this->report.time / 1000,
-			                     this->report.time % 1000);
+			auto fout = this->report.fout;
+			fout.printf("%d.%03d", this->report.time / 1000,
+			            this->report.time % 1000);
 			for (coreid_t i = 0; i < this->report.ncpu; ++i) {
-				out << (*this)[i];
+				fout << (*this)[i];
 			}
-			out << std::endl;
+			fout.putc('\n').flush();
 		}
 	};
 
@@ -1048,12 +1075,12 @@ class Emulator {
 	/**
 	 * The input data source.
 	 */
-	std::istream & cin;
+	ifile<io::link> fin;
 
 	/**
 	 * The output data sink.
 	 */
-	std::ostream & cout;
+	ofile<io::link> fout;
 
 	/**
 	 * A reference to a bool that tells the emulator to die.
@@ -1141,14 +1168,14 @@ class Emulator {
 	 *
 	 * @throws std::out_of_range
 	 *	In case one of the required sysctls is missing
-	 * @param cin,cout
+	 * @param fin,fout
 	 *	The character input and output streams
 	 * @param die
 	 *	If the referenced bool is true, emulation is terminated
 	 *	prematurely
 	 */
-	Emulator(std::istream & cin, std::ostream & cout, bool const & die) :
-	    cin{cin}, cout{cout}, die{die} {
+	Emulator(ifile<io::link> fin, ofile<io::link> fout, bool const & die) :
+	    fin{fin}, fout{fout}, die{die} {
 		/* get freq and freq_levels sysctls */
 		std::vector<mhz_t> freqLevels{};
 		for (coreid_t i = 0; i < this->ncpu; ++i) {
@@ -1162,7 +1189,7 @@ class Emulator {
 			} catch (std::out_of_range &) {
 				if (i == 0) {
 					/* should never be reached */
-					fail("missing sysctl: "_s + name);
+					fail("missing sysctl: %s\n", name);
 					throw;
 				}
 				/* fall back to data from the previous core */
@@ -1183,13 +1210,13 @@ class Emulator {
 				std::istringstream levelstream{levels};
 				freqLevels.clear();
 
-				auto msg = "emulate core %d clock frequencies:"_fmt(i);
+				auto msg = debug("emulate core %d clock frequencies:", i);
 				for (unsigned long level; levelstream.good();) {
 					levelstream >> level;
 					freqLevels.push_back(level);
-					msg += " %d"_fmt(level);
+					msg.printf(" %d", level);
 				}
-				debug(msg);
+				msg.putc('\n');
 			} catch (std::out_of_range &) {
 				if (i == 0) {
 					/* warning handled in Main::main() */
@@ -1217,9 +1244,9 @@ class Emulator {
 	}
 
 	/**
-	 * Performs load emulation and prints statistics on cout.
+	 * Performs load emulation and prints statistics on io::fout.
 	 *
-	 * Reads cin to pull in load changes and updates the
+	 * Reads fin to pull in load changes and updates the
 	 * kern.cp_times sysctl to represent the current state.
 	 *
 	 * When it runs out of load changes it terminates emulation
@@ -1227,11 +1254,11 @@ class Emulator {
 	 */
 	void operator ()() try {
 		auto const features = sysctls[LOADREC_FEATURES].get<flag_t>();
-		Report report(this->cout, this->ncpu);
+		Report report(this->fout, this->ncpu);
 
 		auto time = std::chrono::steady_clock::now();
 		for (uint64_t duration;
-		     !this->die && (this->cin >> duration).good();) {
+		     !this->die && (1 == this->fin.scanf("%ju", duration));) {
 			/* setup new output frame */
 			auto frame = report.frame(duration);
 
@@ -1245,7 +1272,7 @@ class Emulator {
 
 				/* update recorded clock frequency */
 				if (features & 1_FREQ_TRACKING) {
-					this->cin >> core.recFreq;
+					this->fin.scanf("%u", core.recFreq);
 				}
 			}
 
@@ -1262,7 +1289,7 @@ class Emulator {
 				double recBusyTicks = 0;
 				for (size_t state = 0; state < CPUSTATES; ++state) {
 					cptime_t ticks;
-					this->cin >> ticks;
+					this->fin.scanf("%lu", ticks);
 					recTicks += ticks;
 					recBusyTicks += state == CP_IDLE ? 0 : ticks;
 				}
@@ -1329,7 +1356,7 @@ class Emulator {
 		/* tell process to die */
 		raise(SIGINT);
 	} catch (std::out_of_range &) {
-		fail("incomplete emulation setup, please check your load record for complete initialisation");
+		fail("incomplete emulation setup, please check your load record for complete initialisation\n");
 	}
 };
 
@@ -1346,12 +1373,12 @@ class Main {
 	/**
 	 * The optional input file.
 	 */
-	std::ifstream in{sys::env::vars["LOADPLAY_IN"]};
+	ifile<io::own> fin{sys::env::vars["LOADPLAY_IN"], "rb"};
 
 	/**
 	 * The optional output file.
 	 */
-	std::ofstream out{sys::env::vars["LOADPLAY_OUT"]};
+	ofile<io::own> fout{sys::env::vars["LOADPLAY_OUT"], "wb"};
 
 	/**
 	 * Used to request premature death from the emulation thread.
@@ -1369,31 +1396,31 @@ class Main {
 	Main() {
 		/* check input character stream */
 		auto const & env = sys::env::vars;
-		if (env["LOADPLAY_IN"] && !this->in) {
-			fail("failed to open input file "_s +
-			     env["LOADPLAY_IN"].str());
+		if (env["LOADPLAY_IN"] && !this->fin) {
+			fail("failed to open input file %s\n",
+			     env["LOADPLAY_IN"].c_str());
 			return;
 		}
-		std::istream & cin{this->in ? this->in : std::cin};
+		ifile<io::link> fin{this->fin ? this->fin : io::fin};
 
-		std::string input;
-		std::smatch match;
+		char inbuf[16384]{};
+		std::cmatch match;
 
 		/* get static sysctls */
-		auto const expr = "([^=]*)=(.*)"_r;
-		while (std::getline(cin, input) &&
-		       std::regex_match(input, match, expr)) {
+		auto const expr = "([^=]*)=(.*)\n"_r;
+		while (fin.gets(inbuf) &&
+		       std::regex_match(inbuf, match, expr)) {
 			sysctls.addValue(match[1].str(), match[2].str());
-			debug("sysctl %s = %s"_fmt
-			      (match[1].str().c_str(), match[2].str().c_str()));
+			debug("sysctl %s = %s\n",
+			      match[1].str().c_str(), match[2].str().c_str());
 		}
 
 		/* check supported feature flags */
 		auto const features = sysctls[LOADREC_FEATURES].get<flag_t>();
 		auto const unknown = features & ~FEATURES;
 		if (unknown) {
-			fail("%s contains unsupported feature flags: %#lx"_fmt
-			     (LOADREC_FEATURES, unknown));
+			fail("%s contains unsupported feature flags: %#lx\n",
+			     LOADREC_FEATURES, unknown);
 			return;
 		}
 
@@ -1403,7 +1430,7 @@ class Main {
 		try {
 			sysctls.getMib(name);
 		} catch (std::out_of_range &) {
-			fail(""_s + name + " is not set, please check your load record");
+			fail("%s is not set, please check your load record\n", name);
 			return;
 		}
 
@@ -1412,13 +1439,13 @@ class Main {
 		try {
 			sysctls.getMib(name);
 		} catch (std::out_of_range &) {
-			warn(""_s + name + " is not set, please check your load record");
+			warn("%s is not set, please check your load record\n", name);
 		}
 
 
 		/* check for hw.ncpu */
 		if (sysctls[{CTL_HW, HW_NCPU}].get<int>() < 1) {
-			fail("hw.ncpu is not set to a valid value, please check your load record");
+			fail("hw.ncpu is not set to a valid value, please check your load record\n");
 			return;
 		}
 
@@ -1426,10 +1453,11 @@ class Main {
 		try {
 			sysctls.getMib(ACLINE);
 		} catch (std::out_of_range &) {
-			warn(""_s + ACLINE + " is not set, please check your load record");
+			warn("%s is not set, please check your load record", ACLINE);
 		}
 
 		/* skip frame time */
+		std::string input{inbuf};
 		input = input.substr(input.find(' ') + 1);
 
 		/* determine the number of cores */
@@ -1446,7 +1474,7 @@ class Main {
 			istream >> freq;
 			input = input.substr(input.find(' ') + 1);
 			if (freq <= 0) {
-				fail("recorded clock frequencies must be > 0");
+				fail("recorded clock frequencies must be > 0\n");
 				return;
 			}
 		}
@@ -1454,26 +1482,26 @@ class Main {
 		/* initialise kern.cp_times */
 		try {
 			sysctls.addValue(std::string{CP_TIMES}, input);
-			debug("sysctl %s = %s"_fmt(CP_TIMES, input.c_str()));
+			debug("sysctl %s = %s\n", CP_TIMES, input.c_str());
 		} catch (std::out_of_range &) {
-			fail("kern.cp_times cannot be set, please check your load record");
+			fail("kern.cp_times cannot be set, please check your load record\n");
 			return;
 		}
 
 		/* check output character stream */
-		if (env["LOADPLAY_OUT"] && !this->out) {
-			fail("failed to open output file "_s +
-			     env["LOADPLAY_OUT"].str());
+		if (env["LOADPLAY_OUT"] && !this->fout) {
+			fail("failed to open output file %s\n",
+			     env["LOADPLAY_OUT"].c_str());
 			return;
 		}
-		std::ostream & cout{this->out ? this->out : std::cout};
+		ofile<io::link> fout{this->fout ? this->fout : io::fout};
 
 		/* start background thread */
 		try {
 			this->bgthread =
-			    std::thread{Emulator{cin, cout, this->die}};
+			    std::thread{Emulator{fin, fout, this->die}};
 		} catch (std::out_of_range &) {
-			fail("failed to start emulator thread");
+			fail("failed to start emulator thread\n");
 			return;
 		}
 	}

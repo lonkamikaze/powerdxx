@@ -8,8 +8,7 @@
 #include "utility.hpp"
 
 #include "sys/env.hpp"
-
-#include <iostream>  /* std::cerr */
+#include "sys/io.hpp"
 
 #include <unistd.h>  /* execvp() */
 
@@ -24,6 +23,8 @@ using nih::make_Options;
 using errors::Exit;
 using errors::Exception;
 using errors::fail;
+
+namespace io = sys::io;
 
 using utility::to_value;
 using namespace utility::literals;
@@ -119,7 +120,7 @@ int main(int argc, char * argv[]) try {
 	try {
 		while (true) switch (getopt()) {
 		case OE::USAGE:
-			std::cerr << getopt.usage();
+			io::ferr.printf("%s", getopt.usage().c_str());
 			throw Exception{Exit::OK, 0, ""};
 		case OE::FILE_IN:
 			env["LOADPLAY_IN"] = filename(getopt[1]);
@@ -168,10 +169,10 @@ int main(int argc, char * argv[]) try {
 	assert(!"must never be reached");
 } catch (Exception & e) {
 	if (e.msg != "") {
-		std::cerr << "loadplay: " << e.msg << '\n';
+		io::ferr.printf("loadplay: %s\n", e.msg.c_str());
 	}
 	return to_value(e.exitcode);
 } catch (...) {
-	std::cerr << "loadplay: untreated failure\n";
+	io::ferr.print("loadplay: untreated failure\n");
 	return to_value(Exit::EEXCEPT);
 }
