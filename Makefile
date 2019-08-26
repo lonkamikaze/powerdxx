@@ -1,5 +1,5 @@
 FLAGS=     -std=${STD} -Wall -Werror -pedantic
-STD=       c++14
+STD=       c++17
 DBGFLAGS=  -O0 -g -DEBUG
 PFLAGS=    -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error
 
