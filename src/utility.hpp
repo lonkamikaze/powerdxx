@@ -28,28 +28,6 @@ template <typename T, size_t Count>
 constexpr size_t countof(T (&)[Count]) { return Count; }
 
 /**
- * Contains literals.
- */
-namespace literals {
-
-/**
- * A string literal operator equivalent to the `operator "" s` literal
- * provided by C++14 in \<string\>.
- *
- * @param op
- *	The raw string to turn into an std::string object
- * @param size
- *	The size of the raw string
- * @return
- *	An std::string instance
- */
-inline std::string operator "" _s(char const * const op, size_t const size) {
-	return {op, size};
-}
-
-} /* namespace literals */
-
-/**
  * This is a safeguard against accidentally using sprintf().
  *
  * Using it triggers a static_assert(), preventing compilation.
@@ -159,6 +137,9 @@ class Formatter {
 	}
 };
 
+/**
+ * Contains literal operators.
+ */
 namespace literals {
 /**
  * Literal to convert a string literal to a Formatter instance.

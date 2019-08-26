@@ -45,7 +45,7 @@ using errors::fail;
 
 using utility::to_value;
 using utility::sprintf_safe;
-using namespace utility::literals;
+using namespace std::literals::string_literals;
 
 using clas::ival;
 
@@ -158,7 +158,7 @@ void init() {
 		static ofile<io::own> outfile{g.outfilename, "wb"};
 		if (!outfile) {
 			fail(Exit::EWOPEN, errno,
-			     "could not open file for writing: "_s + g.outfilename);
+			     "could not open file for writing: "s + g.outfilename);
 		}
 		g.fout = outfile;
 	}
@@ -197,7 +197,7 @@ void read_args(int const argc, char const * const argv[]) {
 		case OE::OPT_DASH:
 		case OE::OPT_LDASH:
 			fail(Exit::ECLARG, 0,
-			     "unexpected command line argument: "_s + getopt[0]);
+			     "unexpected command line argument: "s + getopt[0]);
 		case OE::OPT_DONE:
 			return;
 		}
@@ -343,7 +343,7 @@ void run() try {
 	takeAndPrintSample();
 	g.fout.flush();
 } catch (sys::sc_error<sys::ctl::error> e) {
-	fail(Exit::ESYSCTL, e, "failed to access sysctl: "_s + CP_TIMES);
+	fail(Exit::ESYSCTL, e, "failed to access sysctl: "s + CP_TIMES);
 }
 
 } /* namespace */

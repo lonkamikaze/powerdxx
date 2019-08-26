@@ -17,7 +17,7 @@
  */
 namespace clas {
 
-using namespace utility::literals;
+using namespace std::literals::string_literals;
 
 /**
  * Convert string to load in the range [0, 1024].
@@ -148,7 +148,7 @@ std::pair<T, T> range(T (& func)(char const * const), char const * const str) {
 	auto const sep = first.find(':');
 	if (sep == std::string::npos) {
 		errors::fail(errors::Exit::ERANGEFMT, 0,
-		             "missing colon separator in range: "_s + str);
+		             "missing colon separator in range: "s + str);
 	}
 	first.erase(sep);
 	result.first = func(first.c_str());

@@ -12,7 +12,7 @@
  */
 namespace errors {
 
-using namespace utility::literals;
+using namespace std::literals::string_literals;
 
 /**
  * Exit codes.
@@ -87,7 +87,7 @@ struct Exception {
  */
 [[noreturn]] inline void
 fail(Exit const exitcode, int const err, std::string const & msg) {
-	throw Exception{exitcode, err, "("_s +
+	throw Exception{exitcode, err, "("s +
 	                               ExitStr[utility::to_value(exitcode)] +
 	                               ") " + msg};
 }

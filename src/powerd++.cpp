@@ -76,6 +76,8 @@ using constants::HITEMP_OFFSET;
 
 namespace io = sys::io;
 
+using namespace std::literals::string_literals;
+
 /**
  * The available AC line states.
  */
@@ -356,7 +358,7 @@ inline void verbose(MsgTs &&... msg) {
  */
 [[noreturn]] inline
 void sysctl_fail(sys::sc_error<sys::ctl::error> const err) {
-	fail(Exit::ESYSCTL, err, "sysctl failed: "_s + err.c_str());
+	fail(Exit::ESYSCTL, err, "sysctl failed: "s + err.c_str());
 }
 
 /**
@@ -409,7 +411,7 @@ void init() {
 		} catch (sys::sc_error<sys::ctl::error> e) {
 			if (e == ENOENT) {
 				if (0 > groupi) {
-					fail(Exit::ENOFREQ, e, "cannot access "_s + name + ", at least the first CPU core must support frequency updates");
+					fail(Exit::ENOFREQ, e, "cannot access "s + name + ", at least the first CPU core must support frequency updates");
 				}
 			} else {
 				verbose("cannot access sysctl: %s\n", name);
@@ -875,7 +877,7 @@ void set_mode(AcLineState const line, char const * const str) {
 		if (e.exitcode == Exit::EOUTOFRANGE) { throw; }
 	}
 
-	fail(Exit::EMODE, 0, "mode not recognised: "_s + str);
+	fail(Exit::EMODE, 0, "mode not recognised: "s + str);
 }
 
 /**
@@ -1026,7 +1028,7 @@ void read_args(int const argc, char const * const argv[]) {
 		case OE::OPT_DASH:
 		case OE::OPT_LDASH:
 			fail(Exit::ECLARG, 0,
-			     "unexpected command line argument: "_s + getopt[0]);
+			     "unexpected command line argument: "s + getopt[0]);
 		case OE::OPT_DONE:
 			return;
 		}
@@ -1092,7 +1094,7 @@ void show_settings() {
 	                g.samples * g.interval.count());
 	for (auto const & acstate : g.acstates) {
 		io::ferr.printf("\t%-22s [%d MHz, %d MHz]\n",
-		                (""_s + acstate.name + ':').c_str(),
+		                (""s + acstate.name + ':').c_str(),
 		                acstate.freq_min, acstate.freq_max);
 	}
 	io::ferr.printf("CPU Cores\n"
@@ -1115,7 +1117,7 @@ void show_settings() {
 	io::ferr.print("Load Targets\n");
 	for (auto const & acstate : g.acstates) {
 		io::ferr.printf("\t%-22s",
-		                (""_s + acstate.name + " power target:").c_str());
+		                (""s + acstate.name + " power target:").c_str());
 		if (acstate.target_load) {
 			io::ferr.printf(" %2d %% load\n", (acstate.target_load * 100 + 512) / 1024);
 		} else {
@@ -1225,7 +1227,7 @@ void run_daemon() try {
 		pidfile.write();
 	} catch (sys::sc_error<sys::pid::error> e) {
 		fail(Exit::EPID, e,
-		     "cannot write to pidfile: "_s + g.pidfilename);
+		     "cannot write to pidfile: "s + g.pidfilename);
 	}
 
 	/* the main loop */
@@ -1240,10 +1242,10 @@ void run_daemon() try {
 	     "a power daemon is already running under PID: %d"_fmt(otherpid));
 } catch (sys::sc_error<sys::pid::error> e) {
 	fail(Exit::EPID, e,
-	     "cannot create pidfile: "_s + g.pidfilename);
+	     "cannot create pidfile: "s + g.pidfilename);
 } catch (sys::sc_error<sys::sig::error> e) {
 	fail(Exit::ESIGNAL, e,
-	     "failed to register signal handler: "_s + e.c_str());
+	     "failed to register signal handler: "s + e.c_str());
 }
 
 } /* namespace */

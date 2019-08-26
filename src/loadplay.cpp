@@ -29,6 +29,8 @@ namespace io = sys::io;
 using utility::to_value;
 using namespace utility::literals;
 
+using namespace std::literals::string_literals;
+
 /**
  * An enum for command line parsing.
  */
@@ -74,7 +76,7 @@ char const * filename(char const * const path) {
 	if (!path || !path[0]) {
 		fail(Exit::EFILE, 0, "empty or missing string for filename");
 	}
-	if ("-"_s == path) {
+	if ("-"s == path) {
 		return nullptr;
 	}
 	return path;
@@ -139,7 +141,7 @@ int main(int argc, char * argv[]) try {
 		case OE::OPT_DASH:
 		case OE::OPT_LDASH:
 			fail(Exit::ECLARG, 0,
-			     "unexpected command line argument: "_s + getopt[0]);
+			     "unexpected command line argument: "s + getopt[0]);
 			break;
 		case OE::OPT_DONE:
 			fail(Exit::ECLARG, 0, "command expected");
@@ -151,16 +153,16 @@ int main(int argc, char * argv[]) try {
 			break;
 		case OE::FILE_IN:
 		case OE::FILE_OUT:
-			e.msg += "\n\n"_s += getopt.show(1);
+			e.msg += "\n\n"s += getopt.show(1);
 			break;
 		case OE::CMD:
-			e.msg += "\n\n"_s += getopt.show(0, 0);
+			e.msg += "\n\n"s += getopt.show(0, 0);
 			break;
 		case OE::OPT_UNKNOWN:
 		case OE::OPT_DASH:
 		case OE::OPT_LDASH:
 		case OE::OPT_DONE:
-			e.msg += "\n\n"_s += getopt.show(0);
+			e.msg += "\n\n"s += getopt.show(0);
 			break;
 		}
 		throw;
