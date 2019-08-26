@@ -52,7 +52,7 @@ const char * const ExitStr[]{
 	"EEXCEPT", "EFILE", "EEXEC"
 };
 
-static_assert(utility::to_value(Exit::LENGTH) == utility::countof(ExitStr),
+static_assert(size_t{utility::to_value(Exit::LENGTH)} == utility::countof(ExitStr),
               "Every Exit code must have a string representation");
 
 /**
