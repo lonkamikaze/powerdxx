@@ -35,7 +35,10 @@ filename != FILENAME {
 #
 line && (/^===*$/ || /^---*$/) {
 	id = tolower(line)
-	gsub(/[^_a-z0-9]+/, "-", id)
+	gsub(/[^- \t_a-z0-9]/, "", id) # remove undesired characters
+	gsub(/[ \t]/, "-", id)         # replace white space with _
+	gsub(/^-*/, "", id)            # trim front
+	gsub(/-*$/, "", id)            # trim back
 	line = line " {#" prefix id "}"
 }
 

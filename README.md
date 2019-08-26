@@ -25,13 +25,13 @@ the following benefits:
 
 **Contents**
 
-1. [Using powerd++](#using-powerd-)
+1. [Using powerd++](#using-powerd)
    1. [Packages](#packages)
-   2. [Running powerd++](#running-powerd-)
+   2. [Running powerd++](#running-powerd)
    3. [Manuals](#manuals)
    4. [Tuning](#tuning)
-   5. [Reporting Issues / Requesting Features](#reporting-issues-requesting-features)
-2. [Building/Installing](#building-installing)
+   5. [Reporting Issues / Requesting Features](#reporting-issues--requesting-features)
+2. [Building/Installing](#buildinginstalling)
    1. [Building](#building)
    2. [Installing](#installing)
    3. [Documentation](#documentation)
