@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['sig_5ft',['sig_t',['../namespacesys_1_1sig.html#a6cb1977f77c30c965e84c90a21b408f4',1,'sys::sig']]],
-  ['sysctlonce',['SysctlOnce',['../namespacesys_1_1ctl.html#ab3f977cbea6b846cdec3071902cc3158',1,'sys::ctl']]],
-  ['sysctlsync',['SysctlSync',['../namespacesys_1_1ctl.html#af8c77556c96c65a66a2a872352e82c9f',1,'sys::ctl']]]
+  ['mhz_5ft',['mhz_t',['../namespacetypes.html#a91b1ac4eb46cc224de6d9af4e1de599f',1,'types']]],
+  ['mib_5ft',['mib_t',['../namespacesys_1_1ctl.html#aa5526c6b48686c7127c8e0c3b85b7e80',1,'sys::ctl']]],
+  ['ms',['ms',['../namespacetypes.html#aa55cfc12fa5b3c6ca213f2a8abd00c97',1,'types']]]
 ];

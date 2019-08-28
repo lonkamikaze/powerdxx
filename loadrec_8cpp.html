@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.2</span>
    </div>
   </td>
  </tr>
@@ -68,6 +68,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
@@ -85,9 +86,8 @@ $(function() {
 <code>#include &quot;<a class="el" href="utility_8hpp_source.html">utility.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="clas_8hpp_source.html">clas.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="version_8hpp_source.html">version.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="io_8hpp_source.html">sys/io.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="sysctl_8hpp_source.html">sys/sysctl.hpp</a>&quot;</code><br />
-<code>#include &lt;iostream&gt;</code><br />
-<code>#include &lt;fstream&gt;</code><br />
 <code>#include &lt;chrono&gt;</code><br />
 <code>#include &lt;thread&gt;</code><br />
 <code>#include &lt;memory&gt;</code><br />
@@ -95,7 +95,7 @@ $(function() {
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for loadrec.cpp:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="loadrec_8cpp__incl.svg" width="1686" height="336"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="loadrec_8cpp__incl.svg" width="1443" height="336"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><table class="memberdecls">
@@ -104,6 +104,13 @@ Namespaces</h2></td></tr>
 <tr class="memitem:namespaceanonymous__namespace_02loadrec_8cpp_03"><td class="memItemLeft" align="right" valign="top"> &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadrec_8cpp_03.html">anonymous_namespace{loadrec.cpp}</a></td></tr>
 <tr class="memdesc:namespaceanonymous__namespace_02loadrec_8cpp_03"><td class="mdescLeft">&#160;</td><td class="mdescRight">File local scope. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:aac9fb675ca0f7b987decdde99bd59b12"><td class="memTemplParams" colspan="2">template&lt;auto Ownership&gt; </td></tr>
+<tr class="memitem:aac9fb675ca0f7b987decdde99bd59b12"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadrec_8cpp_03.html#aac9fb675ca0f7b987decdde99bd59b12">anonymous_namespace{loadrec.cpp}::ofile</a> = <a class="el" href="namespacesys_1_1io.html#classsys_1_1io_1_1file">io::file</a>&lt; Ownership, io::write &gt;</td></tr>
+<tr class="memdesc:aac9fb675ca0f7b987decdde99bd59b12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output file type alias.  <a href="namespaceanonymous__namespace_02loadrec_8cpp_03.html#aac9fb675ca0f7b987decdde99bd59b12">More...</a><br /></td></tr>
+<tr class="separator:aac9fb675ca0f7b987decdde99bd59b12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -128,9 +135,10 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a57c722a065fcdc9cc123ebae2f69551f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadrec_8cpp_03.html#a57c722a065fcdc9cc123ebae2f69551f">anonymous_namespace{loadrec.cpp}::verbose</a> (std::string const &amp;msg)</td></tr>
-<tr class="memdesc:a57c722a065fcdc9cc123ebae2f69551f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Outputs the given message on stderr if g.verbose is set.  <a href="namespaceanonymous__namespace_02loadrec_8cpp_03.html#a57c722a065fcdc9cc123ebae2f69551f">More...</a><br /></td></tr>
-<tr class="separator:a57c722a065fcdc9cc123ebae2f69551f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f48504e052eeaaed9d630c13bbaf065"><td class="memTemplParams" colspan="2">template&lt;typename... MsgTs&gt; </td></tr>
+<tr class="memitem:a1f48504e052eeaaed9d630c13bbaf065"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadrec_8cpp_03.html#a1f48504e052eeaaed9d630c13bbaf065">anonymous_namespace{loadrec.cpp}::verbose</a> (MsgTs &amp;&amp;... msg)</td></tr>
+<tr class="memdesc:a1f48504e052eeaaed9d630c13bbaf065"><td class="mdescLeft">&#160;</td><td class="mdescRight">Outputs the given printf style message on stderr if g.verbose is set.  <a href="namespaceanonymous__namespace_02loadrec_8cpp_03.html#a1f48504e052eeaaed9d630c13bbaf065">More...</a><br /></td></tr>
+<tr class="separator:a1f48504e052eeaaed9d630c13bbaf065"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa76d01fd9997c20f0e6ea1eb23ec248"><td class="memItemLeft" align="right" valign="top"><a id="afa76d01fd9997c20f0e6ea1eb23ec248"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02loadrec_8cpp_03.html#afa76d01fd9997c20f0e6ea1eb23ec248">anonymous_namespace{loadrec.cpp}::init</a> ()</td></tr>
 <tr class="memdesc:afa76d01fd9997c20f0e6ea1eb23ec248"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set up output to the given file. <br /></td></tr>
@@ -165,14 +173,10 @@ struct {</td></tr>
 <tr class="memitem:af564d0fd9322742c224e2d777473e63c"><td class="memItemLeft" align="right" valign="top">ms&#160;</td><td class="memItemRight" valign="bottom"><b>interval</b> {25}</td></tr>
 <tr class="memdesc:af564d0fd9322742c224e2d777473e63c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recording sample interval in ms.  <a href="#af564d0fd9322742c224e2d777473e63c">More...</a><br /></td></tr>
 <tr class="separator:af564d0fd9322742c224e2d777473e63c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b3ad9402b5b7b479ec7272bc8ac6c1d"><td class="memItemLeft" align="right" valign="top"><a id="a2b3ad9402b5b7b479ec7272bc8ac6c1d"></a>
-std::ofstream&#160;</td><td class="memItemRight" valign="bottom"><b>outfile</b> {}</td></tr>
-<tr class="memdesc:a2b3ad9402b5b7b479ec7272bc8ac6c1d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The output file stream to use if an outfilename is provided on the CLI. <br /></td></tr>
-<tr class="separator:a2b3ad9402b5b7b479ec7272bc8ac6c1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a94bb2c84b82513d9f0ba1d7a71df54"><td class="memItemLeft" align="right" valign="top"><a id="a8a94bb2c84b82513d9f0ba1d7a71df54"></a>
-std::ostream *&#160;</td><td class="memItemRight" valign="bottom"><b>out</b> = &amp;std::cout</td></tr>
-<tr class="memdesc:a8a94bb2c84b82513d9f0ba1d7a71df54"><td class="mdescLeft">&#160;</td><td class="mdescRight">A pointer to the stream to use for output, either std::cout or outfile. <br /></td></tr>
-<tr class="separator:a8a94bb2c84b82513d9f0ba1d7a71df54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8234bc5fc83973c822509b363aa0152f"><td class="memItemLeft" align="right" valign="top"><a id="a8234bc5fc83973c822509b363aa0152f"></a>
+<a class="el" href="namespaceanonymous__namespace_02loadrec_8cpp_03.html#aac9fb675ca0f7b987decdde99bd59b12">ofile</a>&lt; io::link &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>fout</b> = io::fout</td></tr>
+<tr class="memdesc:a8234bc5fc83973c822509b363aa0152f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The output stream either io::fout (stdout) or a file. <br /></td></tr>
+<tr class="separator:a8234bc5fc83973c822509b363aa0152f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad923cfc5d0993f3d7f16fb16659ef5a"><td class="memItemLeft" align="right" valign="top"><a id="aad923cfc5d0993f3d7f16fb16659ef5a"></a>
 char const  *&#160;</td><td class="memItemRight" valign="bottom"><b>outfilename</b> {nullptr}</td></tr>
 <tr class="memdesc:aad923cfc5d0993f3d7f16fb16659ef5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The user provided output file name. <br /></td></tr>

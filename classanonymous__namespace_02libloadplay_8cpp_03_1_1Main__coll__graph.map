@@ -1,12 +1,5 @@
 <map id="anonymous_namespace{libloadplay.cpp}::Main" name="anonymous_namespace{libloadplay.cpp}::Main">
-<area shape="rect" id="node1" title="Singleton class representing the main execution environment." alt="" coords="145,428,308,469"/>
-<area shape="rect" id="node2" title="STL class." alt="" coords="53,339,147,365"/>
-<area shape="rect" id="node3" title="STL class." alt="" coords="5,248,139,289"/>
-<area shape="rect" id="node4" title="STL class." alt="" coords="10,157,139,199"/>
-<area shape="rect" id="node5" title="STL class." alt="" coords="75,81,229,108"/>
-<area shape="rect" id="node9" title="STL class." alt="" coords="164,157,297,199"/>
-<area shape="rect" id="node6" title="STL class." alt="" coords="102,5,202,32"/>
-<area shape="rect" id="node7" title="STL class." alt="" coords="177,339,276,365"/>
-<area shape="rect" id="node8" title="STL class." alt="" coords="163,248,301,289"/>
-<area shape="rect" id="node10" title="STL class." alt="" coords="301,339,385,365"/>
+<area shape="rect" id="node1" title="Singleton class representing the main execution environment." alt="" coords="43,124,206,165"/>
+<area shape="rect" id="node2" href="$namespacesys_1_1io.html#namespacesys_1_1io" title=" " alt="" coords="5,5,121,47"/>
+<area shape="rect" id="node3" title="STL class." alt="" coords="145,13,229,39"/>
 </map>

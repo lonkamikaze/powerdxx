@@ -1,9 +1,5 @@
 var searchData=
 [
-  ['_7eframe',['~Frame',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Report_1_1Frame.html#a8e89e30a82272657da5c0344fcc1afc7',1,'anonymous_namespace{libloadplay.cpp}::Report::Frame']]],
-  ['_7efreqguard',['~FreqGuard',['../classanonymous__namespace_02powerd_09_09_8cpp_03_1_1FreqGuard.html#abb75ca94b93421ae8a95f03760140d45',1,'anonymous_namespace{powerd++.cpp}::FreqGuard']]],
-  ['_7ehold',['~Hold',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Hold.html#a01d10947bda593569f6e53f6a1f64fe8',1,'anonymous_namespace{libloadplay.cpp}::Hold']]],
-  ['_7emain',['~Main',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Main.html#a3fb97c24da6cdb98f775428a6bd8a978',1,'anonymous_namespace{libloadplay.cpp}::Main']]],
-  ['_7epidfile',['~Pidfile',['../classsys_1_1pid_1_1Pidfile.html#a2200241f9ebebd250e54d0cb7703aa6d',1,'sys::pid::Pidfile']]],
-  ['_7esignal',['~Signal',['../classsys_1_1sig_1_1Signal.html#a0cb06d6d1386cd70c50ed2aa68eb6973',1,'sys::sig::Signal']]]
+  ['warn',['warn',['../namespaceanonymous__namespace_02libloadplay_8cpp_03.html#ac466bb01b0909aba1c26384d43a0368c',1,'anonymous_namespace{libloadplay.cpp}']]],
+  ['write',['write',['../classsys_1_1io_1_1file__feature_3_01FileT_00_01write_00_01Tail_01_8_8_8_01_4.html#a2ca3856d5d4e3191494006282c24c8d2',1,'sys::io::file_feature&lt; FileT, write, Tail ... &gt;::write(T const &amp;src)'],['../classsys_1_1io_1_1file__feature_3_01FileT_00_01write_00_01Tail_01_8_8_8_01_4.html#a07667f18e281207785caffebfadbfd42',1,'sys::io::file_feature&lt; FileT, write, Tail ... &gt;::write(T const (&amp;src)[Count], std::size_t const count)'],['../classsys_1_1pid_1_1Pidfile.html#a922d86044559d08f943e6382d94b50ba',1,'sys::pid::Pidfile::write()'],['../namespacesys_1_1io.html#a48c6af6f1f4d9d5e93276325dd102b20aefb2a684e4afb7d55e6147fbe5a332ee',1,'sys::io::write()']]]
 ];

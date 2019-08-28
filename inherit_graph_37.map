@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classsys_1_1sig_1_1Signal.html" title="Sets up a given signal handler and restores the old handler when going out of scope." alt="" coords="5,5,117,32"/>
+<area shape="rect" id="node1" href="$structsys_1_1io_1_1enable__if.html" title=" " alt="" coords="5,5,153,61"/>
+<area shape="rect" id="node2" href="$structsys_1_1io_1_1is__superset__of_3_01LSetT_00_01set_3_01RSet_01_8_8_8_01_4_01_4.html" title="Specialise is_superset_of to unpack the right hand io::set." alt="" coords="201,5,356,61"/>
 </map>

@@ -2,6 +2,7 @@ var searchData=
 [
   ['length',['LENGTH',['../namespaceerrors.html#aa66e9dd0957a04da2a8e23e99ff349eaaaddeac40406177897b3fccba88558f1c',1,'errors::LENGTH()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a7cb3a220e40ec33be3ae0fcc22275929aaddeac40406177897b3fccba88558f1c',1,'anonymous_namespace{powerd++.cpp}::LENGTH()']]],
   ['libloadplay_2ecpp',['libloadplay.cpp',['../libloadplay_8cpp.html',1,'']]],
+  ['link',['link',['../namespacesys_1_1io.html#a8f4713dfe0cc5edfb57f4876fee2ea5aa2a304a1348456ccd2234cd71a81bd338',1,'sys::io']]],
   ['load',['load',['../namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a9c46176c91da6b82217b79670e5541b9',1,'anonymous_namespace{libloadplay.cpp}::CoreReport::load()'],['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a62f9c3ed191aa24ef4989561b6167ebb',1,'anonymous_namespace{powerd++.cpp}::CoreGroup::load()'],['../namespaceclas.html#a6e941d23cb8062ab7bae9a08e95eba17',1,'clas::load()']]],
   ['loadplay_2ecpp',['loadplay.cpp',['../loadplay_8cpp.html',1,'']]],
   ['loadrec_2ecpp',['loadrec.cpp',['../loadrec_8cpp.html',1,'']]],

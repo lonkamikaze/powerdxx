@@ -1,11 +1,5 @@
 var searchData=
 [
-  ['main',['Main',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Main.html',1,'anonymous_namespace{libloadplay.cpp}']]],
-  ['max',['Max',['../classutility_1_1Max.html',1,'utility']]],
-  ['max_3c_20decikelvin_5ft_20_3e',['Max&lt; decikelvin_t &gt;',['../classutility_1_1Max.html',1,'utility']]],
-  ['max_3c_20mhz_5ft_20_3e',['Max&lt; mhz_t &gt;',['../classutility_1_1Max.html',1,'utility']]],
-  ['mib_5ft',['mib_t',['../structanonymous__namespace_02libloadplay_8cpp_03_1_1mib__t.html',1,'anonymous_namespace{libloadplay.cpp}']]],
-  ['min',['Min',['../classutility_1_1Min.html',1,'utility']]],
-  ['min_3c_20decikelvin_5ft_20_3e',['Min&lt; decikelvin_t &gt;',['../classutility_1_1Min.html',1,'utility']]],
-  ['min_3c_20mhz_5ft_20_3e',['Min&lt; mhz_t &gt;',['../classutility_1_1Min.html',1,'utility']]]
+  ['is_5fsuperset_5fof',['is_superset_of',['../namespacesys_1_1io.html#structsys_1_1io_1_1is__superset__of',1,'sys::io']]],
+  ['is_5fsuperset_5fof_3c_20lsett_2c_20set_3c_20rset_20_2e_2e_2e_20_3e_20_3e',['is_superset_of&lt; LSetT, set&lt; RSet ... &gt; &gt;',['../structsys_1_1io_1_1is__superset__of_3_01LSetT_00_01set_3_01RSet_01_8_8_8_01_4_01_4.html',1,'sys::io']]]
 ];

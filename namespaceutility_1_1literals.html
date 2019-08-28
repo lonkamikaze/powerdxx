@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.2</span>
    </div>
   </td>
  </tr>
@@ -73,20 +73,17 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Contains literals.  
+<p>Contains literal operators.  
 <a href="#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a77003e6bbc42ee28900be3e981face22"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutility_1_1literals.html#a77003e6bbc42ee28900be3e981face22">operator&quot;&quot;_s</a> (char const *const op, size_t const size)</td></tr>
-<tr class="memdesc:a77003e6bbc42ee28900be3e981face22"><td class="mdescLeft">&#160;</td><td class="mdescRight">A string literal operator equivalent to the <code>operator "" s</code> literal provided by C++14 in &lt;string&gt;.  <a href="#a77003e6bbc42ee28900be3e981face22">More...</a><br /></td></tr>
-<tr class="separator:a77003e6bbc42ee28900be3e981face22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af1348c45ac4977f311075bbc19758991"><td class="memItemLeft" align="right" valign="top">constexpr <a class="el" href="classutility_1_1Formatter.html">Formatter</a>&lt; 16384 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceutility_1_1literals.html#af1348c45ac4977f311075bbc19758991">operator&quot;&quot;_fmt</a> (char const *const fmt, size_t const)</td></tr>
 <tr class="memdesc:af1348c45ac4977f311075bbc19758991"><td class="mdescLeft">&#160;</td><td class="mdescRight">Literal to convert a string literal to a <a class="el" href="classutility_1_1Formatter.html" title="A formatting wrapper around string literals.">Formatter</a> instance.  <a href="#af1348c45ac4977f311075bbc19758991">More...</a><br /></td></tr>
 <tr class="separator:af1348c45ac4977f311075bbc19758991"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Contains literals. </p>
+<div class="textblock"><p>Contains literal operators. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="af1348c45ac4977f311075bbc19758991"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af1348c45ac4977f311075bbc19758991">&#9670;&nbsp;</a></span>operator&quot;&quot;_fmt()</h2>
@@ -122,52 +119,6 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="classutility_1_1Formatter.html" title="A formatting wrapper around string literals.">Formatter</a> instance </dd></dl>
-
-</div>
-</div>
-<a id="a77003e6bbc42ee28900be3e981face22"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a77003e6bbc42ee28900be3e981face22">&#9670;&nbsp;</a></span>operator&quot;&quot;_s()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::string utility::literals::operator&quot;&quot;_s </td>
-          <td>(</td>
-          <td class="paramtype">char const *const&#160;</td>
-          <td class="paramname"><em>op</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">size_t const&#160;</td>
-          <td class="paramname"><em>size</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>A string literal operator equivalent to the <code>operator "" s</code> literal provided by C++14 in &lt;string&gt;. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">op</td><td>The raw string to turn into an std::string object </td></tr>
-    <tr><td class="paramname">size</td><td>The size of the raw string </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>An std::string instance </dd></dl>
 
 </div>
 </div>

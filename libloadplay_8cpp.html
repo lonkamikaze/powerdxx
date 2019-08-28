@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.2</span>
    </div>
   </td>
  </tr>
@@ -69,6 +69,7 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#namespaces">Namespaces</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -80,12 +81,9 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="utility_8hpp_source.html">utility.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="constants_8hpp_source.html">constants.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="fixme_8hpp_source.html">fixme.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="version_8hpp_source.html">version.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="env_8hpp_source.html">sys/env.hpp</a>&quot;</code><br />
-<code>#include &lt;iostream&gt;</code><br />
-<code>#include &lt;fstream&gt;</code><br />
-<code>#include &lt;iomanip&gt;</code><br />
+<code>#include &quot;<a class="el" href="io_8hpp_source.html">sys/io.hpp</a>&quot;</code><br />
 <code>#include &lt;unordered_map&gt;</code><br />
 <code>#include &lt;map&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
@@ -110,7 +108,7 @@ $(function() {
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for libloadplay.cpp:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="libloadplay_8cpp__incl.svg" width="2619" height="262"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+<div class="center"><iframe scrolling="no" frameborder="0" src="libloadplay_8cpp__incl.svg" width="2371" height="262"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
 </div>
 </div>
 </div><table class="memberdecls">
@@ -159,6 +157,17 @@ Namespaces</h2></td></tr>
 <tr class="memdesc:namespaceanonymous__namespace_02libloadplay_8cpp_03"><td class="mdescLeft">&#160;</td><td class="mdescRight">File local scope. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:abd405da4065330cd7c2d390bb20927b2"><td class="memTemplParams" colspan="2">template&lt;auto Ownership&gt; </td></tr>
+<tr class="memitem:abd405da4065330cd7c2d390bb20927b2"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#abd405da4065330cd7c2d390bb20927b2">anonymous_namespace{libloadplay.cpp}::ofile</a> = <a class="el" href="namespacesys_1_1io.html#classsys_1_1io_1_1file">io::file</a>&lt; Ownership, io::write &gt;</td></tr>
+<tr class="memdesc:abd405da4065330cd7c2d390bb20927b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Output file type alias.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#abd405da4065330cd7c2d390bb20927b2">More...</a><br /></td></tr>
+<tr class="separator:abd405da4065330cd7c2d390bb20927b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fde0a10925ccb351e6367bd05ec91fc"><td class="memTemplParams" colspan="2">template&lt;auto Ownership&gt; </td></tr>
+<tr class="memitem:a2fde0a10925ccb351e6367bd05ec91fc"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a2fde0a10925ccb351e6367bd05ec91fc">anonymous_namespace{libloadplay.cpp}::ifile</a> = <a class="el" href="namespacesys_1_1io.html#classsys_1_1io_1_1file">io::file</a>&lt; Ownership, io::read &gt;</td></tr>
+<tr class="memdesc:a2fde0a10925ccb351e6367bd05ec91fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input file type alias.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a2fde0a10925ccb351e6367bd05ec91fc">More...</a><br /></td></tr>
+<tr class="separator:a2fde0a10925ccb351e6367bd05ec91fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:abc522b6c43b4acc40883ff4892b30753"><td class="memTemplParams" colspan="2">template&lt;size_t Size&gt; </td></tr>
@@ -170,27 +179,27 @@ Functions</h2></td></tr>
 <tr class="separator:ae9d8ee6e6cbb9e770f9e37eef26926b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac8fdedcaa68ffde8de7b17db81e6d0f2"><td class="memTemplParams" colspan="2">template&lt;typename ... ArgTs&gt; </td></tr>
 <tr class="memitem:ac8fdedcaa68ffde8de7b17db81e6d0f2"><td class="memTemplItemLeft" align="right" valign="top">constexpr void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#ac8fdedcaa68ffde8de7b17db81e6d0f2">anonymous_namespace{libloadplay.cpp}::dprintf</a> (ArgTs &amp;&amp;... args)</td></tr>
-<tr class="memdesc:ac8fdedcaa68ffde8de7b17db81e6d0f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls fprintf(stderr, ...) if built with -DEBUG.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#ac8fdedcaa68ffde8de7b17db81e6d0f2">More...</a><br /></td></tr>
+<tr class="memdesc:ac8fdedcaa68ffde8de7b17db81e6d0f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calls io::ferr.printf(...) if built with -DEBUG.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#ac8fdedcaa68ffde8de7b17db81e6d0f2">More...</a><br /></td></tr>
 <tr class="separator:ac8fdedcaa68ffde8de7b17db81e6d0f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f88e24072b1e8d07d51adf493663e2c"><td class="memTemplParams" colspan="2">template&lt;&gt; </td></tr>
 <tr class="memitem:a9f88e24072b1e8d07d51adf493663e2c"><td class="memTemplItemLeft" align="right" valign="top">std::string&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a9f88e24072b1e8d07d51adf493663e2c">anonymous_namespace{libloadplay.cpp}::SysctlValue::get&lt; std::string &gt;</a> () const</td></tr>
 <tr class="memdesc:a9f88e24072b1e8d07d51adf493663e2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a copy of the value string.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a9f88e24072b1e8d07d51adf493663e2c">More...</a><br /></td></tr>
 <tr class="separator:a9f88e24072b1e8d07d51adf493663e2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28b58ef1bc903e8b65cc408af6d1f18e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a28b58ef1bc903e8b65cc408af6d1f18e">anonymous_namespace{libloadplay.cpp}::debug</a> (std::string const &amp;msg)</td></tr>
-<tr class="memdesc:a28b58ef1bc903e8b65cc408af6d1f18e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a debugging message if built with -DEBUG.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a28b58ef1bc903e8b65cc408af6d1f18e">More...</a><br /></td></tr>
-<tr class="separator:a28b58ef1bc903e8b65cc408af6d1f18e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9de5bd441664b3b1753df7fc8eeea9a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#ab9de5bd441664b3b1753df7fc8eeea9a">anonymous_namespace{libloadplay.cpp}::warn</a> (std::string const &amp;msg)</td></tr>
-<tr class="memdesc:ab9de5bd441664b3b1753df7fc8eeea9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a warning.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#ab9de5bd441664b3b1753df7fc8eeea9a">More...</a><br /></td></tr>
-<tr class="separator:ab9de5bd441664b3b1753df7fc8eeea9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7ebcc9625a161ad713fa64d84931caf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#aa7ebcc9625a161ad713fa64d84931caf">anonymous_namespace{libloadplay.cpp}::fail</a> (std::string const &amp;msg)</td></tr>
-<tr class="memdesc:aa7ebcc9625a161ad713fa64d84931caf"><td class="mdescLeft">&#160;</td><td class="mdescRight">This prints an error message and sets sys_results to make the hijacked process fail.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#aa7ebcc9625a161ad713fa64d84931caf">More...</a><br /></td></tr>
-<tr class="separator:aa7ebcc9625a161ad713fa64d84931caf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:accd424ed37ce998c93539b3904a51c45"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#accd424ed37ce998c93539b3904a51c45">anonymous_namespace{libloadplay.cpp}::operator&lt;&lt;</a> (std::ostream &amp;out, CoreReport const &amp;core)</td></tr>
-<tr class="memdesc:accd424ed37ce998c93539b3904a51c45"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a core clock frequency and load.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#accd424ed37ce998c93539b3904a51c45">More...</a><br /></td></tr>
-<tr class="separator:accd424ed37ce998c93539b3904a51c45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abfc0e2567e17d3dd70ab39d1fad619b2"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#abfc0e2567e17d3dd70ab39d1fad619b2">anonymous_namespace{libloadplay.cpp}::operator&lt;&lt;</a> (std::ostream &amp;out, CoreFrameReport const &amp;frame)</td></tr>
-<tr class="memdesc:abfc0e2567e17d3dd70ab39d1fad619b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print recorded and running clock frequency and load for a frame.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#abfc0e2567e17d3dd70ab39d1fad619b2">More...</a><br /></td></tr>
-<tr class="separator:abfc0e2567e17d3dd70ab39d1fad619b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a07995c40ccedac107a76ebdb5c2d14"><td class="memTemplParams" colspan="2">template&lt;typename... MsgTs&gt; </td></tr>
+<tr class="memitem:a7a07995c40ccedac107a76ebdb5c2d14"><td class="memTemplItemLeft" align="right" valign="top">ofile&lt; io::link &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a7a07995c40ccedac107a76ebdb5c2d14">anonymous_namespace{libloadplay.cpp}::debug</a> (MsgTs &amp;&amp;... msg)</td></tr>
+<tr class="memdesc:a7a07995c40ccedac107a76ebdb5c2d14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a debugging message if built with -DEBUG.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a7a07995c40ccedac107a76ebdb5c2d14">More...</a><br /></td></tr>
+<tr class="separator:a7a07995c40ccedac107a76ebdb5c2d14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac466bb01b0909aba1c26384d43a0368c"><td class="memTemplParams" colspan="2">template&lt;typename... MsgTs&gt; </td></tr>
+<tr class="memitem:ac466bb01b0909aba1c26384d43a0368c"><td class="memTemplItemLeft" align="right" valign="top">ofile&lt; io::link &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#ac466bb01b0909aba1c26384d43a0368c">anonymous_namespace{libloadplay.cpp}::warn</a> (MsgTs &amp;&amp;... msg)</td></tr>
+<tr class="memdesc:ac466bb01b0909aba1c26384d43a0368c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a warning.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#ac466bb01b0909aba1c26384d43a0368c">More...</a><br /></td></tr>
+<tr class="separator:ac466bb01b0909aba1c26384d43a0368c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dc4109d9606dfd32dc475e2227c0dc1"><td class="memTemplParams" colspan="2">template&lt;typename... MsgTs&gt; </td></tr>
+<tr class="memitem:a2dc4109d9606dfd32dc475e2227c0dc1"><td class="memTemplItemLeft" align="right" valign="top">ofile&lt; io::link &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a2dc4109d9606dfd32dc475e2227c0dc1">anonymous_namespace{libloadplay.cpp}::fail</a> (MsgTs &amp;&amp;... msg)</td></tr>
+<tr class="memdesc:a2dc4109d9606dfd32dc475e2227c0dc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">This prints an error message and sets sys_results to make the hijacked process fail.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a2dc4109d9606dfd32dc475e2227c0dc1">More...</a><br /></td></tr>
+<tr class="separator:a2dc4109d9606dfd32dc475e2227c0dc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a716fee999925e91770c9f76446f1ed"><td class="memItemLeft" align="right" valign="top">ofile&lt; io::link &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a7a716fee999925e91770c9f76446f1ed">anonymous_namespace{libloadplay.cpp}::operator&lt;&lt;</a> (ofile&lt; io::link &gt; fout, CoreFrameReport const &amp;frame)</td></tr>
+<tr class="memdesc:a7a716fee999925e91770c9f76446f1ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print recorded and running clock frequency and load for a frame.  <a href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a7a716fee999925e91770c9f76446f1ed">More...</a><br /></td></tr>
+<tr class="separator:a7a716fee999925e91770c9f76446f1ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad972ce2a8b2b31fabc47aaf1e57b1bfc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="libloadplay_8cpp.html#ad972ce2a8b2b31fabc47aaf1e57b1bfc">sysctl</a> (const int *name, u_int namelen, void *oldp, size_t *oldlenp, const void *newp, size_t newlen)</td></tr>
 <tr class="memdesc:ad972ce2a8b2b31fabc47aaf1e57b1bfc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Functions to intercept.  <a href="#ad972ce2a8b2b31fabc47aaf1e57b1bfc">More...</a><br /></td></tr>
 <tr class="separator:ad972ce2a8b2b31fabc47aaf1e57b1bfc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -244,7 +253,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD. </p>
-<p>This library reads instructions from std::cin and outputs statistics about the hijacked process on std::cout.</p>
+<p>This library reads instructions from io::fin (stdin) and outputs statistics about the hijacked process on io::fout (stdout).</p>
 <p>The following environment variables affect the operation of loadplay:</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
@@ -624,7 +633,7 @@ The load cycles simulated for this frame in [kcycles]. <p>This is determined at 
 </ul>
 <p>The call may fail for 3 reasons:</p>
 <ol type="1">
-<li>The <a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#aa7ebcc9625a161ad713fa64d84931caf" title="This prints an error message and sets sys_results to make the hijacked process fail.">fail()</a> function was called and sys_results was assigned -1</li>
+<li>The <a class="el" href="namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a2dc4109d9606dfd32dc475e2227c0dc1" title="This prints an error message and sets sys_results to make the hijacked process fail.">fail()</a> function was called and sys_results was assigned -1</li>
 <li>A target buffer was too small (errno == ENOMEM)</li>
 <li>The given sysctl is not in the sysctls store (errno == ENOENT)</li>
 </ol>

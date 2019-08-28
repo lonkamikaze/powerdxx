@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.1</span>
+   &#160;<span id="projectnumber">0.4.2</span>
    </div>
   </td>
  </tr>
@@ -75,15 +75,15 @@ $(function() {
 </ul>
 <p><b>Contents</b></p>
 <ol type="1">
-<li><a class="el" href="index.html#md_README_using-powerd-">Using powerd++</a><ol type="a">
+<li><a class="el" href="index.html#md_README_using-powerd">Using powerd++</a><ol type="a">
 <li><a class="el" href="index.html#md_README_packages">Packages</a></li>
-<li><a class="el" href="index.html#md_README_running-powerd-">Running powerd++</a></li>
+<li><a class="el" href="index.html#md_README_running-powerd">Running powerd++</a></li>
 <li><a class="el" href="index.html#md_README_manuals">Manuals</a></li>
 <li><a class="el" href="index.html#md_README_tuning">Tuning</a></li>
-<li><a class="el" href="index.html#md_README_reporting-issues-requesting-features">Reporting Issues / Requesting Features</a></li>
+<li><a class="el" href="/usr/home/kamikaze/stark/freebsd/git/powerdxx/README.md.html#md_README_reporting-issues--requesting-features">Reporting Issues / Requesting Features</a></li>
 </ol>
 </li>
-<li><a class="el" href="index.html#md_README_building-installing">Building/Installing</a><ol type="a">
+<li><a class="el" href="index.html#md_README_buildinginstalling">Building/Installing</a><ol type="a">
 <li><a class="el" href="index.html#md_README_building">Building</a></li>
 <li><a class="el" href="index.html#md_README_installing">Installing</a></li>
 <li><a class="el" href="index.html#md_README_documentation">Documentation</a></li>
@@ -95,7 +95,7 @@ $(function() {
 </ol>
 </li>
 </ol>
-<h1><a class="anchor" id="md_README_using-powerd-"></a>
+<h1><a class="anchor" id="md_README_using-powerd"></a>
 Using powerd++ </h1>
 <p>Powerd++ offers the following features:</p>
 <ul>
@@ -111,7 +111,7 @@ Using powerd++ </h1>
 <h2><a class="anchor" id="md_README_packages"></a>
 Packages </h2>
 <p>The <a href="https://www.freebsd.org/">FreeBSD</a> port is <code>sysutils/powerdxx</code>, the package name <code>powerdxx</code>.</p>
-<h2><a class="anchor" id="md_README_running-powerd-"></a>
+<h2><a class="anchor" id="md_README_running-powerd"></a>
 Running powerd++ </h2>
 <p>It is not intended to run powerd++ simultaneously with powerd. To prevent this powerd++ uses the same default pidfile as powerd:</p>
 <div class="fragment"><div class="line"># service powerdxx onestart</div><div class="line">Starting powerdxx.</div><div class="line">powerd++: (ECONFLICT) a power daemon is already running under PID: 59866</div><div class="line">/usr/local/etc/rc.d/powerdxx: WARNING: failed to start powerdxx</div></div><!-- fragment --><p>So if powerd is already setup, it first needs to be disabled:</p>
@@ -132,13 +132,13 @@ Tuning </h2>
 <p>The key to tuning powerd++ is the <code>-f</code> flag, which keeps powerd++ in foreground and causes it to report its activity. This allows directly observing the effects of a parameter set.</p>
 <p>Observing the defaults in action may be a good start:</p>
 <div class="fragment"><div class="line"># powerd++ -f</div><div class="line">power:  online, load:  693 MHz,  42 C, cpu.0.freq: 2401 MHz, wanted: 1848 MHz</div><div class="line">power:  online, load:  475 MHz,  43 C, cpu.0.freq: 1800 MHz, wanted: 1266 MHz</div><div class="line">power:  online, load:  271 MHz,  43 C, cpu.0.freq: 1300 MHz, wanted:  722 MHz</div><div class="line">power:  online, load:   64 MHz,  43 C, cpu.0.freq:  768 MHz, wanted:  170 MHz</div><div class="line">power:  online, load:   55 MHz,  42 C, cpu.0.freq:  768 MHz, wanted:  146 MHz</div><div class="line">power:  online, load:   57 MHz,  42 C, cpu.0.freq:  768 MHz, wanted:  152 MHz</div><div class="line">power:  online, load:   60 MHz,  44 C, cpu.0.freq:  768 MHz, wanted:  160 MHz</div><div class="line">power:  online, load:   67 MHz,  42 C, cpu.0.freq:  768 MHz, wanted:  178 MHz</div><div class="line">...</div></div><!-- fragment --><p>Note, the immediate high load is due to the load buffer being filled under the assumption that the past load fits the current clock frequency when powerd++ starts.</p>
-<h2><a class="anchor" id="md_README_reporting-issues-requesting-features"></a>
-Reporting Issues / Requesting Features </h2>
+<h2><a class="anchor" id="md_README_reporting-issues"></a>
+–requesting-features Reporting Issues / Requesting Features</h2>
 <p>Please report issues and feature requests on <a href="https://github.com/lonkamikaze/powerdxx/issues">GitHub</a> or to <a href="#" onclick="location.href='mai'+'lto:'+'kam'+'ik'+'aze'+'@b'+'sdf'+'or'+'en.'+'de'; return false;">kamik<span style="display: none;">.nosp@m.</span>aze@<span style="display: none;">.nosp@m.</span>bsdfo<span style="display: none;">.nosp@m.</span>ren.<span style="display: none;">.nosp@m.</span>de</a>.</p>
 <p>If powerd++ behaves in some unexpected or undesired manner, please mention all the command line flags (e.g. from <code>/etc/rc.conf</code> <code>powerdxx_flags</code>) and provide a load recording:</p>
 <div class="fragment"><div class="line">&gt; loadrec -o myissue.load</div></div><!-- fragment --><p>The default recording duration is 30 s. Do not omit the <code>-o</code> parameter, printing the output on the terminal may create significant load and impact the recorded load significantly.</p>
 <p>Before submitting the report, try to reproduce the behaviour using the recorded load:</p>
-<div class="fragment"><div class="line">&gt; loadplay -i myissue.load -o /dev/null powerd++ -f</div><div class="line">power:  online, load:  224 MHz, cpu.0.freq:  768 MHz, wanted:  597 MHz</div><div class="line">power:  online, load:  155 MHz, cpu.0.freq:  768 MHz, wanted:  413 MHz</div><div class="line">power:  online, load:   85 MHz, cpu.0.freq:  768 MHz, wanted:  226 MHz</div><div class="line">power:  online, load:   29 MHz, cpu.0.freq:  768 MHz, wanted:   77 MHz</div><div class="line">power:  online, load:   23 MHz, cpu.0.freq:  768 MHz, wanted:   61 MHz</div><div class="line">...</div></div><!-- fragment --><h1><a class="anchor" id="md_README_building-installing"></a>
+<div class="fragment"><div class="line">&gt; loadplay -i myissue.load -o /dev/null powerd++ -f</div><div class="line">power:  online, load:  224 MHz, cpu.0.freq:  768 MHz, wanted:  597 MHz</div><div class="line">power:  online, load:  155 MHz, cpu.0.freq:  768 MHz, wanted:  413 MHz</div><div class="line">power:  online, load:   85 MHz, cpu.0.freq:  768 MHz, wanted:  226 MHz</div><div class="line">power:  online, load:   29 MHz, cpu.0.freq:  768 MHz, wanted:   77 MHz</div><div class="line">power:  online, load:   23 MHz, cpu.0.freq:  768 MHz, wanted:   61 MHz</div><div class="line">...</div></div><!-- fragment --><h1><a class="anchor" id="md_README_buildinginstalling"></a>
 Building/Installing </h1>
 <p>The <code>Makefile</code> offers a set of targets, it is written for FreeBSD's <a href="https://www.freebsd.org/cgi/man.cgi?query=make">make(1)</a>:</p>
 <table class="markdownTable">
@@ -164,7 +164,7 @@ Building/Installing </h1>
 <h2><a class="anchor" id="md_README_building"></a>
 Building </h2>
 <p>The <code>all</code> target is the default target that is called implicitly if make is run without arguments:</p>
-<div class="fragment"><div class="line">&gt; make</div><div class="line">c++  -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -c src/powerd++.cpp -o powerd++.o</div><div class="line">c++  -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -c src/clas.cpp -o clas.o</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic powerd++.o clas.o -lutil -o powerd++</div><div class="line">c++  -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -c src/loadrec.cpp -o loadrec.o</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic loadrec.o clas.o -o loadrec</div><div class="line">c++  -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -c src/loadplay.cpp -o loadplay.o</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic loadplay.o clas.o -o loadplay</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic -fPIC -c src/libloadplay.cpp -o libloadplay.o</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++14 -Wall -Werror -pedantic libloadplay.o -lpthread -shared -o libloadplay.so</div><div class="line">&gt;</div></div><!-- fragment --><p>The <code>debug</code> and <code>paranoid</code> flags perform the same build as the <code>all</code> target, but with different/additional <code>CXXFLAGS</code>. The <code>debug</code> and <code>paranoid</code> targets can be combined.</p>
+<div class="fragment"><div class="line">&gt; make</div><div class="line">c++  -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic -c src/powerd++.cpp -o powerd++.o</div><div class="line">c++  -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic -c src/clas.cpp -o clas.o</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic powerd++.o clas.o -lutil -o powerd++</div><div class="line">c++  -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic -c src/loadrec.cpp -o loadrec.o</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic loadrec.o clas.o -o loadrec</div><div class="line">c++  -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic -c src/loadplay.cpp -o loadplay.o</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic loadplay.o clas.o -o loadplay</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic -fPIC -c src/libloadplay.cpp -o libloadplay.o</div><div class="line">c++ -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic libloadplay.o -lpthread -shared -o libloadplay.so</div><div class="line">&gt;</div></div><!-- fragment --><p>The <code>debug</code> and <code>paranoid</code> flags perform the same build as the <code>all</code> target, but with different/additional <code>CXXFLAGS</code>. The <code>debug</code> and <code>paranoid</code> targets can be combined.</p>
 <h2><a class="anchor" id="md_README_installing"></a>
 Installing </h2>
 <p>The installer installs the tools and manual pages according to a recipe in <code>pkg/files</code>. The following variables can be passed to <code>make install</code> or <code>make deinstall</code> to affect the install destination:</p>

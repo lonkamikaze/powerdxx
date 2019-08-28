@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['timing',['timing',['../namespacetiming.html',1,'']]],
-  ['types',['types',['../namespacetypes.html',1,'']]]
+  ['literals',['literals',['../namespaceutility_1_1literals.html',1,'utility']]],
+  ['utility',['utility',['../namespaceutility.html',1,'']]]
 ];

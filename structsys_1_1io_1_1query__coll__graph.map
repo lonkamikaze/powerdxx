@@ -1,0 +1,4 @@
+<map id="sys::io::query" name="sys::io::query">
+<area shape="rect" id="node1" title="Ask questions about the contents of a string." alt="" coords="47,95,148,121"/>
+<area shape="rect" id="node2" href="$structsys_1_1io_1_1query_1_1contains__ftor.html" title="Test a string whether it contains a set of characters." alt="" coords="5,5,189,32"/>
+</map>

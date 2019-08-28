@@ -7,6 +7,7 @@ var searchData=
   ['signal',['signal',['../namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#a0697539b7d7dcfe6c9b884a5709ae195',1,'anonymous_namespace{powerd++.cpp}::Global']]],
   ['size',['size',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Emulator.html#a9c248e662def135ef4e7454c9b31ccad',1,'anonymous_namespace{libloadplay.cpp}::Emulator']]],
   ['sparam',['sparam',['../namespacenih.html#a7cdbafa009fd001eba2b41689804c7a7',1,'nih::Parameter']]],
+  ['str',['str',['../structsys_1_1io_1_1query_1_1contains__ftor.html#a1f6b79fee1679a57cdb06c462094877d',1,'sys::io::query::contains_ftor']]],
   ['sum',['sum',['../classanonymous__namespace_02libloadplay_8cpp_03_1_1Emulator.html#a764f3c89889da8eff2b032a78e388037',1,'anonymous_namespace{libloadplay.cpp}::Emulator']]],
   ['sys_5fresults',['sys_results',['../namespaceanonymous__namespace_02libloadplay_8cpp_03.html#a0cb0d329c3b640cabbd46f553557f247',1,'anonymous_namespace{libloadplay.cpp}']]],
   ['sysctl',['sysctl',['../classsys_1_1ctl_1_1Sync.html#ac077d5b1bf784b3b6588dacc5e88ceb6',1,'sys::ctl::Sync']]],
