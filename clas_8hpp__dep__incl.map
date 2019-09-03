@@ -1,5 +1,5 @@
 <map id="src/clas.hpp" name="src/clas.hpp">
-<area shape="rect" id="node1" title="Implements functions to process command line arguments." alt="" coords="85,5,178,32"/>
-<area shape="rect" id="node2" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="5,80,116,107"/>
-<area shape="rect" id="node3" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="140,80,267,107"/>
+<area shape="rect" id="node1" title=" " alt="" coords="85,5,178,32"/>
+<area shape="rect" id="node2" href="$loadrec_8cpp.html" title=" " alt="" coords="5,80,116,107"/>
+<area shape="rect" id="node3" href="$powerd_09_09_8cpp.html" title=" " alt="" coords="140,80,267,107"/>
 </map>

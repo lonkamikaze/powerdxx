@@ -9,27 +9,27 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 80)">
 <title>src/sys/pidfile.hpp</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-80 100,-80 100,4 -4,4"/>
-<!-- Node5 -->
+<!-- Node1 -->
 <g id="node1" class="node">
-<title>Node5</title>
-<g id="a_node1"><a xlink:title="Implements safer c++ wrappers for the pidfile_*() interface.">
+<title>Node1</title>
+<g id="a_node1"><a xlink:title=" ">
 <polygon fill="#bfbfbf" stroke="#000000" points="0,-56.5 0,-75.5 96,-75.5 96,-56.5 0,-56.5"/>
 <text text-anchor="middle" x="48" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/sys/pidfile.hpp</text>
 </a>
 </g>
 </g>
-<!-- Node6 -->
+<!-- Node2 -->
 <g id="node2" class="node">
-<title>Node6</title>
-<g id="a_node2"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
+<title>Node2</title>
+<g id="a_node2"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points=".5,-.5 .5,-19.5 95.5,-19.5 95.5,-.5 .5,-.5"/>
 <text text-anchor="middle" x="48" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/powerd++.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node5&#45;&gt;Node6 -->
+<!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
-<title>Node5&#45;&gt;Node6</title>
+<title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="#191970" d="M48,-46.1575C48,-37.155 48,-26.9199 48,-19.6427"/>
 <polygon fill="#191970" stroke="#191970" points="44.5001,-46.2455 48,-56.2455 51.5001,-46.2456 44.5001,-46.2455"/>
 </g>

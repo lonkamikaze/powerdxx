@@ -1,6 +1,6 @@
 <map id="src/constants.hpp" name="src/constants.hpp">
-<area shape="rect" id="node1" title="Defines a collection of constants." alt="" coords="153,5,279,32"/>
-<area shape="rect" id="node2" href="$libloadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD." alt="" coords="5,80,136,107"/>
-<area shape="rect" id="node3" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="161,80,271,107"/>
-<area shape="rect" id="node4" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="295,80,422,107"/>
+<area shape="rect" id="node1" title=" " alt="" coords="153,5,279,32"/>
+<area shape="rect" id="node2" href="$libloadplay_8cpp.html" title=" " alt="" coords="5,80,136,107"/>
+<area shape="rect" id="node3" href="$loadrec_8cpp.html" title=" " alt="" coords="161,80,271,107"/>
+<area shape="rect" id="node4" href="$powerd_09_09_8cpp.html" title=" " alt="" coords="295,80,422,107"/>
 </map>

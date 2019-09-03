@@ -1,11 +1,11 @@
 <map id="src/utility.hpp" name="src/utility.hpp">
-<area shape="rect" id="node1" title="Implements generally useful functions." alt="" coords="359,5,459,32"/>
-<area shape="rect" id="node2" href="$errors_8hpp.html" title="Common error handling code." alt="" coords="403,80,506,107"/>
-<area shape="rect" id="node3" href="$clas_8hpp.html" title="Implements functions to process command line arguments." alt="" coords="324,155,417,181"/>
-<area shape="rect" id="node4" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="231,229,342,256"/>
-<area shape="rect" id="node5" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="513,229,639,256"/>
-<area shape="rect" id="node6" href="$loadplay_8cpp.html" title="Implements the loadplay a bootstrapping tool for libloadplay." alt="" coords="492,155,609,181"/>
-<area shape="rect" id="node7" href="$libloadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD." alt="" coords="5,155,136,181"/>
-<area shape="rect" id="node8" href="$version_8hpp.html" title="Defines types and constants used for version management." alt="" coords="93,80,203,107"/>
-<area shape="rect" id="node9" href="$Options_8hpp.html" title="This file provides nih::Options&lt;&gt;, a substitute for getopt(3)." alt="" coords="588,80,703,107"/>
+<area shape="rect" id="node1" title=" " alt="" coords="359,5,459,32"/>
+<area shape="rect" id="node2" href="$errors_8hpp.html" title=" " alt="" coords="403,80,506,107"/>
+<area shape="rect" id="node3" href="$clas_8hpp.html" title=" " alt="" coords="324,155,417,181"/>
+<area shape="rect" id="node4" href="$loadrec_8cpp.html" title=" " alt="" coords="231,229,342,256"/>
+<area shape="rect" id="node5" href="$powerd_09_09_8cpp.html" title=" " alt="" coords="513,229,639,256"/>
+<area shape="rect" id="node6" href="$loadplay_8cpp.html" title=" " alt="" coords="492,155,609,181"/>
+<area shape="rect" id="node7" href="$libloadplay_8cpp.html" title=" " alt="" coords="5,155,136,181"/>
+<area shape="rect" id="node8" href="$version_8hpp.html" title=" " alt="" coords="93,80,203,107"/>
+<area shape="rect" id="node9" href="$Options_8hpp.html" title=" " alt="" coords="588,80,703,107"/>
 </map>

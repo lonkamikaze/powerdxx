@@ -9,9 +9,9 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 102)">
 <title>anonymous_namespace{libloadplay.cpp}::CoreReport</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-102 147,-102 147,4 -4,4"/>
-<!-- Node5 -->
+<!-- Node1 -->
 <g id="node1" class="node">
-<title>Node5</title>
+<title>Node1</title>
 <g id="a_node1"><a xlink:title="The reported state of a single CPU pipeline.">
 <polygon fill="#bfbfbf" stroke="#000000" points="0,-.5 0,-30.5 143,-30.5 143,-.5 0,-.5"/>
 <text text-anchor="start" x="8" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">anonymous_namespace</text>
@@ -19,18 +19,18 @@
 </a>
 </g>
 </g>
-<!-- Node6 -->
+<!-- Node2 -->
 <g id="node2" class="node">
-<title>Node6</title>
+<title>Node2</title>
 <g id="a_node2"><a xlink:title=" ">
 <polygon fill="#ffffff" stroke="#bfbfbf" points="49.5,-78.5 49.5,-97.5 93.5,-97.5 93.5,-78.5 49.5,-78.5"/>
 <text text-anchor="middle" x="71.5" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">mhz_t</text>
 </a>
 </g>
 </g>
-<!-- Node6&#45;&gt;Node5 -->
+<!-- Node2&#45;&gt;Node1 -->
 <g id="edge1" class="edge">
-<title>Node6&#45;&gt;Node5</title>
+<title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M71.5,-68.0177C71.5,-56.2164 71.5,-41.513 71.5,-30.668"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="68.0001,-68.2223 71.5,-78.2223 75.0001,-68.2224 68.0001,-68.2223"/>
 <text text-anchor="middle" x="81.5" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000"> freq</text>

@@ -9,198 +9,198 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 192)">
 <title>src/utility.hpp</title>
 <polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-192 541.6591,-192 541.6591,4 -4,4"/>
-<!-- Node4 -->
+<!-- Node1 -->
 <g id="node1" class="node">
-<title>Node4</title>
-<g id="a_node1"><a xlink:title="Implements generally useful functions.">
+<title>Node1</title>
+<g id="a_node1"><a xlink:title=" ">
 <polygon fill="#bfbfbf" stroke="#000000" points="265.5,-168.5 265.5,-187.5 340.5,-187.5 340.5,-168.5 265.5,-168.5"/>
 <text text-anchor="middle" x="303" y="-175.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/utility.hpp</text>
 </a>
 </g>
 </g>
-<!-- Node5 -->
+<!-- Node2 -->
 <g id="node2" class="node">
-<title>Node5</title>
-<g id="a_node2"><a xlink:href="errors_8hpp.html" target="_top" xlink:title="Common error handling code.">
+<title>Node2</title>
+<g id="a_node2"><a xlink:href="errors_8hpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="298.5,-112.5 298.5,-131.5 375.5,-131.5 375.5,-112.5 298.5,-112.5"/>
 <text text-anchor="middle" x="337" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/errors.hpp</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node5 -->
+<!-- Node1&#45;&gt;Node2 -->
 <g id="edge1" class="edge">
-<title>Node4&#45;&gt;Node5</title>
+<title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="#191970" d="M314.1535,-159.6296C319.8247,-150.2887 326.4845,-139.3197 331.1455,-131.6427"/>
 <polygon fill="#191970" stroke="#191970" points="311.1204,-157.8812 308.9223,-168.2455 317.1039,-161.5141 311.1204,-157.8812"/>
 </g>
-<!-- Node6 -->
+<!-- Node3 -->
 <g id="node3" class="node">
-<title>Node6</title>
-<g id="a_node3"><a xlink:href="clas_8hpp.html" target="_top" xlink:title="Implements functions to process command line arguments.">
+<title>Node3</title>
+<g id="a_node3"><a xlink:href="clas_8hpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="239,-56.5 239,-75.5 309,-75.5 309,-56.5 239,-56.5"/>
 <text text-anchor="middle" x="274" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/clas.hpp</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node6 -->
+<!-- Node1&#45;&gt;Node3 -->
 <g id="edge8" class="edge">
-<title>Node4&#45;&gt;Node6</title>
+<title>Node1&#45;&gt;Node3</title>
 <path fill="none" stroke="#191970" d="M296.7248,-158.4962C294.1909,-150.3453 291.3231,-140.7517 289,-132 283.7544,-112.2384 278.7099,-88.8499 276.0165,-75.8941"/>
 <polygon fill="#191970" stroke="#191970" points="293.4374,-159.7089 299.7896,-168.1882 300.1116,-157.5983 293.4374,-159.7089"/>
 </g>
-<!-- Node7 -->
+<!-- Node4 -->
 <g id="node4" class="node">
-<title>Node7</title>
-<g id="a_node4"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings.">
+<title>Node4</title>
+<g id="a_node4"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="169.5,-.5 169.5,-19.5 252.5,-19.5 252.5,-.5 169.5,-.5"/>
 <text text-anchor="middle" x="211" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/loadrec.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node7 -->
+<!-- Node1&#45;&gt;Node4 -->
 <g id="edge18" class="edge">
-<title>Node4&#45;&gt;Node7</title>
+<title>Node1&#45;&gt;Node4</title>
 <path fill="none" stroke="#191970" d="M282.7493,-161.783C261.5787,-143.4779 229.4652,-111.5753 215,-76 207.3901,-57.2843 208.3532,-33.1074 209.6983,-19.8245"/>
 <polygon fill="#191970" stroke="#191970" points="280.6287,-164.5728 290.5347,-168.3306 285.1342,-159.2155 280.6287,-164.5728"/>
 </g>
-<!-- Node8 -->
+<!-- Node5 -->
 <g id="node5" class="node">
-<title>Node8</title>
-<g id="a_node5"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
+<title>Node5</title>
+<g id="a_node5"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="380.5,-.5 380.5,-19.5 475.5,-19.5 475.5,-.5 380.5,-.5"/>
 <text text-anchor="middle" x="428" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/powerd++.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node8 -->
+<!-- Node1&#45;&gt;Node5 -->
 <g id="edge19" class="edge">
-<title>Node4&#45;&gt;Node8</title>
+<title>Node1&#45;&gt;Node5</title>
 <path fill="none" stroke="#191970" d="M350.6381,-175.3337C410.8924,-170.8508 509.5312,-159.431 532,-132 548.1579,-112.2737 526.0244,-74.3833 510,-56 495.3057,-39.1427 472.8548,-27.1539 455.1575,-19.6507"/>
 <polygon fill="#191970" stroke="#191970" points="350.3167,-171.8476 340.5883,-176.0439 350.8102,-178.8302 350.3167,-171.8476"/>
 </g>
-<!-- Node9 -->
+<!-- Node6 -->
 <g id="node6" class="node">
-<title>Node9</title>
-<g id="a_node6"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title="Implements the loadplay a bootstrapping tool for libloadplay.">
+<title>Node6</title>
+<g id="a_node6"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="365,-56.5 365,-75.5 453,-75.5 453,-56.5 365,-56.5"/>
 <text text-anchor="middle" x="409" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/loadplay.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node9 -->
+<!-- Node1&#45;&gt;Node6 -->
 <g id="edge17" class="edge">
-<title>Node4&#45;&gt;Node9</title>
+<title>Node1&#45;&gt;Node6</title>
 <path fill="none" stroke="#191970" d="M338.9337,-164.2222C354.548,-156.7088 371.9784,-146.0373 384,-132 398.3461,-115.2484 404.8776,-89.4244 407.4913,-75.5677"/>
 <polygon fill="#191970" stroke="#191970" points="337.1734,-161.1773 329.5108,-168.4941 340.0637,-167.5527 337.1734,-161.1773"/>
 </g>
-<!-- Node10 -->
+<!-- Node7 -->
 <g id="node7" class="node">
-<title>Node10</title>
-<g id="a_node7"><a xlink:href="libloadplay_8cpp.html" target="_top" xlink:title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.">
+<title>Node7</title>
+<g id="a_node7"><a xlink:href="libloadplay_8cpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="0,-56.5 0,-75.5 98,-75.5 98,-56.5 0,-56.5"/>
 <text text-anchor="middle" x="49" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/libloadplay.cpp</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node10 -->
+<!-- Node1&#45;&gt;Node7 -->
 <g id="edge9" class="edge">
-<title>Node4&#45;&gt;Node10</title>
+<title>Node1&#45;&gt;Node7</title>
 <path fill="none" stroke="#191970" d="M255.1029,-175.7032C190.9984,-171.5616 82.2956,-160.4441 56,-132 41.9206,-116.7702 44.1797,-90.3279 46.7619,-75.9701"/>
 <polygon fill="#191970" stroke="#191970" points="255.1773,-179.2142 265.3725,-176.3318 255.605,-172.2272 255.1773,-179.2142"/>
 </g>
-<!-- Node11 -->
+<!-- Node8 -->
 <g id="node8" class="node">
-<title>Node11</title>
-<g id="a_node8"><a xlink:href="version_8hpp.html" target="_top" xlink:title="Defines types and constants used for version management.">
+<title>Node8</title>
+<g id="a_node8"><a xlink:href="version_8hpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="65.5,-112.5 65.5,-131.5 148.5,-131.5 148.5,-112.5 65.5,-112.5"/>
 <text text-anchor="middle" x="107" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/version.hpp</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node11 -->
+<!-- Node1&#45;&gt;Node8 -->
 <g id="edge10" class="edge">
-<title>Node4&#45;&gt;Node11</title>
+<title>Node1&#45;&gt;Node8</title>
 <path fill="none" stroke="#191970" d="M259.5587,-165.5882C223.5484,-155.2996 173.1132,-140.8895 140.2539,-131.5011"/>
 <polygon fill="#191970" stroke="#191970" points="258.7296,-168.9913 269.3064,-168.3733 260.6527,-162.2606 258.7296,-168.9913"/>
 </g>
-<!-- Node12 -->
+<!-- Node9 -->
 <g id="node9" class="node">
-<title>Node12</title>
-<g id="a_node9"><a xlink:href="Options_8hpp.html" target="_top" xlink:title="This file provides nih::Options&lt;&gt;, a substitute for getopt(3).">
+<title>Node9</title>
+<g id="a_node9"><a xlink:href="Options_8hpp.html" target="_top" xlink:title=" ">
 <polygon fill="#ffffff" stroke="#000000" points="437,-112.5 437,-131.5 523,-131.5 523,-112.5 437,-112.5"/>
 <text text-anchor="middle" x="480" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#000000">src/Options.hpp</text>
 </a>
 </g>
 </g>
-<!-- Node4&#45;&gt;Node12 -->
+<!-- Node1&#45;&gt;Node9 -->
 <g id="edge13" class="edge">
-<title>Node4&#45;&gt;Node12</title>
+<title>Node1&#45;&gt;Node9</title>
 <path fill="none" stroke="#191970" d="M343.0668,-165.3235C375.527,-155.0536 420.5493,-140.8093 449.9697,-131.5011"/>
 <polygon fill="#191970" stroke="#191970" points="341.9058,-162.0197 333.4274,-168.3733 344.0174,-168.6937 341.9058,-162.0197"/>
 </g>
-<!-- Node5&#45;&gt;Node6 -->
+<!-- Node2&#45;&gt;Node3 -->
 <g id="edge2" class="edge">
-<title>Node5&#45;&gt;Node6</title>
+<title>Node2&#45;&gt;Node3</title>
 <path fill="none" stroke="#191970" d="M318.2808,-105.3607C307.3818,-95.6727 294.0245,-83.7995 284.848,-75.6427"/>
 <polygon fill="#191970" stroke="#191970" points="316.2268,-108.2178 326.0262,-112.2455 320.8774,-102.9859 316.2268,-108.2178"/>
 </g>
-<!-- Node5&#45;&gt;Node7 -->
+<!-- Node2&#45;&gt;Node4 -->
 <g id="edge6" class="edge">
-<title>Node5&#45;&gt;Node7</title>
+<title>Node2&#45;&gt;Node4</title>
 <path fill="none" stroke="#191970" d="M288.8024,-111.1936C268.1104,-104.2955 245.2372,-93.2842 230,-76 215.807,-59.9002 212.1796,-33.8114 211.2767,-19.7401"/>
 <polygon fill="#191970" stroke="#191970" points="287.8427,-114.5603 298.4303,-114.1701 289.9103,-107.8726 287.8427,-114.5603"/>
 </g>
-<!-- Node5&#45;&gt;Node8 -->
+<!-- Node2&#45;&gt;Node5 -->
 <g id="edge7" class="edge">
-<title>Node5&#45;&gt;Node8</title>
+<title>Node2&#45;&gt;Node5</title>
 <path fill="none" stroke="#191970" d="M338.995,-102.0025C341.2369,-87.9811 345.9814,-69.42 356,-56 368.4232,-39.3591 388.7917,-27.1619 404.6999,-19.5249"/>
 <polygon fill="#191970" stroke="#191970" points="335.5022,-101.7207 337.6806,-112.0891 342.4435,-102.6252 335.5022,-101.7207"/>
 </g>
-<!-- Node5&#45;&gt;Node9 -->
+<!-- Node2&#45;&gt;Node6 -->
 <g id="edge5" class="edge">
-<title>Node5&#45;&gt;Node9</title>
+<title>Node2&#45;&gt;Node6</title>
 <path fill="none" stroke="#191970" d="M357.664,-105.928C370.2489,-96.1397 385.9092,-83.9595 396.6023,-75.6427"/>
 <polygon fill="#191970" stroke="#191970" points="355.2862,-103.3434 349.5414,-112.2455 359.5838,-108.8688 355.2862,-103.3434"/>
 </g>
-<!-- Node6&#45;&gt;Node7 -->
+<!-- Node3&#45;&gt;Node4 -->
 <g id="edge3" class="edge">
-<title>Node6&#45;&gt;Node7</title>
+<title>Node3&#45;&gt;Node4</title>
 <path fill="none" stroke="#191970" d="M255.2808,-49.3607C244.3818,-39.6727 231.0245,-27.7995 221.848,-19.6427"/>
 <polygon fill="#191970" stroke="#191970" points="253.2268,-52.2178 263.0262,-56.2455 257.8774,-46.9859 253.2268,-52.2178"/>
 </g>
-<!-- Node6&#45;&gt;Node8 -->
+<!-- Node3&#45;&gt;Node5 -->
 <g id="edge4" class="edge">
-<title>Node6&#45;&gt;Node8</title>
+<title>Node3&#45;&gt;Node5</title>
 <path fill="none" stroke="#191970" d="M309.9614,-52.9231C338.1134,-42.686 376.6055,-28.6889 401.8719,-19.5011"/>
 <polygon fill="#191970" stroke="#191970" points="308.6754,-49.6665 300.4735,-56.3733 311.0676,-56.245 308.6754,-49.6665"/>
 </g>
-<!-- Node11&#45;&gt;Node7 -->
+<!-- Node8&#45;&gt;Node4 -->
 <g id="edge12" class="edge">
-<title>Node11&#45;&gt;Node7</title>
+<title>Node8&#45;&gt;Node4</title>
 <path fill="none" stroke="#191970" d="M119.789,-104.0305C129.8491,-90.3432 144.5379,-71.31 159,-56 171.7463,-42.5064 187.9748,-28.601 198.8834,-19.6622"/>
 <polygon fill="#191970" stroke="#191970" points="116.9311,-102.0096 113.8955,-112.1603 122.5986,-106.1182 116.9311,-102.0096"/>
 </g>
-<!-- Node11&#45;&gt;Node10 -->
+<!-- Node8&#45;&gt;Node7 -->
 <g id="edge11" class="edge">
-<title>Node11&#45;&gt;Node10</title>
+<title>Node8&#45;&gt;Node7</title>
 <path fill="none" stroke="#191970" d="M89.4707,-105.0751C79.4917,-95.4402 67.3524,-83.7196 58.9871,-75.6427"/>
 <polygon fill="#191970" stroke="#191970" points="87.272,-107.8175 96.8972,-112.2455 92.1342,-102.7817 87.272,-107.8175"/>
 </g>
-<!-- Node12&#45;&gt;Node7 -->
+<!-- Node9&#45;&gt;Node4 -->
 <g id="edge15" class="edge">
-<title>Node12&#45;&gt;Node7</title>
+<title>Node9&#45;&gt;Node4</title>
 <path fill="none" stroke="#191970" d="M479.9369,-102.1153C478.7756,-87.2842 474.6865,-67.6515 462,-56 432.0221,-28.4677 315.764,-16.7602 252.5296,-12.3448"/>
 <polygon fill="#191970" stroke="#191970" points="476.4478,-102.4584 480.3482,-112.3091 483.4421,-102.1761 476.4478,-102.4584"/>
 </g>
-<!-- Node12&#45;&gt;Node8 -->
+<!-- Node9&#45;&gt;Node5 -->
 <g id="edge16" class="edge">
-<title>Node12&#45;&gt;Node8</title>
+<title>Node9&#45;&gt;Node5</title>
 <path fill="none" stroke="#191970" d="M490.9493,-103.0674C497.3362,-89.358 502.7522,-70.7258 495,-56 486.0612,-39.0201 467.7107,-27.0989 452.4712,-19.6538"/>
 <polygon fill="#191970" stroke="#191970" points="487.7867,-101.5635 486.3014,-112.0537 494.0043,-104.7794 487.7867,-101.5635"/>
 </g>
-<!-- Node12&#45;&gt;Node9 -->
+<!-- Node9&#45;&gt;Node6 -->
 <g id="edge14" class="edge">
-<title>Node12&#45;&gt;Node9</title>
+<title>Node9&#45;&gt;Node6</title>
 <path fill="none" stroke="#191970" d="M459.623,-105.928C447.2129,-96.1397 431.77,-83.9595 421.2255,-75.6427"/>
 <polygon fill="#191970" stroke="#191970" points="457.6136,-108.8007 467.6327,-112.2455 461.9486,-103.3046 457.6136,-108.8007"/>
 </g>
