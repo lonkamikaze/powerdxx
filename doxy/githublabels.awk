@@ -7,6 +7,12 @@
 #
 # Get file name prefix for references.
 #
+# The prefix mimics the doxygen file naming scheme,
+# e.g. `man/loadrec.1` becomse `man_1_loadrec`.
+#
+# Equivalently the prefix for `foo/bar.md` becomes the prefix `foo_md_bar_`.
+# The trailing `_` exists as a separator to the internal reference label.
+#
 filename != FILENAME {
 	filename = FILENAME
 	# strip path
@@ -15,9 +21,14 @@ filename != FILENAME {
 	prefix = substr(filename, 1, length(path)) == path \
 	         ? substr(filename, length(path) + 1) \
 	         : filename
-	sub(/\.[^.]*$/, "", prefix)
-	gsub(/[^_a-z0-9]+/, "-", prefix)
-	prefix = "md_" prefix "_"
+	# put the filename suffix behind the path but in front of
+	# the file name
+	sufx = prefix
+	sub(/.*\./, "", sufx)               # get suffix
+	sub(/\.[^.]*$/, "", prefix)         # strip suffix from filename
+	sub(/[^\/]*$/, sufx "_&_", prefix)  # insert suffix
+	# sanitise characters
+	gsub(/[^_a-zA-Z0-9]+/, "_", prefix)
 }
 
 #
