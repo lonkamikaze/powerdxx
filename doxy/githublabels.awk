@@ -50,6 +50,20 @@ line && (/^===*$/ || /^---*$/) {
 }
 
 #
+# Doxygen up to at least 1.8.16 chokes on successive - in labels.
+#
+line ~ "#" prefix {
+	cnt = split(line, a, "#" prefix)
+	line = a[1]
+	for (i = 2; i <= cnt; ++i) {
+		while (a[i] ~ /^[-a-z0-9]*--[-a-z0-9]*/) {
+			sub(/--+/, "-", a[i])
+		}
+		line = line "#" prefix a[i]
+	}
+}
+
+#
 # Print the previous line, after a label might have been added.
 #
 {print line}
