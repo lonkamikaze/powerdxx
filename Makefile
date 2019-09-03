@@ -14,7 +14,7 @@ TMP!=      cd ${.CURDIR} && \
            env MKDEP_CPP_OPTS="-MM -std=${STD}" mkdep ${SRCS}
 RELEASE!=  git tag -l --sort=-taggerdate 2>&- | head -n1 || date -uI
 COMMITS!=  git rev-list --count HEAD "^${RELEASE}" 2>&- || echo 0
-VERSION=   ${RELEASE}${COMMITS:C/^/c/:Nc0}
+VERSION=   ${RELEASE}${COMMITS:C/^/+c/:N+c0}
 
 # Build
 all: ${TARGETS}
