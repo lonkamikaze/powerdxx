@@ -10,7 +10,7 @@
 filename != FILENAME {
 	filename = FILENAME
 	# strip path
-	"pwd" | getline path
+	"pwd -P" | getline path
 	path = path "/"
 	prefix = substr(filename, 1, length(path)) == path \
 	         ? substr(filename, length(path) + 1) \
