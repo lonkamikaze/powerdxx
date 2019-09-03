@@ -35,9 +35,7 @@ filename != FILENAME {
 # Substitute github references with doxygen references.
 #
 /\(#[_a-z0-9-]*\)/ {
-	gsub(/\(#[_a-z0-9-]*\)/, "<__REF__&__REF__>")
-	gsub(/<__REF__\(#/, "(@ref " prefix)
-	gsub(/\)__REF__>/, ")")
+	gsub(/\[[^]]*\]\(#/, "&" prefix)
 }
 
 #
