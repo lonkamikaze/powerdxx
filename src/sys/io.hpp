@@ -401,7 +401,7 @@ class file_feature<FileT, read, Tail ...> :
 	 * @return
 	 *	The number of characters read
 	 */
-	template <typename T, auto Count>
+	template <typename T, std::size_t Count>
 	std::size_t read(T (& dst)[Count], std::size_t const count) {
 		if (this->handle) {
 			return fread(&dst, sizeof(T),
@@ -534,7 +534,7 @@ class file_feature<FileT, write, Tail ...> :
 	 * @return
 	 *	A self reference
 	 */
-	template <auto Count>
+	template <std::size_t Count>
 	FileT & print(char const (& msg)[Count]) {
 		if (this->handle) {
 			fwrite(msg, sizeof(char), Count - 1, this->handle);
@@ -592,7 +592,7 @@ class file_feature<FileT, write, Tail ...> :
 	 * @return
 	 *	A self reference
 	 */
-	template <typename T, auto Count>
+	template <typename T, std::size_t Count>
 	FileT & write(T const (& src)[Count], std::size_t const count) {
 		if (this->handle) {
 			fwrite(&src, sizeof(T),
