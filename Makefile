@@ -43,7 +43,7 @@ powerd++: ${.TARGET}.o clas.o
 loadrec loadplay: ${.TARGET}.o clas.o
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -o ${.TARGET}
 
-libloadplay.so: ${.TARGET:C/\.so$//}.o
+libloadplay.so: ${.TARGET:.so=.o}
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -shared -o ${.TARGET}
 
 # Combinable build targets
@@ -55,7 +55,7 @@ CXXFLAGS+= ${FLAGS}
 CXXFLAGS+= ${PFLAGS}
 .endif
 
-debug paranoid: all
+debug paranoid: ${.TARGETS:Ndebug:Nparanoid:S/^$/all/W}
 
 # Install
 install: ${TARGETS}
