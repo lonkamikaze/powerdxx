@@ -1,5 +1,5 @@
 /** \file
- * Implements functions to process command line arguments.
+ * Provides functions to process command line arguments.
  */
 
 #ifndef _POWERDXX_CLAS_HPP_

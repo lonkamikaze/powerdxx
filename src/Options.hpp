@@ -1,12 +1,12 @@
 /** \file
- * This file provides \ref nih::Options<>, a substitute for `getopt(3)`.
+ * Provides the nih::Options functor template, a substitute for `getopt(3)`.
  *
  * The `getopt(3)` interface takes the command line arguments as `char * const`
  * instead of `char const *`. I.e. it reserves the right to mutate the
  * provided arguments, which it actually does.
  *
- * The \ref nih::Options<> functor is not a drop in substitute, but
- * tries to be easily adoptable and does not change the data given to it.
+ * The nih::Options functor is not a drop in substitute, but tries
+ * to be easily adoptable and does not change the data entrusted to it.
  *
  * To use the options an enum or enum class is required, e.g.:
  *

@@ -1,3 +1,7 @@
+/** \file
+ * Implements functions to process command line arguments.
+ */
+
 #include "clas.hpp"
 
 #include <cstdlib>   /* strtod(), strtol() */
