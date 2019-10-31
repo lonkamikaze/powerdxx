@@ -6,12 +6,11 @@ PFLAGS=    -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-e
 PREFIX?=   /usr/local
 DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
 
-BINS=      src/powerd++.cpp src/loadrec.cpp src/loadplay.cpp
-SOS=       src/libloadplay.cpp
-SRCS!=     cd ${.CURDIR} && find src/ -name \*.cpp
-TARGETS=   ${BINS:C/.*\///:C/\.cpp$//} ${SOS:C/.*\///:C/\.cpp$/.so/}
-TMP!=      cd ${.CURDIR} && \
-           env MKDEP_CPP_OPTS="-MM -std=${STD}" mkdep ${SRCS}
+BINCPPS=   src/powerd++.cpp src/loadrec.cpp src/loadplay.cpp
+SOCPPS=    src/libloadplay.cpp
+SRCFILES!= cd ${.CURDIR} && find src/ -type f
+CPPS=      ${SRCFILES:M*.cpp}
+TARGETS=   ${BINCPPS:T:.cpp=} ${SOCPPS:T:.cpp=.so}
 RELEASE!=  git tag -l --sort=-taggerdate 2>&- | head -n1 || date -uI
 COMMITS!=  git rev-list --count HEAD "^${RELEASE}" 2>&- || echo 0
 VERSION=   ${RELEASE}${COMMITS:C/^/+c/:N+c0}
@@ -19,7 +18,13 @@ VERSION=   ${RELEASE}${COMMITS:C/^/+c/:N+c0}
 # Build
 all: ${TARGETS}
 
-.sinclude ".depend"
+# Create .depend
+.depend: ${SRCFILES}
+	cd ${.CURDIR} && env MKDEP_CPP_OPTS="-MM -std=${STD}" mkdep ${CPPS}
+
+.if ${.MAKE.LEVEL} == 0
+TMP!=      cd ${.CURDIR} && ${MAKE} .depend
+.endif
 
 # Building
 libloadplay.o:
