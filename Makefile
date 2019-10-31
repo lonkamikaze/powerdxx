@@ -1,20 +1,20 @@
-FLAGS=     -std=${STD} -Wall -Werror -pedantic
-STD=       c++17
-DBGFLAGS=  -O0 -g -DEBUG
-PFLAGS=    -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error
-TESTBUILDS=clang++90 clang++80 clang++70 g++9
+FLAGS=         -std=${STD} -Wall -Werror -pedantic
+STD=           c++17
+DBGFLAGS=      -O0 -g -DEBUG
+PFLAGS=        -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error
+TESTBUILDS=    clang++90 clang++80 clang++70 g++9
 
-PREFIX?=   /usr/local
-DOCSDIR?=  ${PREFIX}/share/doc/powerdxx
+PREFIX?=       /usr/local
+DOCSDIR?=      ${PREFIX}/share/doc/powerdxx
 
-BINCPPS=   src/powerd++.cpp src/loadrec.cpp src/loadplay.cpp
-SOCPPS=    src/libloadplay.cpp
-SRCFILES!= cd ${.CURDIR} && find src/ -type f
-CPPS=      ${SRCFILES:M*.cpp}
-TARGETS=   ${BINCPPS:T:.cpp=} ${SOCPPS:T:.cpp=.so}
-RELEASE!=  git tag -l --sort=-taggerdate 2>&- | head -n1 || date -uI
-COMMITS!=  git rev-list --count HEAD "^${RELEASE}" 2>&- || echo 0
-VERSION=   ${RELEASE}${COMMITS:C/^/+c/:N+c0}
+BINCPPS=       src/powerd++.cpp src/loadrec.cpp src/loadplay.cpp
+SOCPPS=        src/libloadplay.cpp
+SRCFILES!=     cd ${.CURDIR} && find src/ -type f
+CPPS=          ${SRCFILES:M*.cpp}
+TARGETS=       ${BINCPPS:T:.cpp=} ${SOCPPS:T:.cpp=.so}
+RELEASE!=      git tag -l --sort=-taggerdate 2>&- | head -n1 || date -uI
+COMMITS!=      git rev-list --count HEAD "^${RELEASE}" 2>&- || echo 0
+VERSION=       ${RELEASE}${COMMITS:C/^/+c/:N+c0}
 
 # Build
 all: ${TARGETS}
