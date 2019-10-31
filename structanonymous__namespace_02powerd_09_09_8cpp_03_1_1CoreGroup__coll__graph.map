@@ -1,13 +1,13 @@
 <map id="anonymous_namespace{powerd++.cpp}::CoreGroup" name="anonymous_namespace{powerd++.cpp}::CoreGroup">
-<area shape="rect" id="node1" title="Contains the management information for a group of cores with a common clock frequency." alt="" coords="472,181,656,222"/>
-<area shape="rect" id="node2" title=" " alt="" coords="21,85,80,112"/>
-<area shape="rect" id="node6" title=" " alt="" coords="187,59,359,85"/>
-<area shape="rect" id="node7" href="$classutility_1_1Min.html" title=" " alt="" coords="202,109,345,136"/>
-<area shape="rect" id="node10" href="$classutility_1_1Max.html" title=" " alt="" coords="200,160,347,187"/>
-<area shape="rect" id="node3" title=" " alt="" coords="239,211,307,237"/>
-<area shape="rect" id="node4" href="$classsys_1_1ctl_1_1Sync.html" title=" " alt="" coords="192,261,355,288"/>
-<area shape="rect" id="node5" title=" " alt="" coords="17,261,84,288"/>
-<area shape="rect" id="node8" href="$classutility_1_1Min.html" title=" " alt="" coords="186,313,361,340"/>
-<area shape="rect" id="node9" title=" " alt="" coords="5,335,96,361"/>
-<area shape="rect" id="node11" href="$classutility_1_1Max.html" title=" " alt="" coords="184,364,363,391"/>
+<area shape="rect" id="node1" title="Contains the management information for a group of cores with a common clock frequency." alt="" coords="472,179,655,221"/>
+<area shape="rect" id="node2" title=" " alt="" coords="21,84,80,111"/>
+<area shape="rect" id="node6" title=" " alt="" coords="187,57,359,84"/>
+<area shape="rect" id="node7" href="$classutility_1_1Min.html" title=" " alt="" coords="202,108,345,135"/>
+<area shape="rect" id="node10" href="$classutility_1_1Max.html" title=" " alt="" coords="200,159,347,185"/>
+<area shape="rect" id="node3" title=" " alt="" coords="239,209,307,236"/>
+<area shape="rect" id="node4" href="$classsys_1_1ctl_1_1Sync.html" title=" " alt="" coords="192,260,355,287"/>
+<area shape="rect" id="node5" title=" " alt="" coords="17,260,84,287"/>
+<area shape="rect" id="node8" href="$classutility_1_1Min.html" title=" " alt="" coords="186,312,361,339"/>
+<area shape="rect" id="node9" title=" " alt="" coords="5,333,96,360"/>
+<area shape="rect" id="node11" href="$classutility_1_1Max.html" title=" " alt="" coords="184,363,363,389"/>
 </map>
