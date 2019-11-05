@@ -12,9 +12,15 @@ SOCPPS=        src/libloadplay.cpp
 SRCFILES!=     cd ${.CURDIR} && find src/ -type f
 CPPS=          ${SRCFILES:M*.cpp}
 TARGETS=       ${BINCPPS:T:.cpp=} ${SOCPPS:T:.cpp=.so}
-RELEASE!=      git tag -l --sort=-taggerdate 2>&- | head -n1 || date -uI
-COMMITS!=      git rev-list --count HEAD "^${RELEASE}" 2>&- || echo 0
-VERSION=       ${RELEASE}${COMMITS:C/^/+c/:N+c0}
+
+PKGVERSION=    ${.CURDIR:T:C/.*-//:M[0-9]*.[0-9]*.[0-9]*}
+GITRELEASE.sh= git tag -l --sort=-taggerdate 2>&- | head -n1 || :
+GITCOMMITS.sh= git rev-list --count HEAD "^${GITRELEASE}" 2>&- || echo 0
+GITRELEASE=    ${GITRELEASE.sh:sh}
+GITCOMMITS=    ${GITCOMMITS.sh:sh}
+GITVERSION=    ${GITRELEASE}${GITCOMMITS:C/^/+c/:N+c0}
+VERSIONLIST=   ${GITVERSION} ${PKGVERSION} unknown
+VERSION=       ${VERSIONLIST:[1]}
 
 # Build
 all: ${TARGETS}
