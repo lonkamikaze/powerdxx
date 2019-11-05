@@ -28,7 +28,9 @@ TMP!=      cd ${.CURDIR} && ${MAKE} .depend
 .endif
 # Usually .depend is read implicitly after parsing the Makefile,
 # but it's needed before that to generate the testbuild/* targets.
-.include ".depend"
+.if !make(.depend)
+.include "${.CURDIR}/.depend"
+.endif
 
 # Building
 libloadplay.o:
