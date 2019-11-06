@@ -22,6 +22,15 @@ GITVERSION=    ${GITRELEASE}${GITCOMMITS:C/^/+c/:N+c0}
 VERSIONLIST=   ${GITVERSION} ${PKGVERSION} unknown
 VERSION=       ${VERSIONLIST:[1]}
 
+INFO=          VERSION GITVERSION GITHASH PKGVERSION TARGETS \
+               CXX CXXFLAGS CXXVERSION UNAME_A
+GITHASH.sh=    git log -1 --pretty=%H 2>&- || :
+GITHASH=       ${GITHASH.sh:sh}
+CXXVERSION.sh= ${CXX} --version
+CXXVERSION=    ${CXXVERSION.sh:sh}
+UNAME_A.sh=    uname -a
+UNAME_A=       ${UNAME_A.sh:sh}
+
 # Build
 all: ${TARGETS}
 
@@ -57,6 +66,9 @@ loadrec loadplay: ${.TARGET}.o clas.o
 
 libloadplay.so: ${.TARGET:.so=.o}
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -shared -o ${.TARGET}
+
+info::
+	@echo -n '${INFO:@v@${v}="${${v}}"${.newline}@}'
 
 # Combinable build targets
 .ifmake(debug)

@@ -154,6 +154,29 @@ Reporting Issues / Requesting Features
 Please report issues and feature requests on [GitHub][issues] or
 to <kamikaze@bsdforen.de>.
 
+### Build Issues
+
+In case of a build issue, please report the build output as well
+as the output of `make info`:
+
+```
+> make info
+VERSION="0.4.3+c8"
+GITVERSION="0.4.3+c8"
+GITHASH="8431d86abe7479a4c0a040c19551ff3fa2454ea1"
+PKGVERSION=""
+TARGETS="powerd++ loadrec loadplay libloadplay.so"
+CXX="ccache c++"
+CXXFLAGS="-O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic"
+CXXVERSION="FreeBSD clang version 8.0.1 (tags/RELEASE_801/final 366581) (based on LLVM 8.0.1) Target
+: x86_64-unknown-freebsd12.1 Thread model: posix InstalledDir: /usr/bin"
+UNAME_A="FreeBSD AprilRyan.norad 12.1-STABLE FreeBSD 12.1-STABLE #1 ea071b9cb32(stable/12)-dirty: Mo
+n Oct 28 23:37:31 CET 2019     root@AprilRyan.norad:/usr/obj/S403/amd64/usr/src/amd64.amd64/sys/S403
+  amd64"
+```
+
+### Performance Issues
+
 If powerd++ behaves in some unexpected or undesired manner, please
 mention all the command line flags (e.g. from `/etc/rc.conf`
 `powerdxx_flags`) and provide a load recording:
@@ -188,6 +211,7 @@ The `Makefile` offers a set of targets, it is written for FreeBSD's
 | Target    | Description                                  |
 |-----------|----------------------------------------------|
 | all       | Build everything                             |
+| info      | Print the build configuration                |
 | debug     | Build with `CXXFLAGS=-O0 -g -DEBUG`          |
 | paranoid  | Turn on undefined behaviour canaries         |
 | install   | Install tools and manuals                    |
