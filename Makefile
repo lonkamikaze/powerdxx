@@ -38,12 +38,10 @@ all: ${TARGETS}
 .depend: ${SRCFILES}
 	cd ${.CURDIR} && env MKDEP_CPP_OPTS="-MM -std=${STD}" mkdep ${CPPS}
 
-.if ${.MAKE.LEVEL} == 0
+.if !make(.depend)
 TMP!=      cd ${.CURDIR} && ${MAKE} .depend
-.endif
 # Usually .depend is read implicitly after parsing the Makefile,
 # but it's needed before that to generate the testbuild/* targets.
-.if !make(.depend)
 .include "${.CURDIR}/.depend"
 .endif
 
@@ -92,6 +90,17 @@ install deinstall: pkg/${.TARGET:C,.*/,,}.sh pkg/files
 # Clean
 clean:
 	rm -f *.o ${TARGETS}
+
+# Test release build and install
+RTNAME=        ${.CURDIR:T:S,-*,,}-${VERSION}
+RTMAKE=        env GIT_DIR=.nogit ${MAKE} -C${RTNAME} MAKEOBJDIR=
+releasetest::
+	@rm -rf ${RTNAME}
+	@git clone ${.CURDIR} ${RTNAME}
+	${RTMAKE} info
+	${RTMAKE}
+	${RTMAKE} install DESTDIR=root
+	@rm -rf ${RTNAME}
 
 # Test-build with supported compilers
 #

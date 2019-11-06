@@ -208,19 +208,20 @@ Building/Installing
 The `Makefile` offers a set of targets, it is written for FreeBSD's
 [make(1)](https://www.freebsd.org/cgi/man.cgi?query=make):
 
-| Target    | Description                                  |
-|-----------|----------------------------------------------|
-| all       | Build everything                             |
-| info      | Print the build configuration                |
-| debug     | Build with `CXXFLAGS=-O0 -g -DEBUG`          |
-| paranoid  | Turn on undefined behaviour canaries         |
-| install   | Install tools and manuals                    |
-| deinstall | Deinstall tools and manuals                  |
-| clean     | Clear build directory `obj/`                 |
-| testbuild | Test build with a set of compilers           |
-| tb        | Alias for testbuild                          |
-| doc       | Build HTML documentation                     |
-| gh-pages  | Build and publish HTML and PDF documentation |
+| Target      | Description                                           |
+|-------------|-------------------------------------------------------|
+| all         | Build everything                                      |
+| info        | Print the build configuration                         |
+| debug       | Build with `CXXFLAGS=-O0 -g -DEBUG`                   |
+| paranoid    | Turn on undefined behaviour canaries                  |
+| install     | Install tools and manuals                             |
+| deinstall   | Deinstall tools and manuals                           |
+| clean       | Clear build directory `obj/`                          |
+| releasetest | Attempt a build and install from a gitless repo clone |
+| testbuild   | Test build with a set of compilers                    |
+| tb          | Alias for testbuild                                   |
+| doc         | Build HTML documentation                              |
+| gh-pages    | Build and publish HTML and PDF documentation          |
 
 Building
 --------
