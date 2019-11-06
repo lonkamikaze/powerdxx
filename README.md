@@ -246,6 +246,49 @@ The `debug` and `paranoid` flags perform the same build as the `all`
 target, but with different/additional `CXXFLAGS`. The `debug` and
 `paranoid` targets can be combined.
 
+### `make testbuild` / `make tb`
+
+The `testbuild` target builds all supported test builds, the list
+of builds can be queried from the `TESTBUILDS` make variable:
+
+```
+> make -VTESTBUILDS
+clang++90 clang++80 clang++70 g++9
+```
+
+A specific test build may be selected by appending it to the `testbuild` target:
+
+```
+> make tb/g++9
+[testbuild/g++9]: make
+g++9  -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic -c ../src/powerd++.cpp -o powerd++.o
+...
+```
+
+Instead of creating the default target any non-documentation target
+may be appended to the `testbuild` target:
+
+```
+> make tb/g++9/clean
+[testbuild/g++9]: make clean
+rm -f *.o powerd++ loadrec loadplay libloadplay.so
+```
+
+In order to run a specific target on all test builds, the build can
+be omitted from the target:
+
+```
+> make tb/clean
+[testbuild/clang++90]: make clean
+rm -f *.o powerd++ loadrec loadplay libloadplay.so
+[testbuild/clang++80]: make clean
+rm -f *.o powerd++ loadrec loadplay libloadplay.so
+[testbuild/clang++70]: make clean
+rm -f *.o powerd++ loadrec loadplay libloadplay.so
+[testbuild/g++9]: make clean
+rm -f *.o powerd++ loadrec loadplay libloadplay.so
+```
+
 Installing
 ----------
 
