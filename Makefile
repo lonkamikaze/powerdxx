@@ -113,7 +113,7 @@ ${TESTBUILDS:S,^,testbuild/,}::
 	@mkdir -p "${.TARGET}"
 	@echo [${.TARGET}]: ${MAKE} ${MAKEFLAGS:N.*}
 	@(cd "${.CURDIR}" && \
-	  ${MAKE} MAKEOBJDIR="${.CURDIR}/obj/${.TARGET}" CXX="${.TARGET:T}")
+	  ${MAKE} MAKEOBJDIR="${.OBJDIR}/${.TARGET}" CXX="${.TARGET:T}")
 	@rmdir -p "${.TARGET}" 2> /dev/null ||:
 
 # Build default target for all
@@ -125,7 +125,7 @@ ${TESTBUILDS:S,^,testbuild/,:S,$,/${target},}::
 	@mkdir -p "${.TARGET:H}"
 	@echo [${.TARGET:H}]: ${MAKE} ${.TARGET:T} ${MAKEFLAGS:N.*}
 	@(cd "${.CURDIR}" && \
-	  ${MAKE} MAKEOBJDIR="${.CURDIR}/obj/${.TARGET:H}" CXX="${.TARGET:H:T}" \
+	  ${MAKE} MAKEOBJDIR="${.OBJDIR}/${.TARGET:H}" CXX="${.TARGET:H:T}" \
 	          ${.TARGET:T})
 	@rmdir -p "${.TARGET:H}" 2> /dev/null ||:
 .endfor
