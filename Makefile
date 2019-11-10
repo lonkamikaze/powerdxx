@@ -45,25 +45,22 @@ TMP!=      cd ${.CURDIR} && ${MAKE} .depend
 .include "${.CURDIR}/.depend"
 .endif
 
-# Building
-libloadplay.o:
-	${CXX} ${CXXFLAGS} -fPIC -c ${.IMPSRC} -o ${.TARGET}
-
-# Linking
+# Building/Linking
 #
 # | Flag      | Targets           | Why                                    |
 # |-----------|-------------------|----------------------------------------|
 # | -lutil    | powerd++          | Required for pidfile_open() etc.       |
 # | -lpthread | libloadplay.so    | Uses std::thread                       |
 
-powerd++: ${.TARGET}.o clas.o
-	${CXX} ${CXXFLAGS} ${.ALLSRC} -lutil -o ${.TARGET}
+CXXFLAGS.libloadplay.o=  -fPIC
+CXXFLAGS.libloadplay.so= -lpthread -shared
+CXXFLAGS.powerd++ =      -lutil
 
-loadrec loadplay: ${.TARGET}.o clas.o
+${TARGETS:M*.so}: mk-binary ${.TARGET:.so=.o}
+${TARGETS:N*.so}: mk-binary ${.TARGET}.o clas.o
+
+mk-binary: .USE
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -o ${.TARGET}
-
-libloadplay.so: ${.TARGET:.so=.o}
-	${CXX} ${CXXFLAGS} ${.ALLSRC} -lpthread -shared -o ${.TARGET}
 
 info::
 	@echo -n '${INFO:@v@${v}="${${v}}"${.newline}@}'
@@ -78,6 +75,9 @@ CXXFLAGS+= ${PFLAGS}
 .endif
 
 debug paranoid: ${.TARGETS:Ndebug:Nparanoid:S/^$/all/W}
+
+# Final addition to CXXFLAGS, target specific flags
+CXXFLAGS+= ${CXXFLAGS.${.TARGET}}
 
 # Install
 install: ${TARGETS}
