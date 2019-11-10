@@ -10,8 +10,10 @@ DOCSDIR?=      ${PREFIX}/share/doc/powerdxx
 BINCPPS=       src/powerd++.cpp src/loadrec.cpp src/loadplay.cpp
 SOCPPS=        src/libloadplay.cpp
 SRCFILES!=     cd ${.CURDIR} && find src/ -type f
+HPPS=          ${SRCFILES:M*.hpp}
 CPPS=          ${SRCFILES:M*.cpp}
 TARGETS=       ${BINCPPS:T:.cpp=} ${SOCPPS:T:.cpp=.so}
+CLEAN=         *.o *.pch ${TARGETS}
 
 PKGVERSION=    ${.CURDIR:T:C/.*-//:M[0-9]*.[0-9]*.[0-9]*}
 GITRELEASE.sh= git tag -l --sort=-taggerdate 2>&- | head -n1 || :
@@ -79,6 +81,13 @@ debug paranoid: ${.TARGETS:Ndebug:Nparanoid:S/^$/all/W}
 # Final addition to CXXFLAGS, target specific flags
 CXXFLAGS+= ${CXXFLAGS.${.TARGET}}
 
+# Build headers to verify they are consistent
+headers: ${HPPS:T:=.pch}
+.for h in ${HPPS}
+${h:T:=.pch}: ${h}
+	${CXX} ${CXXFLAGS} -c ${.ALLSRC} -o ${.TARGET}
+.endfor
+
 # Install
 install: ${TARGETS}
 
@@ -89,7 +98,7 @@ install deinstall: pkg/${.TARGET:C,.*/,,}.sh pkg/files
 
 # Clean
 clean:
-	rm -f *.o ${TARGETS}
+	rm -f ${CLEAN}
 
 # Test release build and install
 RTNAME=        ${.CURDIR:T:S,-*,,}-${VERSION}
