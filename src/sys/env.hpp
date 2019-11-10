@@ -118,21 +118,6 @@ class Var {
 	char const * c_str() const {
 		return *this;
 	}
-
-	/**
-	 * Explicitly retrieve the value as a std::string.
-	 *
-	 * Returns an empty string if the variable does not exist.
-	 * Use c_str() to distinguish between an empty string and
-	 * an inexistant variable.
-	 *
-	 * @return
-	 *	A string containing the variable value
-	 */
-	std::string str() const {
-		auto const result = c_str();
-		return {result ? result : ""};
-	}
 };
 
 /**
