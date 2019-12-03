@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements c++ wrappers for &lt;cstdio&gt; I/O functionality.">
 <polygon fill="#bfbfbf" stroke="black" points="170.5,-56.5 170.5,-75.5 248.5,-75.5 248.5,-56.5 170.5,-56.5"/>
 <text text-anchor="middle" x="209.5" y="-63.5" font-family="Helvetica" font-size="10.00">src/sys/io.hpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="libloadplay_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="libloadplay_8cpp.html" target="_top" xlink:title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.">
 <polygon fill="white" stroke="black" points="0,-0.5 0,-19.5 97,-19.5 97,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="48.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/libloadplay.cpp</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title="Implements loadplay, a bootstrapping tool for libloadplay.">
 <polygon fill="white" stroke="black" points="115,-0.5 115,-19.5 202,-19.5 202,-0.5 115,-0.5"/>
 <text text-anchor="middle" x="158.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/loadplay.cpp</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings.">
 <polygon fill="white" stroke="black" points="220,-0.5 220,-19.5 303,-19.5 303,-0.5 220,-0.5"/>
 <text text-anchor="middle" x="261.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/loadrec.cpp</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
 <polygon fill="white" stroke="black" points="321,-0.5 321,-19.5 416,-19.5 416,-0.5 321,-0.5"/>
 <text text-anchor="middle" x="368.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/powerd++.cpp</text>
 </a>

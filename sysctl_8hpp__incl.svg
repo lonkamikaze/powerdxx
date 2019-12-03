@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements safer c++ wrappers for the sysctl() interface.">
 <polygon fill="#bfbfbf" stroke="black" points="144.5,-112.5 144.5,-131.5 241.5,-131.5 241.5,-112.5 144.5,-112.5"/>
 <text text-anchor="middle" x="193" y="-119.5" font-family="Helvetica" font-size="10.00">src/sys/sysctl.hpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="error_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="error_8hpp.html" target="_top" xlink:title="Provides system call error handling.">
 <polygon fill="white" stroke="black" points="26,-56.5 26,-75.5 80,-75.5 80,-56.5 26,-56.5"/>
 <text text-anchor="middle" x="53" y="-63.5" font-family="Helvetica" font-size="10.00">error.hpp</text>
 </a>

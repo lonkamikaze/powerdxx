@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.3+c4</span>
+   &#160;<span id="projectnumber">0.4.3+c17</span>
    </div>
   </td>
  </tr>
@@ -76,6 +76,9 @@ $(function() {
 <div class="title">libloadplay.cpp File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.  
+<a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="utility_8hpp_source.html">utility.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="constants_8hpp_source.html">constants.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="version_8hpp_source.html">version.hpp</a>&quot;</code><br />
@@ -251,7 +254,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="name
 <tr class="separator:afddc0835919e9ddb078a4e829159e625"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.</p>
+<div class="textblock"><p>Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD. </p>
 <p>This library reads instructions from io::fin (stdin) and outputs statistics about the hijacked process on io::fout (stdout).</p>
 <p>The following environment variables affect the operation of loadplay:</p>
 <table class="markdownTable">

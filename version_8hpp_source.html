@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.3+c4</span>
+   &#160;<span id="projectnumber">0.4.3+c17</span>
    </div>
   </td>
  </tr>
@@ -71,43 +71,43 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <a href="version_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160; </div>
-<div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="preprocessor">#ifndef _POWERDXX_VERSION_HPP_</span></div>
-<div class="line"><a name="l00006"></a><span class="lineno">    6</span>&#160;<span class="preprocessor">#define _POWERDXX_VERSION_HPP_</span></div>
-<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160; </div>
-<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="utility_8hpp.html">utility.hpp</a>&quot;</span>  <span class="comment">/* utility::to_value() */</span></div>
+<div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="preprocessor">#ifndef _POWERDXX_VERSION_HPP_</span></div>
+<div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#define _POWERDXX_VERSION_HPP_</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160; </div>
-<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span>      <span class="comment">/* uint64_t, uint8_t */</span></div>
+<div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="utility_8hpp.html">utility.hpp</a>&quot;</span>  <span class="comment">/* utility::to_value() */</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno"><a class="line" href="namespaceversion.html">   15</a></span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceversion.html">version</a> {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno"><a class="line" href="namespaceversion.html#a81d58a8981448cfeb9e2c3d831267e48">   20</a></span>&#160;<span class="keywordtype">char</span> <span class="keyword">const</span> * <span class="keyword">const</span> <a class="code" href="namespaceversion.html#a81d58a8981448cfeb9e2c3d831267e48">LOADREC_FEATURES</a> = <span class="stringliteral">&quot;usr.app.powerdxx.loadrec.features&quot;</span>;</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00025"></a><span class="lineno"><a class="line" href="namespaceversion.html#abff3a005db955d48069e25d74f379fc6">   25</a></span>&#160;<span class="keyword">typedef</span> uint64_t <a class="code" href="namespaceversion.html#abff3a005db955d48069e25d74f379fc6">flag_t</a>;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279">   30</a></span>&#160;<span class="keyword">enum class</span> <a class="code" href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279">LoadrecBits</a> {</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279ae8b8c25307c44b2ce50047ce2e13babd">FREQ_TRACKING</a>,  </div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;};</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="namespaceversion_1_1literals.html">   37</a></span>&#160;<span class="keyword">namespace </span>literals {</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno"><a class="line" href="namespaceversion_1_1literals.html#a05f38db81c97f4d830883fbfaf514f2c">   47</a></span>&#160;constexpr <a class="code" href="namespaceversion.html#abff3a005db955d48069e25d74f379fc6">flag_t</a> <span class="keyword">operator</span> <span class="stringliteral">&quot;&quot;</span>_FREQ_TRACKING(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> <span class="keywordtype">int</span> value) {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keywordflow">return</span> static_cast&lt;flag_t&gt;(value &gt; 0) &lt;&lt;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;           <a class="code" href="namespaceutility.html#a4187afc8e639fd11929c0ea16117f515">utility::to_value</a>(<a class="code" href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279ae8b8c25307c44b2ce50047ce2e13babd">LoadrecBits::FREQ_TRACKING</a>);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;}</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;} <span class="comment">/* namespace literals */</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;cstdint&gt;</span>      <span class="comment">/* uint64_t, uint8_t */</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
+<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="namespaceversion.html">   17</a></span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceversion.html">version</a> {</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="line" href="namespaceversion.html#a81d58a8981448cfeb9e2c3d831267e48">   22</a></span>&#160;<span class="keywordtype">char</span> <span class="keyword">const</span> * <span class="keyword">const</span> <a class="code" href="namespaceversion.html#a81d58a8981448cfeb9e2c3d831267e48">LOADREC_FEATURES</a> = <span class="stringliteral">&quot;usr.app.powerdxx.loadrec.features&quot;</span>;</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160; </div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="namespaceversion.html#abff3a005db955d48069e25d74f379fc6">   27</a></span>&#160;<span class="keyword">typedef</span> uint64_t <a class="code" href="namespaceversion.html#abff3a005db955d48069e25d74f379fc6">flag_t</a>;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279">   32</a></span>&#160;<span class="keyword">enum class</span> <a class="code" href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279">LoadrecBits</a> {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279ae8b8c25307c44b2ce50047ce2e13babd">FREQ_TRACKING</a>,  </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;};</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="namespaceversion_1_1literals.html">   39</a></span>&#160;<span class="keyword">namespace </span>literals {</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="line" href="namespaceversion_1_1literals.html#a05f38db81c97f4d830883fbfaf514f2c">   49</a></span>&#160;constexpr <a class="code" href="namespaceversion.html#abff3a005db955d48069e25d74f379fc6">flag_t</a> <span class="keyword">operator</span> <span class="stringliteral">&quot;&quot;</span>_FREQ_TRACKING(<span class="keywordtype">unsigned</span> <span class="keywordtype">long</span> <span class="keywordtype">long</span> <span class="keywordtype">int</span> value) {</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordflow">return</span> static_cast&lt;flag_t&gt;(value &gt; 0) &lt;&lt;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;           <a class="code" href="namespaceutility.html#a4187afc8e639fd11929c0ea16117f515">utility::to_value</a>(<a class="code" href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279ae8b8c25307c44b2ce50047ce2e13babd">LoadrecBits::FREQ_TRACKING</a>);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;} <span class="comment">/* namespace version */</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;} <span class="comment">/* namespace literals */</span></div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* _POWERDXX_VERSION_HPP_ */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;} <span class="comment">/* namespace version */</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* _POWERDXX_VERSION_HPP_ */</span><span class="preprocessor"></span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="anamespaceversion_html_a81d58a8981448cfeb9e2c3d831267e48"><div class="ttname"><a href="namespaceversion.html#a81d58a8981448cfeb9e2c3d831267e48">version::LOADREC_FEATURES</a></div><div class="ttdeci">const char *const LOADREC_FEATURES</div><div class="ttdoc">The pseudo MIB name for the load recording feature flags.</div><div class="ttdef"><b>Definition:</b> version.hpp:20</div></div>
-<div class="ttc" id="anamespaceversion_html"><div class="ttname"><a href="namespaceversion.html">version</a></div><div class="ttdoc">Version information constants and types.</div><div class="ttdef"><b>Definition:</b> version.hpp:15</div></div>
+<div class="ttc" id="anamespaceversion_html_a81d58a8981448cfeb9e2c3d831267e48"><div class="ttname"><a href="namespaceversion.html#a81d58a8981448cfeb9e2c3d831267e48">version::LOADREC_FEATURES</a></div><div class="ttdeci">const char *const LOADREC_FEATURES</div><div class="ttdoc">The pseudo MIB name for the load recording feature flags.</div><div class="ttdef"><b>Definition:</b> version.hpp:22</div></div>
+<div class="ttc" id="anamespaceversion_html"><div class="ttname"><a href="namespaceversion.html">version</a></div><div class="ttdoc">Version information constants and types.</div><div class="ttdef"><b>Definition:</b> version.hpp:17</div></div>
 <div class="ttc" id="anamespaceversion_html_a5d5d25ed4f6b395ca3c2d6e6f01c2279ae8b8c25307c44b2ce50047ce2e13babd"><div class="ttname"><a href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279ae8b8c25307c44b2ce50047ce2e13babd">version::LoadrecBits::FREQ_TRACKING</a></div><div class="ttdoc">Record clock frequencies per frame.</div></div>
-<div class="ttc" id="anamespaceutility_html_a4187afc8e639fd11929c0ea16117f515"><div class="ttname"><a href="namespaceutility.html#a4187afc8e639fd11929c0ea16117f515">utility::to_value</a></div><div class="ttdeci">constexpr VT to_value(ET const op)</div><div class="ttdoc">Casts an enum to its underlying value.</div><div class="ttdef"><b>Definition:</b> utility.hpp:81</div></div>
-<div class="ttc" id="anamespaceversion_html_a5d5d25ed4f6b395ca3c2d6e6f01c2279"><div class="ttname"><a href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279">version::LoadrecBits</a></div><div class="ttdeci">LoadrecBits</div><div class="ttdoc">Feature flags for load recordings.</div><div class="ttdef"><b>Definition:</b> version.hpp:30</div></div>
-<div class="ttc" id="autility_8hpp_html"><div class="ttname"><a href="utility_8hpp.html">utility.hpp</a></div></div>
-<div class="ttc" id="anamespaceversion_html_abff3a005db955d48069e25d74f379fc6"><div class="ttname"><a href="namespaceversion.html#abff3a005db955d48069e25d74f379fc6">version::flag_t</a></div><div class="ttdeci">uint64_t flag_t</div><div class="ttdoc">The data type to use for feature flags.</div><div class="ttdef"><b>Definition:</b> version.hpp:25</div></div>
+<div class="ttc" id="anamespaceutility_html_a4187afc8e639fd11929c0ea16117f515"><div class="ttname"><a href="namespaceutility.html#a4187afc8e639fd11929c0ea16117f515">utility::to_value</a></div><div class="ttdeci">constexpr VT to_value(ET const op)</div><div class="ttdoc">Casts an enum to its underlying value.</div><div class="ttdef"><b>Definition:</b> utility.hpp:83</div></div>
+<div class="ttc" id="anamespaceversion_html_a5d5d25ed4f6b395ca3c2d6e6f01c2279"><div class="ttname"><a href="namespaceversion.html#a5d5d25ed4f6b395ca3c2d6e6f01c2279">version::LoadrecBits</a></div><div class="ttdeci">LoadrecBits</div><div class="ttdoc">Feature flags for load recordings.</div><div class="ttdef"><b>Definition:</b> version.hpp:32</div></div>
+<div class="ttc" id="autility_8hpp_html"><div class="ttname"><a href="utility_8hpp.html">utility.hpp</a></div><div class="ttdoc">Implements generally useful functions.</div></div>
+<div class="ttc" id="anamespaceversion_html_abff3a005db955d48069e25d74f379fc6"><div class="ttname"><a href="namespaceversion.html#abff3a005db955d48069e25d74f379fc6">version::flag_t</a></div><div class="ttdeci">uint64_t flag_t</div><div class="ttdoc">The data type to use for feature flags.</div><div class="ttdef"><b>Definition:</b> version.hpp:27</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

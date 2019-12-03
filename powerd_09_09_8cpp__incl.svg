@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
 <polygon fill="#bfbfbf" stroke="black" points="716.05,-224.5 716.05,-243.5 811.05,-243.5 811.05,-224.5 716.05,-224.5"/>
 <text text-anchor="middle" x="763.55" y="-231.5" font-family="Helvetica" font-size="10.00">src/powerd++.cpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="Options_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="Options_8hpp.html" target="_top" xlink:title="Provides the nih::Options functor template, a substitute for getopt(3).">
 <polygon fill="white" stroke="black" points="490.05,-168.5 490.05,-187.5 559.05,-187.5 559.05,-168.5 490.05,-168.5"/>
 <text text-anchor="middle" x="524.55" y="-175.5" font-family="Helvetica" font-size="10.00">Options.hpp</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="utility_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="utility_8hpp.html" target="_top" xlink:title="Implements generally useful functions.">
 <polygon fill="white" stroke="black" points="351.55,-56.5 351.55,-75.5 409.55,-75.5 409.55,-56.5 351.55,-56.5"/>
 <text text-anchor="middle" x="380.55" y="-63.5" font-family="Helvetica" font-size="10.00">utility.hpp</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="Cycle_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="Cycle_8hpp.html" target="_top" xlink:title="Implements timing::Cycle, a cyclic sleep functor.">
 <polygon fill="white" stroke="black" points="7.55,-168.5 7.55,-187.5 67.55,-187.5 67.55,-168.5 7.55,-168.5"/>
 <text text-anchor="middle" x="37.55" y="-175.5" font-family="Helvetica" font-size="10.00">Cycle.hpp</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="types_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="types_8hpp.html" target="_top" xlink:title="A collection of type aliases.">
 <polygon fill="white" stroke="black" points="81.05,-112.5 81.05,-131.5 140.05,-131.5 140.05,-112.5 81.05,-112.5"/>
 <text text-anchor="middle" x="110.55" y="-119.5" font-family="Helvetica" font-size="10.00">types.hpp</text>
 </a>
@@ -81,7 +81,7 @@
 <!-- Node13 -->
 <g id="node13" class="node">
 <title>Node13</title>
-<g id="a_node13"><a xlink:href="constants_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node13"><a xlink:href="constants_8hpp.html" target="_top" xlink:title="Defines a collection of constants.">
 <polygon fill="white" stroke="black" points="94.55,-168.5 94.55,-187.5 172.55,-187.5 172.55,-168.5 94.55,-168.5"/>
 <text text-anchor="middle" x="133.55" y="-175.5" font-family="Helvetica" font-size="10.00">constants.hpp</text>
 </a>
@@ -96,7 +96,7 @@
 <!-- Node14 -->
 <g id="node14" class="node">
 <title>Node14</title>
-<g id="a_node14"><a xlink:href="errors_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node14"><a xlink:href="errors_8hpp.html" target="_top" xlink:title="Common error handling code.">
 <polygon fill="white" stroke="black" points="292.55,-112.5 292.55,-131.5 352.55,-131.5 352.55,-112.5 292.55,-112.5"/>
 <text text-anchor="middle" x="322.55" y="-119.5" font-family="Helvetica" font-size="10.00">errors.hpp</text>
 </a>
@@ -111,7 +111,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="clas_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="clas_8hpp.html" target="_top" xlink:title="Provides functions to process command line arguments.">
 <polygon fill="white" stroke="black" points="235.05,-168.5 235.05,-187.5 288.05,-187.5 288.05,-168.5 235.05,-168.5"/>
 <text text-anchor="middle" x="261.55" y="-175.5" font-family="Helvetica" font-size="10.00">clas.hpp</text>
 </a>
@@ -126,7 +126,7 @@
 <!-- Node17 -->
 <g id="node17" class="node">
 <title>Node17</title>
-<g id="a_node17"><a xlink:href="sysctl_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node17"><a xlink:href="sysctl_8hpp.html" target="_top" xlink:title="Implements safer c++ wrappers for the sysctl() interface.">
 <polygon fill="white" stroke="black" points="674.55,-168.5 674.55,-187.5 754.55,-187.5 754.55,-168.5 674.55,-168.5"/>
 <text text-anchor="middle" x="714.55" y="-175.5" font-family="Helvetica" font-size="10.00">sys/sysctl.hpp</text>
 </a>
@@ -156,7 +156,7 @@
 <!-- Node24 -->
 <g id="node24" class="node">
 <title>Node24</title>
-<g id="a_node24"><a xlink:href="pidfile_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node24"><a xlink:href="pidfile_8hpp.html" target="_top" xlink:title="Implements safer c++ wrappers for the pidfile_*() interface.">
 <polygon fill="white" stroke="black" points="772.55,-168.5 772.55,-187.5 852.55,-187.5 852.55,-168.5 772.55,-168.5"/>
 <text text-anchor="middle" x="812.55" y="-175.5" font-family="Helvetica" font-size="10.00">sys/pidfile.hpp</text>
 </a>
@@ -171,7 +171,7 @@
 <!-- Node26 -->
 <g id="node26" class="node">
 <title>Node26</title>
-<g id="a_node26"><a xlink:href="signal_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node26"><a xlink:href="signal_8hpp.html" target="_top" xlink:title="Implements a c++ wrapper for the signal(3) call.">
 <polygon fill="white" stroke="black" points="870.55,-168.5 870.55,-187.5 950.55,-187.5 950.55,-168.5 870.55,-168.5"/>
 <text text-anchor="middle" x="910.55" y="-175.5" font-family="Helvetica" font-size="10.00">sys/signal.hpp</text>
 </a>
@@ -186,7 +186,7 @@
 <!-- Node28 -->
 <g id="node28" class="node">
 <title>Node28</title>
-<g id="a_node28"><a xlink:href="io_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node28"><a xlink:href="io_8hpp.html" target="_top" xlink:title="Implements c++ wrappers for &lt;cstdio&gt; I/O functionality.">
 <polygon fill="white" stroke="black" points="1017.55,-56.5 1017.55,-75.5 1079.55,-75.5 1079.55,-56.5 1017.55,-56.5"/>
 <text text-anchor="middle" x="1048.55" y="-63.5" font-family="Helvetica" font-size="10.00">sys/io.hpp</text>
 </a>
@@ -471,7 +471,7 @@
 <!-- Node18 -->
 <g id="node18" class="node">
 <title>Node18</title>
-<g id="a_node18"><a xlink:href="error_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node18"><a xlink:href="error_8hpp.html" target="_top" xlink:title="Provides system call error handling.">
 <polygon fill="white" stroke="black" points="864.55,-112.5 864.55,-131.5 918.55,-131.5 918.55,-112.5 864.55,-112.5"/>
 <text text-anchor="middle" x="891.55" y="-119.5" font-family="Helvetica" font-size="10.00">error.hpp</text>
 </a>

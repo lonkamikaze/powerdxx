@@ -1,4 +1,4 @@
 <map id="src/sys/signal.hpp" name="src/sys/signal.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,133,32"/>
-<area shape="rect" id="node2" href="$powerd_09_09_8cpp.html" title=" " alt="" coords="6,80,133,107"/>
+<area shape="rect" id="node1" title="Implements a c++ wrapper for the signal(3) call." alt="" coords="5,5,133,32"/>
+<area shape="rect" id="node2" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="6,80,133,107"/>
 </map>

@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Provides functions to process command line arguments.">
 <polygon fill="#bfbfbf" stroke="black" points="130.5,-168.5 130.5,-187.5 200.5,-187.5 200.5,-168.5 130.5,-168.5"/>
 <text text-anchor="middle" x="165.5" y="-175.5" font-family="Helvetica" font-size="10.00">src/clas.hpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="types_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="types_8hpp.html" target="_top" xlink:title="A collection of type aliases.">
 <polygon fill="white" stroke="black" points="0,-112.5 0,-131.5 59,-131.5 59,-112.5 0,-112.5"/>
 <text text-anchor="middle" x="29.5" y="-119.5" font-family="Helvetica" font-size="10.00">types.hpp</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="errors_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="errors_8hpp.html" target="_top" xlink:title="Common error handling code.">
 <polygon fill="white" stroke="black" points="77.5,-112.5 77.5,-131.5 137.5,-131.5 137.5,-112.5 77.5,-112.5"/>
 <text text-anchor="middle" x="107.5" y="-119.5" font-family="Helvetica" font-size="10.00">errors.hpp</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="utility_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node5"><a xlink:href="utility_8hpp.html" target="_top" xlink:title="Implements generally useful functions.">
 <polygon fill="white" stroke="black" points="114.5,-56.5 114.5,-75.5 172.5,-75.5 172.5,-56.5 114.5,-56.5"/>
 <text text-anchor="middle" x="143.5" y="-63.5" font-family="Helvetica" font-size="10.00">utility.hpp</text>
 </a>

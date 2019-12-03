@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements zero&#45;cost abstractions for the getenv(3) facilities.">
 <polygon fill="#bfbfbf" stroke="black" points="60.5,-56.5 60.5,-75.5 146.5,-75.5 146.5,-56.5 60.5,-56.5"/>
 <text text-anchor="middle" x="103.5" y="-63.5" font-family="Helvetica" font-size="10.00">src/sys/env.hpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="libloadplay_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="libloadplay_8cpp.html" target="_top" xlink:title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.">
 <polygon fill="white" stroke="black" points="0,-0.5 0,-19.5 97,-19.5 97,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="48.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/libloadplay.cpp</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title="Implements loadplay, a bootstrapping tool for libloadplay.">
 <polygon fill="white" stroke="black" points="115,-0.5 115,-19.5 202,-19.5 202,-0.5 115,-0.5"/>
 <text text-anchor="middle" x="158.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/loadplay.cpp</text>
 </a>

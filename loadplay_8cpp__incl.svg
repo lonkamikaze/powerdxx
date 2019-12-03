@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements loadplay, a bootstrapping tool for libloadplay.">
 <polygon fill="#bfbfbf" stroke="black" points="171.17,-168.5 171.17,-187.5 258.17,-187.5 258.17,-168.5 171.17,-168.5"/>
 <text text-anchor="middle" x="214.67" y="-175.5" font-family="Helvetica" font-size="10.00">src/loadplay.cpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="Options_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="Options_8hpp.html" target="_top" xlink:title="Provides the nih::Options functor template, a substitute for getopt(3).">
 <polygon fill="white" stroke="black" points="20.17,-112.5 20.17,-131.5 89.17,-131.5 89.17,-112.5 20.17,-112.5"/>
 <text text-anchor="middle" x="54.67" y="-119.5" font-family="Helvetica" font-size="10.00">Options.hpp</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="utility_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="utility_8hpp.html" target="_top" xlink:title="Implements generally useful functions.">
 <polygon fill="white" stroke="black" points="146.67,-56.5 146.67,-75.5 204.67,-75.5 204.67,-56.5 146.67,-56.5"/>
 <text text-anchor="middle" x="175.67" y="-63.5" font-family="Helvetica" font-size="10.00">utility.hpp</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="errors_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="errors_8hpp.html" target="_top" xlink:title="Common error handling code.">
 <polygon fill="white" stroke="black" points="145.67,-112.5 145.67,-131.5 205.67,-131.5 205.67,-112.5 145.67,-112.5"/>
 <text text-anchor="middle" x="175.67" y="-119.5" font-family="Helvetica" font-size="10.00">errors.hpp</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node10 -->
 <g id="node10" class="node">
 <title>Node10</title>
-<g id="a_node10"><a xlink:href="env_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node10"><a xlink:href="env_8hpp.html" target="_top" xlink:title="Implements zero&#45;cost abstractions for the getenv(3) facilities.">
 <polygon fill="white" stroke="black" points="304.17,-112.5 304.17,-131.5 373.17,-131.5 373.17,-112.5 304.17,-112.5"/>
 <text text-anchor="middle" x="338.67" y="-119.5" font-family="Helvetica" font-size="10.00">sys/env.hpp</text>
 </a>
@@ -81,7 +81,7 @@
 <!-- Node15 -->
 <g id="node15" class="node">
 <title>Node15</title>
-<g id="a_node15"><a xlink:href="io_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node15"><a xlink:href="io_8hpp.html" target="_top" xlink:title="Implements c++ wrappers for &lt;cstdio&gt; I/O functionality.">
 <polygon fill="white" stroke="black" points="223.67,-112.5 223.67,-131.5 285.67,-131.5 285.67,-112.5 223.67,-112.5"/>
 <text text-anchor="middle" x="254.67" y="-119.5" font-family="Helvetica" font-size="10.00">sys/io.hpp</text>
 </a>
@@ -204,7 +204,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="error_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="error_8hpp.html" target="_top" xlink:title="Provides system call error handling.">
 <polygon fill="white" stroke="black" points="345.67,-56.5 345.67,-75.5 399.67,-75.5 399.67,-56.5 345.67,-56.5"/>
 <text text-anchor="middle" x="372.67" y="-63.5" font-family="Helvetica" font-size="10.00">error.hpp</text>
 </a>

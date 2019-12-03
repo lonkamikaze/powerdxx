@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.">
 <polygon fill="#bfbfbf" stroke="black" points="782.66,-168.5 782.66,-187.5 879.66,-187.5 879.66,-168.5 782.66,-168.5"/>
 <text text-anchor="middle" x="831.16" y="-175.5" font-family="Helvetica" font-size="10.00">src/libloadplay.cpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="utility_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="utility_8hpp.html" target="_top" xlink:title="Implements generally useful functions.">
 <polygon fill="white" stroke="black" points="157.16,-56.5 157.16,-75.5 215.16,-75.5 215.16,-56.5 157.16,-56.5"/>
 <text text-anchor="middle" x="186.16" y="-63.5" font-family="Helvetica" font-size="10.00">utility.hpp</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="constants_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node6"><a xlink:href="constants_8hpp.html" target="_top" xlink:title="Defines a collection of constants.">
 <polygon fill="white" stroke="black" points="23.16,-112.5 23.16,-131.5 101.16,-131.5 101.16,-112.5 23.16,-112.5"/>
 <text text-anchor="middle" x="62.16" y="-119.5" font-family="Helvetica" font-size="10.00">constants.hpp</text>
 </a>
@@ -81,7 +81,7 @@
 <!-- Node9 -->
 <g id="node9" class="node">
 <title>Node9</title>
-<g id="a_node9"><a xlink:href="version_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node9"><a xlink:href="version_8hpp.html" target="_top" xlink:title="Defines types and constants used for version management.">
 <polygon fill="white" stroke="black" points="222.66,-112.5 222.66,-131.5 289.66,-131.5 289.66,-112.5 222.66,-112.5"/>
 <text text-anchor="middle" x="256.16" y="-119.5" font-family="Helvetica" font-size="10.00">version.hpp</text>
 </a>
@@ -96,7 +96,7 @@
 <!-- Node11 -->
 <g id="node11" class="node">
 <title>Node11</title>
-<g id="a_node11"><a xlink:href="env_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node11"><a xlink:href="env_8hpp.html" target="_top" xlink:title="Implements zero&#45;cost abstractions for the getenv(3) facilities.">
 <polygon fill="white" stroke="black" points="362.66,-112.5 362.66,-131.5 431.66,-131.5 431.66,-112.5 362.66,-112.5"/>
 <text text-anchor="middle" x="397.16" y="-119.5" font-family="Helvetica" font-size="10.00">sys/env.hpp</text>
 </a>
@@ -126,7 +126,7 @@
 <!-- Node16 -->
 <g id="node16" class="node">
 <title>Node16</title>
-<g id="a_node16"><a xlink:href="io_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node16"><a xlink:href="io_8hpp.html" target="_top" xlink:title="Implements c++ wrappers for &lt;cstdio&gt; I/O functionality.">
 <polygon fill="white" stroke="black" points="297.16,-56.5 297.16,-75.5 359.16,-75.5 359.16,-56.5 297.16,-56.5"/>
 <text text-anchor="middle" x="328.16" y="-63.5" font-family="Helvetica" font-size="10.00">sys/io.hpp</text>
 </a>
@@ -447,7 +447,7 @@
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:href="types_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node7"><a xlink:href="types_8hpp.html" target="_top" xlink:title="A collection of type aliases.">
 <polygon fill="white" stroke="black" points="28.66,-56.5 28.66,-75.5 87.66,-75.5 87.66,-56.5 28.66,-56.5"/>
 <text text-anchor="middle" x="58.16" y="-63.5" font-family="Helvetica" font-size="10.00">types.hpp</text>
 </a>
@@ -489,7 +489,7 @@
 <!-- Node12 -->
 <g id="node12" class="node">
 <title>Node12</title>
-<g id="a_node12"><a xlink:href="error_8hpp.html" target="_top" xlink:title=" ">
+<g id="a_node12"><a xlink:href="error_8hpp.html" target="_top" xlink:title="Provides system call error handling.">
 <polygon fill="white" stroke="black" points="441.16,-56.5 441.16,-75.5 495.16,-75.5 495.16,-56.5 441.16,-56.5"/>
 <text text-anchor="middle" x="468.16" y="-63.5" font-family="Helvetica" font-size="10.00">error.hpp</text>
 </a>

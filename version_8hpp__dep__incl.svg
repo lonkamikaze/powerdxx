@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Defines types and constants used for version management.">
 <polygon fill="#bfbfbf" stroke="black" points="61,-56.5 61,-75.5 144,-75.5 144,-56.5 61,-56.5"/>
 <text text-anchor="middle" x="102.5" y="-63.5" font-family="Helvetica" font-size="10.00">src/version.hpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="libloadplay_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="libloadplay_8cpp.html" target="_top" xlink:title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD.">
 <polygon fill="white" stroke="black" points="0,-0.5 0,-19.5 97,-19.5 97,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="48.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/libloadplay.cpp</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings.">
 <polygon fill="white" stroke="black" points="115,-0.5 115,-19.5 198,-19.5 198,-0.5 115,-0.5"/>
 <text text-anchor="middle" x="156.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/loadrec.cpp</text>
 </a>

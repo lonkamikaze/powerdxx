@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Provides the nih::Options functor template, a substitute for getopt(3).">
 <polygon fill="#bfbfbf" stroke="black" points="103.5,-56.5 103.5,-75.5 189.5,-75.5 189.5,-56.5 103.5,-56.5"/>
 <text text-anchor="middle" x="146.5" y="-63.5" font-family="Helvetica" font-size="10.00">src/Options.hpp</text>
 </a>
@@ -21,7 +21,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="loadplay_8cpp.html" target="_top" xlink:title="Implements loadplay, a bootstrapping tool for libloadplay.">
 <polygon fill="white" stroke="black" points="0,-0.5 0,-19.5 87,-19.5 87,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="43.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/loadplay.cpp</text>
 </a>
@@ -36,7 +36,7 @@
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
-<g id="a_node3"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node3"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings.">
 <polygon fill="white" stroke="black" points="105,-0.5 105,-19.5 188,-19.5 188,-0.5 105,-0.5"/>
 <text text-anchor="middle" x="146.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/loadrec.cpp</text>
 </a>
@@ -51,7 +51,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title=" ">
+<g id="a_node4"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
 <polygon fill="white" stroke="black" points="206,-0.5 206,-19.5 301,-19.5 301,-0.5 206,-0.5"/>
 <text text-anchor="middle" x="253.5" y="-7.5" font-family="Helvetica" font-size="10.00">src/powerd++.cpp</text>
 </a>

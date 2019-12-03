@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">powerd++
-   &#160;<span id="projectnumber">0.4.3+c4</span>
+   &#160;<span id="projectnumber">0.4.3+c17</span>
    </div>
   </td>
  </tr>
@@ -167,6 +167,22 @@ Tuning</h2>
 <h2><a class="anchor" id="md_README_reporting-issues-requesting-features"></a>
 Reporting Issues / Requesting Features</h2>
 <p>Please report issues and feature requests on <a href="https://github.com/lonkamikaze/powerdxx/issues">GitHub</a> or to <a href="#" onclick="location.href='mai'+'lto:'+'kam'+'ik'+'aze'+'@b'+'sdf'+'or'+'en.'+'de'; return false;">kamik<span style="display: none;">.nosp@m.</span>aze@<span style="display: none;">.nosp@m.</span>bsdfo<span style="display: none;">.nosp@m.</span>ren.<span style="display: none;">.nosp@m.</span>de</a>.</p>
+<h3>Build Issues</h3>
+<p>In case of a build issue, please report the build output as well as the output of <code>make info</code>:</p>
+<div class="fragment"><div class="line">&gt; make info</div>
+<div class="line">VERSION=&quot;0.4.3+c8&quot;</div>
+<div class="line">GITVERSION=&quot;0.4.3+c8&quot;</div>
+<div class="line">GITHASH=&quot;8431d86abe7479a4c0a040c19551ff3fa2454ea1&quot;</div>
+<div class="line">PKGVERSION=&quot;&quot;</div>
+<div class="line">TARGETS=&quot;powerd++ loadrec loadplay libloadplay.so&quot;</div>
+<div class="line">CXX=&quot;ccache c++&quot;</div>
+<div class="line">CXXFLAGS=&quot;-O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic&quot;</div>
+<div class="line">CXXVERSION=&quot;FreeBSD clang version 8.0.1 (tags/RELEASE_801/final 366581) (based on LLVM 8.0.1) Target</div>
+<div class="line">: x86_64-unknown-freebsd12.1 Thread model: posix InstalledDir: /usr/bin&quot;</div>
+<div class="line">UNAME_A=&quot;FreeBSD AprilRyan.norad 12.1-STABLE FreeBSD 12.1-STABLE #1 ea071b9cb32(stable/12)-dirty: Mo</div>
+<div class="line">n Oct 28 23:37:31 CET 2019     root@AprilRyan.norad:/usr/obj/S403/amd64/usr/src/amd64.amd64/sys/S403</div>
+<div class="line">  amd64&quot;</div>
+</div><!-- fragment --><h3>Performance Issues</h3>
 <p>If powerd++ behaves in some unexpected or undesired manner, please mention all the command line flags (e.g. from <code>/etc/rc.conf</code> <code>powerdxx_flags</code>) and provide a load recording:</p>
 <div class="fragment"><div class="line">&gt; loadrec -o myissue.load</div>
 </div><!-- fragment --><p>The default recording duration is 30 s. Do not omit the <code>-o</code> parameter, printing the output on the terminal may create significant load and impact the recorded load significantly.</p>
@@ -187,15 +203,23 @@ Building/Installing</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">all  </td><td class="markdownTableBodyNone">Build everything   </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">info  </td><td class="markdownTableBodyNone">Print the build configuration   </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">debug  </td><td class="markdownTableBodyNone">Build with <code>CXXFLAGS=-O0 -g -DEBUG</code>   </td></tr>
-<tr class="markdownTableRowOdd">
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">paranoid  </td><td class="markdownTableBodyNone">Turn on undefined behaviour canaries   </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone">install  </td><td class="markdownTableBodyNone">Install tools and manuals   </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">deinstall  </td><td class="markdownTableBodyNone">Deinstall tools and manuals   </td></tr>
+<td class="markdownTableBodyNone">install  </td><td class="markdownTableBodyNone">Install tools and manuals   </td></tr>
 <tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">deinstall  </td><td class="markdownTableBodyNone">Deinstall tools and manuals   </td></tr>
+<tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">clean  </td><td class="markdownTableBodyNone">Clear build directory <code>obj/</code>   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">releasetest  </td><td class="markdownTableBodyNone">Attempt a build and install from a gitless repo clone   </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">testbuild  </td><td class="markdownTableBodyNone">Test build with a set of compilers   </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">tb  </td><td class="markdownTableBodyNone">Alias for testbuild   </td></tr>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">doc  </td><td class="markdownTableBodyNone">Build HTML documentation   </td></tr>
 <tr class="markdownTableRowEven">
@@ -216,7 +240,30 @@ Building</h2>
 <div class="line">c++ -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic libloadplay.o -lpthread -shared -o libloadplay.so</div>
 <div class="line">&gt;</div>
 </div><!-- fragment --><p>The <code>debug</code> and <code>paranoid</code> flags perform the same build as the <code>all</code> target, but with different/additional <code>CXXFLAGS</code>. The <code>debug</code> and <code>paranoid</code> targets can be combined.</p>
-<h2><a class="anchor" id="md_README_installing"></a>
+<h3><code>make testbuild</code> / <code>make tb</code></h3>
+<p>The <code>testbuild</code> target builds all supported test builds, the list of builds can be queried from the <code>TESTBUILDS</code> make variable:</p>
+<div class="fragment"><div class="line">&gt; make -VTESTBUILDS</div>
+<div class="line">clang++90 clang++80 clang++70 g++9</div>
+</div><!-- fragment --><p>A specific test build may be selected by appending it to the <code>testbuild</code> target:</p>
+<div class="fragment"><div class="line">&gt; make tb/g++9</div>
+<div class="line">[testbuild/g++9]: make</div>
+<div class="line">g++9  -O2 -pipe -march=haswell  -std=c++17 -Wall -Werror -pedantic -c ../src/powerd++.cpp -o powerd++.o</div>
+<div class="line">...</div>
+</div><!-- fragment --><p>Instead of creating the default target any non-documentation target may be appended to the <code>testbuild</code> target:</p>
+<div class="fragment"><div class="line">&gt; make tb/g++9/clean</div>
+<div class="line">[testbuild/g++9]: make clean</div>
+<div class="line">rm -f *.o powerd++ loadrec loadplay libloadplay.so</div>
+</div><!-- fragment --><p>In order to run a specific target on all test builds, the build can be omitted from the target:</p>
+<div class="fragment"><div class="line">&gt; make tb/clean</div>
+<div class="line">[testbuild/clang++90]: make clean</div>
+<div class="line">rm -f *.o powerd++ loadrec loadplay libloadplay.so</div>
+<div class="line">[testbuild/clang++80]: make clean</div>
+<div class="line">rm -f *.o powerd++ loadrec loadplay libloadplay.so</div>
+<div class="line">[testbuild/clang++70]: make clean</div>
+<div class="line">rm -f *.o powerd++ loadrec loadplay libloadplay.so</div>
+<div class="line">[testbuild/g++9]: make clean</div>
+<div class="line">rm -f *.o powerd++ loadrec loadplay libloadplay.so</div>
+</div><!-- fragment --><h2><a class="anchor" id="md_README_installing"></a>
 Installing</h2>
 <p>The installer installs the tools and manual pages according to a recipe in <code>pkg/files</code>. The following variables can be passed to <code>make install</code> or <code>make deinstall</code> to affect the install destination:</p>
 <table class="markdownTable">

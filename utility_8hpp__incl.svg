@@ -12,7 +12,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title=" ">
+<g id="a_node1"><a xlink:title="Implements generally useful functions.">
 <polygon fill="#bfbfbf" stroke="black" points="64,-56.5 64,-75.5 138,-75.5 138,-56.5 64,-56.5"/>
 <text text-anchor="middle" x="101" y="-63.5" font-family="Helvetica" font-size="10.00">src/utility.hpp</text>
 </a>
