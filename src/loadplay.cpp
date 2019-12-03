@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements loadplay, a bootstrapping tool for libloadplay.
+ *
+ * @file
  */
 
 #include "Options.hpp"

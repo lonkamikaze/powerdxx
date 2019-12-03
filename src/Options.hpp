@@ -1,4 +1,4 @@
-/** \file
+/**
  * Provides the nih::Options functor template, a substitute for `getopt(3)`.
  *
  * The `getopt(3)` interface takes the command line arguments as `char * const`
@@ -120,6 +120,8 @@
  * `-vi`, `-ifile` or `-vifile`. This is useful for the `OPT_UNKNOWN`
  * and `OPT_NOOPT` cases. The `getopt[1]` call on the other hand would
  * return `file` regardless of argument chaining.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_NIH_OPTIONS_HPP_

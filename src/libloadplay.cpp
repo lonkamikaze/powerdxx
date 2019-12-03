@@ -1,4 +1,4 @@
-/** \file
+/**
  * Implements a library intended to be injected into a clock frequency
  * deamon via LD_PRELOAD.
  *
@@ -11,6 +11,8 @@
  * |--------------|-------------------------|
  * | LOADPLAY_IN  | Alternative input file  |
  * | LOADPLAY_OUT | Alternative output file |
+ *
+ * @file
  */
 
 #include "utility.hpp"

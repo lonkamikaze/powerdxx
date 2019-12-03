@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements a c++ wrapper for the signal(3) call.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_SYS_SIGNAL_HPP_

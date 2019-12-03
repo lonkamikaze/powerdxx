@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements safer c++ wrappers for the sysctl() interface.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_SYS_SYSCTL_HPP_

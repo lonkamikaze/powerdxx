@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements zero-cost abstractions for the getenv(3) facilities.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_SYS_ENV_HPP_

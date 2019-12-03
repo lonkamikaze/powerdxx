@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements functions to process command line arguments.
+ *
+ * @file
  */
 
 #include "clas.hpp"

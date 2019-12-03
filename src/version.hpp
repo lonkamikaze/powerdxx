@@ -1,5 +1,7 @@
-/** \file
+/**
  * Defines types and constants used for version management.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_VERSION_HPP_

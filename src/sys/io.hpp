@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements c++ wrappers for \<cstdio> I/O functionality.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_SYS_IO_HPP_

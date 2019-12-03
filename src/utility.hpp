@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements generally useful functions.
+ *
+ * @file
  */
 
 #include <type_traits> /* std::underlying_type */

@@ -1,7 +1,9 @@
-/** \file
+/**
  * Implements safer c++ wrappers for the pidfile_*() interface.
  *
  * Requires linking with -lutil.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_SYS_PIDFILE_HPP_

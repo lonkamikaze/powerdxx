@@ -1,5 +1,7 @@
-/** \file
+/**
  * A collection of type aliases.
+ *
+ * @file
  */
 
 #include <chrono>    /* std::chrono::milliseconds */

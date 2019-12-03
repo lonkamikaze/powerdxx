@@ -1,6 +1,8 @@
-/** \file
+/**
  * Implements a load recorder, useful for simulating loads to test
  * CPU clock daemons and settings.
+ *
+ * @file
  */
 
 #include "Options.hpp"

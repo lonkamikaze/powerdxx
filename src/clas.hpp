@@ -1,5 +1,7 @@
-/** \file
+/**
  * Provides functions to process command line arguments.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_CLAS_HPP_

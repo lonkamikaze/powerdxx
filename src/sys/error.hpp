@@ -1,5 +1,7 @@
-/** \file
+/**
  * Provides system call error handling.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_SYS_ERROR_HPP_

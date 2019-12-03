@@ -1,5 +1,7 @@
-/** \file
+/**
  * Common error handling code.
+ *
+ * @file
  */
 
 #include "utility.hpp"

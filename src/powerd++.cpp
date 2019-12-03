@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements powerd++ a drop in replacement for FreeBSD's powerd.
+ *
+ * @file
  */
 
 #include "Options.hpp"

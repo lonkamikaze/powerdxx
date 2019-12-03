@@ -1,5 +1,7 @@
-/** \file
+/**
  * Implements timing::Cycle, a cyclic sleep functor.
+ *
+ * @file
  */
 
 #ifndef _POWERDXX_TIMING_CYCLE_HPP_

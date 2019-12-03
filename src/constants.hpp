@@ -1,5 +1,7 @@
-/** \file
+/**
  * Defines a collection of constants.
+ *
+ * @file
  */
 
 #include "types.hpp"
