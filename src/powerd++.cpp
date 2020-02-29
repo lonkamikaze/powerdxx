@@ -280,6 +280,11 @@ struct Global {
 	bool foreground{false};
 
 	/**
+	 * The list of states considered idle.
+	 */
+	bool idleStates[CPUSTATES]{};
+
+	/**
 	 * Temperature throttling mode.
 	 */
 	bool temp_throttling{false};
@@ -329,6 +334,16 @@ struct Global {
 	 * that has a dev.cpu.%d.freq handle.
 	 */
 	std::unique_ptr<CoreGroup[]> groups{nullptr};
+
+	/**
+	 * Perform initialisations that cannot fail/throw.
+	 */
+	Global() {
+		/* idleStates */
+		for (size_t i = 0; i < CPUSTATES; ++i) {
+			this->idleStates[i] = (i == CP_IDLE);
+		}
+	}
 } g; /**< The gobal state. */
 
 static_assert(countof(g.acstates) == to_value(AcLineState::LENGTH),
@@ -606,16 +621,15 @@ void update_loads() {
 
 		/* update load */
 		if (Load) {
-			/* sum of collected ticks */
+			/* collect ticks */
 			cptime_t all_new = 0;
+			cptime_t idle_new = 0;
 			for (size_t i = 0; i < CPUSTATES; ++i) {
 				all_new += core.cp_time[i];
+				idle_new += g.idleStates[i] * core.cp_time[i];
 			}
 			cptime_t const all = all_new - core.all;
 			core.all = all_new;
-
-			/* collected idle ticks */
-			cptime_t idle_new = core.cp_time[CP_IDLE];
 			cptime_t const idle = idle_new - core.idle;
 			core.idle = idle_new;
 
@@ -904,6 +918,7 @@ enum class OE {
 	FILE_PID,        /**< Set pidfile */
 	FLAG_VERBOSE,    /**< Activate verbose output on stderr */
 	FLAG_FOREGROUND, /**< Stay in foreground, log events to stdout */
+	FLAG_NICE,       /**< Treat nice time as idle */
 	CNT_SAMPLES,     /**< Set number of load samples */
 	IGNORE,          /**< Legacy settings */
 	OPT_UNKNOWN,     /**< Obligatory */
@@ -916,7 +931,7 @@ enum class OE {
 /**
  * The short usage string.
  */
-char const * const USAGE = "[-hvf] [-abn mode] [-mM freq] [-FAB freq:freq] [-H temp:temp] [-p ival] [-s cnt] [-P file]";
+char const * const USAGE = "[-hvfN] [-abn mode] [-mM freq] [-FAB freq:freq] [-H temp:temp] [-p ival] [-s cnt] [-P file]";
 
 /**
  * Definitions of command line parameters.
@@ -925,6 +940,7 @@ Parameter<OE> const PARAMETERS[]{
 	{OE::USAGE,           'h', "help",            "",          "Show usage and exit"},
 	{OE::FLAG_VERBOSE,    'v', "verbose",         "",          "Be verbose"},
 	{OE::FLAG_FOREGROUND, 'f', "foreground",      "",          "Stay in foreground"},
+	{OE::FLAG_NICE,       'N', "idle-nice",       "",          "Treat nice time as idle"},
 	{OE::MODE_AC,         'a', "ac",              "mode",      "Mode while on AC power"},
 	{OE::MODE_BATT,       'b', "batt",            "mode",      "Mode while on battery power"},
 	{OE::MODE_UNKNOWN,    'n', "unknown",         "mode",      "Mode while power source is unknown"},
@@ -968,6 +984,9 @@ void read_args(int const argc, char const * const argv[]) {
 			break;
 		case OE::FLAG_FOREGROUND:
 			g.foreground = true;
+			break;
+		case OE::FLAG_NICE:
+			g.idleStates[CP_NICE] = true;
 			break;
 		case OE::MODE_AC:
 			set_mode(AcLineState::ONLINE, getopt[1]);
@@ -1040,6 +1059,7 @@ void read_args(int const argc, char const * const argv[]) {
 			break;
 		case OE::FLAG_VERBOSE:
 		case OE::FLAG_FOREGROUND:
+		case OE::FLAG_NICE:
 			e.msg += "\n\n";
 			e.msg += getopt.show(0);
 			break;

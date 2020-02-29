@@ -1,4 +1,4 @@
-.Dd 9 May, 2017
+.Dd Feb 29, 2020
 .Dt powerd++ 8
 .Os
 .Sh NAME
@@ -8,7 +8,7 @@
 .Nm
 .Fl h
 .Nm
-.Op Fl vf
+.Op Fl vfN
 .Op Fl a Ar mode
 .Op Fl b Ar mode
 .Op Fl n Ar mode
@@ -88,6 +88,15 @@ Be verbose and produce initial diagnostics on
 .It Fl f , -foreground
 Stay in foreground, produce an event log on
 .Pa stdout .
+.It Fl N , -idle-nice
+Treat nice time as idle.
+.Pp
+This option exists for
+.Xr powerd 8
+compatibility, but note that most heavy workloads such as compiling
+software mostly consist of nice time. Users considering this flag
+may be better served with running at a fixed low frequency:
+.Dl Nm Fl b Ar min
 .It Fl a , -ac Ar mode
 Mode to use while the AC power line is connected (default
 .Li hadp ) .
