@@ -1134,13 +1134,13 @@ class Emulator {
 		cptime_t runLoadCycles{0};
 
 		/**
-		 * The load cycles carried over to the next frame in [kcycles].
+		 * The cycles carried over to the next frame in [kcycles].
 		 *
 		 * This is determined at the beginning of frame and
 		 * used to calculated the simulation load at the
 		 * beginning of the next frame.
 		 */
-		cptime_t carryLoadCycles{0};
+		cptime_t carryCycles[CPUSTATES]{};
 	};
 
 	/**
@@ -1284,47 +1284,56 @@ class Emulator {
 				auto & core = this->cores[i];
 
 				/* get recorded ticks */
-				double recTicks = 0;
-				double recBusyTicks = 0;
-				for (size_t state = 0; state < CPUSTATES; ++state) {
-					cptime_t ticks;
+				cptime_t recTicks[CPUSTATES]{};
+				cptime_t sumRecTicks{0};
+				for (auto & ticks : recTicks) {
 					this->fin.scanf("%lu", ticks);
-					recTicks += ticks;
-					recBusyTicks += state == CP_IDLE ? 0 : ticks;
+					sumRecTicks += ticks;
 				}
-
-				/* get recorded load in [MHz] */
-				double const recLoad =
-				    recTicks
-				    ? recBusyTicks * core.recFreq / recTicks
-				    : 0;
-
+				/* must be non-zero */
+				sumRecTicks += !sumRecTicks;
 				/* update report with recorded data */
 				frame[i].rec =
-				    {core.recFreq, recLoad / core.recFreq};
+				    {core.recFreq, 1. - static_cast<double>(recTicks[CP_IDLE]) / sumRecTicks};
 
-				/* get recorded load in [kcycles] */
-				cptime_t recLoadCycles = recLoad * duration;
+				/* get recorded cycles in [kcycles] */
+				cptime_t cycles[CPUSTATES]{};
+				auto const runCycles = duration * core.recFreq;
+				for (cptime_t state = 0; state < CPUSTATES; ++state) {
+					cycles[state] = runCycles * recTicks[state] / sumRecTicks;
+				}
 
-				/* add carry from last frame */
-				recLoadCycles += core.carryLoadCycles;
+				/* add the carry to the recorded cycles */
+				for (cptime_t state = 0; state < CPUSTATES; ++state) {
+					cycles[state] += core.carryCycles[state];
+					core.carryCycles[state] = 0;
+				}
 
-				/* get the load carrying into the next frame,
-				 * assume the whole frame runs at the current
-				 * clock speed */
-				cptime_t const runCycles =
-				    core.runFreq * duration;
-				core.runLoadCycles =
-				    std::min<cptime_t>(runCycles,
-				                       recLoadCycles);
-				core.carryLoadCycles =
-				    recLoadCycles - core.runLoadCycles;
+				/* determine simulation cycles at current freq */
+				cptime_t availableCycles = core.runFreq * duration;
+				core.runLoadCycles = 0;
+				/* assign cycles in order of priority */
+				static_assert(CPUSTATES == 5, "All CPUSTATES must be implemented");
+				for (auto state : {CP_INTR, CP_SYS, CP_USER, CP_NICE}) {
+					if (availableCycles >= cycles[state]) {
+						availableCycles -= cycles[state];
+						core.carryCycles[state] = 0;
+					} else {
+						core.carryCycles[state] =
+						    cycles[state] - availableCycles;
+						cycles[state] = availableCycles;
+						availableCycles = 0;
+					}
+					core.runLoadCycles += cycles[state];
+				}
+				/* assign leftovers to the idle state */
+				cycles[CP_IDLE] = availableCycles;
 
 				/* set load for this core */
-				this->sum[i * CPUSTATES + CP_USER] +=
-				    core.runLoadCycles;
-				this->sum[i * CPUSTATES + CP_IDLE] +=
-				    runCycles - core.runLoadCycles;
+				for (cptime_t state = 0; state < CPUSTATES; ++state) {
+					this->sum[i * CPUSTATES + state] +=
+					    cycles[state];
+				}
 			}
 
 			/* commit changes */
