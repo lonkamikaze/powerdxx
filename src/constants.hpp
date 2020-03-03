@@ -46,8 +46,21 @@ char const * const TEMPERATURE = "dev.cpu.%d.temperature";
 /**
  * An array of maximum temperature sources.
  */
-char const * const TJMAX_SOURCES[] = {
+char const * const TJMAX_SOURCES[]{
 	"dev.cpu.%d.coretemp.tjmax"
+};
+
+/**
+ * The MIB name for the CPU frequency drivers.
+ */
+char const * const FREQ_DRIVER = "dev.cpufreq.%d.freq_driver";
+
+/**
+ * A list of driver prefixes, that are known not to allow manual
+ * frequency control.
+ */
+char const * const FREQ_DRIVER_BLACKLIST[]{
+	"hwpstate_"
 };
 
 /*

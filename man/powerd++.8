@@ -1,4 +1,4 @@
-.Dd Feb 29, 2020
+.Dd Mar 3, 2020
 .Dt powerd++ 8
 .Os
 .Sh NAME
@@ -323,3 +323,10 @@ requires ACPI to detect the current power line state.
 .Sh AUTHORS
 Implementation and manual by
 .An Dominic Fandrey Aq Mt kami@freebsd.org
+.Sh CAVEATS
+Unlike
+.Xr powerd 8 ,
+.Nm
+refuses to run if the frequency control driver is known not to allow
+user control of the CPU frequency (e.g.
+.Xr hwpstate_intel 4 ).

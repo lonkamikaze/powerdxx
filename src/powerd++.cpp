@@ -65,6 +65,8 @@ using constants::CP_TIMES;
 using constants::ACLINE;
 using constants::FREQ;
 using constants::FREQ_LEVELS;
+using constants::FREQ_DRIVER;
+using constants::FREQ_DRIVER_BLACKLIST;
 using constants::TEMPERATURE;
 using constants::TJMAX_SOURCES;
 
@@ -514,13 +516,15 @@ void init() {
 		}
 	}
 
-	/* set per group min/max frequency boundaries */
+	/* set per group settings */
 	CoreGroup * group = nullptr;
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		auto & core = g.cores[i];
 		if (core.group == group) { continue; }
 		group = core.group;
 		char name[40];
+
+		/* set per group min/max frequency boundaries */
 		sprintf_safe(name, FREQ_LEVELS, i);
 		try {
 			sys::ctl::Sysctl<> const ctl{name};
@@ -538,6 +542,10 @@ void init() {
 				/* no idea what that value means */
 				if (pch[0] != ' ') { break; }
 			}
+			/* there is only one level with hwpstate */
+			if (min == max) {
+				min = FREQ_DEFAULT_MIN;
+			}
 			assert(min < max &&
 			       "minimum must be less than maximum");
 			group->min = min;
@@ -551,6 +559,25 @@ void init() {
 			} else {
 				verbose("cannot access sysctl: %s\n", name);
 			}
+		}
+
+		/* check freq_drivers  */
+		sprintf_safe(name, FREQ_DRIVER, i);
+		try {
+			sys::ctl::Sysctl<> const ctl{name};
+			auto driver = ctl.get<char>();
+			for (auto const prefix : FREQ_DRIVER_BLACKLIST) {
+				if (0 != std::strncmp(driver.get(), prefix,
+				                      std::strlen(prefix))) {
+					continue;
+				}
+				fail(Exit::EDRIVER, 0,
+				     "frequency control driver not supported: %s"_fmt
+				     (driver.get()));
+			}
+		} catch (sys::sc_error<sys::ctl::error>) {
+			/* no driver is fine */
+			verbose("cannot access sysctl: %s\n", name);
 		}
 	}
 
