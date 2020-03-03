@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# This is a helper script to run loadplay from the build directory.
+#
+# The first argument is the binary to be executed and its path is
+# added to LD_LIBRARY_PATH and PATH. E.g. if present at the given
+# path libloadplay.so and/or powerd++ are picked up from there.
+#
+
+export LD_LIBRARY_PATH="${1%/*}" PATH="${1%/*}:${PATH}"
+exec "$@"
