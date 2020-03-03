@@ -55,6 +55,7 @@ using constants::CP_TIMES;
 using constants::ACLINE;
 using constants::FREQ;
 using constants::FREQ_LEVELS;
+using constants::FREQ_DRIVER;
 
 using utility::sprintf_safe;
 using namespace utility::literals;
@@ -772,7 +773,8 @@ class Sysctls {
 		{FREQ,             {1001}},
 		{FREQ_LEVELS,      {1002}},
 		{CP_TIMES,         {1003}},
-		{LOADREC_FEATURES, {1004}}
+		{LOADREC_FEATURES, {1004}},
+		{FREQ_DRIVER,      {1005}}
 	};
 
 	/**
@@ -786,7 +788,8 @@ class Sysctls {
 		{{1001},               {CTLTYPE_INT,    "0"}},
 		{{1002},               {CTLTYPE_STRING, ""}},
 		{{1003},               {CTLTYPE_LONG,   ""}},
-		{{1004},               {CTLTYPE_U64,    "0"}}
+		{{1004},               {CTLTYPE_U64,    "0"}},
+		{{1005},               {CTLTYPE_STRING, ""}}
 	};
 
 	public:

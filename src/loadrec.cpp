@@ -34,6 +34,7 @@ using nih::make_Options;
 using constants::ACLINE;
 using constants::FREQ;
 using constants::FREQ_LEVELS;
+using constants::FREQ_DRIVER;
 using constants::CP_TIMES;
 
 using types::ms;
@@ -265,13 +266,16 @@ void print_sysctls() {
 				fail(Exit::ENOFREQ, e,
 				     "at least the first CPU core must report its clock frequency");
 			}
+			continue;
 		}
-		sprintf_safe(mibname, FREQ_LEVELS, i);
-		try {
-			sys::ctl::Sysctl<> ctl{mibname};
-			g.fout.printf("%s=%s\n", mibname, ctl.get<char>().get());
-		} catch (sys::sc_error<sys::ctl::error>) {
-			/* do nada */
+		for (auto const mibbasename : {FREQ_LEVELS, FREQ_DRIVER}) {
+			sprintf_safe(mibname, mibbasename, i);
+			try {
+				sys::ctl::Sysctl<> ctl{mibname};
+				g.fout.printf("%s=%s\n", mibname, ctl.get<char>().get());
+			} catch (sys::sc_error<sys::ctl::error>) {
+				verbose("cannot access sysctl: %s\n", mibname);
+			}
 		}
 	}
 }
