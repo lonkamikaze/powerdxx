@@ -334,6 +334,7 @@ The following table provides an overview of repository contents:
 | `man/`        | Manual pages written using mdoc(7) markup  |
 | `obj/`        | Build output                               |
 | `pkg/`        | Installer scripts and instructions         |
+| `loads/`      | Load recordings useful for testing         |
 | `src/`        | C++ source files                           |
 | `src/sys/`    | C++ wrappers for common C interfaces       |
 | `powerd++.rc` | Init script / service description          |
