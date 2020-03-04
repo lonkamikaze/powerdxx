@@ -1362,7 +1362,9 @@ class Emulator {
 		}
 
 		/* tell process to die */
-		raise(SIGINT);
+		if (!this->die) {
+			raise(SIGINT);
+		}
 	} catch (std::out_of_range &) {
 		fail("incomplete emulation setup, please check your load record for complete initialisation\n");
 	}
