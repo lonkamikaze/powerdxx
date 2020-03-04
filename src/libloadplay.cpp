@@ -364,9 +364,7 @@ class SysctlValue {
 		size_t count = 0;
 		T value;
 		for (std::istringstream stream{this->value};
-		     stream.good(); ++count) {
-			stream >> value;
-		}
+		     (stream >> value).good(); ++count);
 		return count * sizeof(T);
 	}
 
@@ -482,22 +480,21 @@ class SysctlValue {
 	 * @retval 0
 	 *	On success
 	 * @retval -1
-	 *	On failure to fit all values into the taget buffer,
+	 *	On failure to fit all values into the target buffer,
 	 *	also sets errno=ENOMEM
 	 */
 	template <typename T>
 	int get(T * dst, size_t & size) const {
 		lock_guard const lock{this->mtx};
 		std::istringstream stream{this->value};
+		size /= sizeof(T);
 		size_t i = 0;
-		for (; stream.good(); ++i) {
-			if ((i + 1) * sizeof(T) > size) {
-				errno = ENOMEM;
-				return -1;
-			}
-			stream >> dst[i];
-		}
+		for (; stream.good() && i < size; stream >> dst[i++]);
 		size = i * sizeof(T);
+		if (T value; (stream >> value).good()) {
+			errno = ENOMEM;
+			return -1;
+		}
 		return 0;
 	}
 
