@@ -260,11 +260,16 @@ struct Global {
 		 * The string representation of this state.
 		 */
 		char const * const name;
-	} acstates[3] {
+	};
+
+	/**
+	 * The power states.
+	 */
+	ACSet acstates[3]{
 		{FREQ_UNSET,       FREQ_UNSET,       ADP,  0, "battery"},
 		{FREQ_UNSET,       FREQ_UNSET,       HADP, 0, "online"},
 		{FREQ_DEFAULT_MIN, FREQ_DEFAULT_MAX, HADP, 0, "unknown"}
-	}; /**< The power states. */
+	};
 
 	/**
 	 * The hw.acpi.acline ctl.
