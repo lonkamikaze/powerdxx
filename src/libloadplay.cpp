@@ -1383,12 +1383,12 @@ class Main {
 	/**
 	 * The optional input file.
 	 */
-	ifile<io::own> fin{sys::env::vars["LOADPLAY_IN"], "rb"};
+	ifile<io::own> fin;
 
 	/**
 	 * The optional output file.
 	 */
-	ofile<io::own> fout{sys::env::vars["LOADPLAY_OUT"], "wb"};
+	ofile<io::own> fout;
 
 	/**
 	 * Used to request premature death from the emulation thread.
@@ -1406,12 +1406,13 @@ class Main {
 	Main() {
 		/* check input character stream */
 		auto const & env = sys::env::vars;
-		if (env["LOADPLAY_IN"] && !this->fin) {
+		ifile<io::link> fin{io::fin};
+		if (env["LOADPLAY_IN"] &&
+		    !(fin = this->fin = {env["LOADPLAY_IN"], "rb"})) {
 			fail("failed to open input file %s\n",
 			     env["LOADPLAY_IN"].c_str());
 			return;
 		}
-		ifile<io::link> fin{this->fin ? this->fin : io::fin};
 
 		char inbuf[16384]{};
 		std::cmatch match;
@@ -1499,12 +1500,13 @@ class Main {
 		}
 
 		/* check output character stream */
-		if (env["LOADPLAY_OUT"] && !this->fout) {
+		ofile<io::link> fout{io::fout};
+		if (env["LOADPLAY_OUT"] &&
+		    !(fout = this->fout = {sys::env::vars["LOADPLAY_OUT"], "wb"})) {
 			fail("failed to open output file %s\n",
 			     env["LOADPLAY_OUT"].c_str());
 			return;
 		}
-		ofile<io::link> fout{this->fout ? this->fout : io::fout};
 
 		/* start background thread */
 		try {
