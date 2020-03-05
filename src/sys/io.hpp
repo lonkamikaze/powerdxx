@@ -8,6 +8,7 @@
 #define _POWERDXX_SYS_IO_HPP_
 
 #include <cstdio>       /* fopen(), fprintf() etc. */
+#include <utility>      /* std::swap() */
 
 namespace sys {
 
@@ -699,6 +700,11 @@ class file_feature<FileT, seek, Tail ...> :
 template <feature ... Features>
 class file<own, Features ...> final :
     public file_feature<file<own, Features ...>, Features ...> {
+	/**
+	 * Friend all file classes for move assignment.
+	 */
+	template <ownership, feature ...> friend class file;
+
 	public:
 	/**
 	 * Must not copy construct for risk of multiple close() on
@@ -725,6 +731,11 @@ class file<own, Features ...> final :
 	 */
 	explicit file(FILE * const handle) :
 	    file_feature<file, Features ...>{handle} {}
+
+	/**
+	 * Default construct.
+	 */
+	file() : file{nullptr} {}
 
 	/**
 	 * Move construct from another owning file type instance.
@@ -787,6 +798,19 @@ class file<own, Features ...> final :
 	}
 
 	/**
+	 * Move assign from a temporary
+	 *
+	 * @param move
+	 *	The rvalue file to acquire the FILE object from
+	 * @return
+	 *	A self reference
+	 */
+	file & operator =(file && move) {
+		std::swap(this->handle, move.handle);
+		return *this;
+	}
+
+	/**
 	 * Move assign from another owning file type instance.
 	 *
 	 * The origin file type instance must support all features
@@ -802,8 +826,7 @@ class file<own, Features ...> final :
 	template <feature ... Superset,
 	          class = is_superset_of_t<set<Superset ...>, set<Features ...>>>
 	file & operator =(file<own, Superset ...> && move) {
-		~file();
-		this->handle = move.release();
+		std::swap(this->handle, move.handle);
 		return *this;
 	}
 
@@ -878,6 +901,11 @@ class file<link, Features ...> final :
 	 */
 	explicit file(FILE * const handle) :
 	    file_feature<file, Features ...>{handle} {}
+
+	/**
+	 * Default construct.
+	 */
+	file() : file{nullptr} {}
 
 	/**
 	 * Copy construct from another file type instance.
