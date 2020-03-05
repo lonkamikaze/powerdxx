@@ -1,4 +1,4 @@
-.Dd 3 September, 2019
+.Dd Mar 5, 2020
 .Dt loadplay 1
 .Os
 .Sh NAME
@@ -42,8 +42,8 @@ instead of
 .Sh USAGE NOTES
 The
 .Nm
-command injects
-.Pa libloadplay.so
+command injects the
+.Lb libloadplay.so
 into
 .Ar command .
 This library simulates the load from the input and outputs load statistics.
@@ -147,9 +147,29 @@ This only affects the output of
 .Nm ,
 the host process is not affected.
 .It Ev LD_PRELOAD
-Used to inject
-.Pa libloadplay.so
+Used to inject the
+.Lb libloadplay.so
 into the host process.
+.It Ev LD_LIBRARY_PATH
+Is set to the same path
+.Nm
+was called through. Remains untouched if the path does not contain a
+.Sq /
+character.
+.Pp
+I.e. calling
+.Dq Pa obj/loadplay
+will set
+.Dq Ev LD_LIBRARY_PATH=obj ,
+calling
+.Dq Pa loadplay
+will not.
+.Pp
+This behaviour facilitates running test builds of
+.Nm
+and the
+.Lb libloadplay.so
+without performing an install.
 .El
 .Sh FILES
 .Bl -tag -width indent

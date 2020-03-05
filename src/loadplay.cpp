@@ -105,6 +105,34 @@ char const * filename(char const * const path) {
 	     "failed to execute %s: %s"_fmt(file, strerror(errno)));
 }
 
+/**
+ * If running from an explicit path add the path to the library search path.
+ *
+ * This function facilitates calling `loadplay` directly from the build
+ * directory for testing and allows it to pick up `libloadplay.so` from
+ * the same directory.
+ *
+ * @param argc,argv
+ *	The command line arguments provided to loadplay
+ * @pre argc >= 2
+ * @warning
+ *	This function changes the contents of argv[0]
+ */
+void set_library_path(int const argc, char * const argv[]) {
+	assert(argc >= 2);
+	/* search argv[0] for a / from right to left */
+	auto argp = argv[1] - 1;
+	while (--argp >= argv[0] && *argp != '/');
+
+	/* replace the / with a cstring terminator and set LD_LIBRARY_PATH
+	 * to the resulting path in argv[0] */
+	if (argp >= argv[0]) {
+		*argp = 0;
+		sys::env::vars["LD_LIBRARY_PATH"] = argv[0];
+		return;
+	}
+}
+
 } /* namespace */
 
 /**
@@ -136,6 +164,7 @@ int main(int argc, char * argv[]) try {
 			env["LD_PRELOAD"] = "libloadplay.so";
 			assert(getopt.offset() < argc &&
 			       "only OPT_DONE may violate this constraint");
+			set_library_path(argc, argv);
 			/* forward the remainder of the arguments */
 			execute(getopt[0], argv + getopt.offset());
 			break;
