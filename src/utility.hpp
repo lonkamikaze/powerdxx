@@ -344,11 +344,11 @@ struct FromChars {
 		if (!this->it) {
 			return false;
 		}
-		for (; std::isspace(*this->it); ++this->it);
 		auto [p, ec] = std::from_chars(this->it, this->end, dst);
 		if (this->it == p) {
 			return false;
 		}
+		for (; p != this->end && std::isspace(*p); ++p);
 		this->it = p;
 		return true;
 	}
@@ -366,9 +366,20 @@ struct FromChars {
 	}
 
 	/**
+	 * Range base constructor.
+	 *
+	 * @param start,end
+	 *	The character array range
+	 */
+	FromChars(char const * const start, char const * const end) :
+	    it{start}, end{end} {
+		for (; this->it != end && std::isspace(*this->it); ++this->it);
+	}
+
+	/**
 	 * Construct from a character array.
 	 *
-	 * @tpram CountV
+	 * @tparam CountV
 	 *	The number of characters
 	 * @param str
 	 *	Tha character array to parse from
@@ -378,7 +389,7 @@ struct FromChars {
 	 */
 	template <size_t CountV>
 	FromChars(char const (& str)[CountV], bool terminator = true) :
-	    it{str}, end{str + CountV - terminator} {}
+	    FromChars{str, str + CountV - terminator} {}
 
 	/**
 	 * Construct functor from a string.
@@ -391,7 +402,7 @@ struct FromChars {
 	 *	The string to parse from
 	 */
 	FromChars(std::string const & str) :
-	    it{str.data()}, end{it + str.size()} {}
+	    FromChars{str.data(), str.data() + str.size()} {}
 };
 
 } /* namespace utility */
