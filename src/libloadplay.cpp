@@ -1173,7 +1173,7 @@ class Emulator {
 		for (coreid_t i = 0; i < this->ncpu; ++i) {
 			auto & core = this->cores[i];
 
-			/* get freqency handler */
+			/* get frequency handler */
 			char name[40];
 			sprintf_safe(name, FREQ, i);
 			try {
@@ -1363,6 +1363,13 @@ class Emulator {
 };
 
 /**
+ * Set to activate fallback to the original sysctl functions.
+ *
+ * This is reset when Main initialisation completes.
+ */
+bool sysctl_fallback = true;
+
+/**
  * Singleton class representing the main execution environment.
  */
 class Main {
@@ -1507,6 +1514,7 @@ class Main {
 		try {
 			this->bgthread =
 			    std::thread{Emulator{fin, fout, this->die}};
+			sysctl_fallback = false;
 		} catch (std::out_of_range &) {
 			fail("failed to start emulator thread\n");
 			return;
@@ -1558,11 +1566,6 @@ class Hold {
 		this->ref = this->restore;
 	}
 };
-
-/**
- * Set to activate fallback to the original sysctl functions.
- */
-bool sysctl_fallback = false;
 
 } /* namespace */
 
