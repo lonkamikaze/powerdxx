@@ -5,6 +5,8 @@
  */
 
 #include <type_traits> /* std::underlying_type */
+#include <charconv>    /* std::from_chars() */
+#include <cctype>      /* std::isspace() */
 #include <string>
 
 #include <cstdio>      /* snprintf() */
@@ -300,6 +302,96 @@ class Max {
 		this->value = this->value >= value ? this->value : value;
 		return *this;
 	}
+};
+
+/**
+ * A functor for reading numerical values from a string or character
+ * array.
+ */
+struct FromChars {
+	/**
+	 * The next character to read.
+	 */
+	char const * it;
+
+	/**
+	 * The first character of the same array that may not be read,
+	 * this should usually point to a terminating zero.
+	 */
+	char const * const end;
+
+	/**
+	 * Retrieve an integral or floating point value from the array.
+	 *
+	 * The operation may fail for multiple reasons:
+	 *
+	 * - No more characters left to read, in that case the functor
+	 *   will equal false
+	 * - The given characters do not represent a valid value, in
+	 *   that case the functor will equal true
+	 *
+	 * @tparam T
+	 *	The value type to retrieve
+	 * @param dst
+	 *	The lvalue to assign to
+	 * @retval true
+	 *	The numerical value was successfully read from the array
+	 * @retval false
+	 *	The numerical value could not be read from the array
+	 */
+	template <typename T>
+	[[nodiscard]] bool operator ()(T & dst) {
+		if (!this->it) {
+			return false;
+		}
+		for (; std::isspace(*this->it); ++this->it);
+		auto [p, ec] = std::from_chars(this->it, this->end, dst);
+		if (this->it == p) {
+			return false;
+		}
+		this->it = p;
+		return true;
+	}
+
+	/**
+	 * Check if unread characters remain.
+	 *
+	 * @retval false
+	 *	All characters have been read
+	 * @retval true
+	 *	Characters remain to be read
+	 */
+	operator bool() const {
+		return this->end != this->it;
+	}
+
+	/**
+	 * Construct from a character array.
+	 *
+	 * @tpram CountV
+	 *	The number of characters
+	 * @param str
+	 *	Tha character array to parse from
+	 * @param terminator
+	 *	Indicates whether the character array has a terminating
+	 *	null character.
+	 */
+	template <size_t CountV>
+	FromChars(char const (& str)[CountV], bool terminator = true) :
+	    it{str}, end{str + CountV - terminator} {}
+
+	/**
+	 * Construct functor from a string.
+	 *
+	 * Note that changing the string during the lifetime of the
+	 * functor may silently invalidate the functor's state and
+	 * thus invoke undefined behaviour.
+	 *
+	 * @param str
+	 *	The string to parse from
+	 */
+	FromChars(std::string const & str) :
+	    it{str.data()}, end{it + str.size()} {}
 };
 
 } /* namespace utility */

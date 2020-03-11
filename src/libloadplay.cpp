@@ -25,7 +25,6 @@
 #include <map>
 #include <string>
 #include <regex>
-#include <sstream>   /* std::ostringstream, std::istringstream */
 #include <memory>    /* std::unique_ptr */
 #include <thread>
 #include <exception>
@@ -60,6 +59,7 @@ using constants::FREQ_DRIVER;
 using utility::sprintf_safe;
 using namespace utility::literals;
 using utility::Sum;
+using utility::FromChars;
 
 using types::ms;
 using types::cptime_t;
@@ -363,8 +363,8 @@ class SysctlValue {
 		lock_guard const lock{this->mtx};
 		size_t count = 0;
 		T value;
-		for (std::istringstream stream{this->value};
-		     (stream >> value).good(); ++count);
+		for (auto fetch = FromChars{this->value};
+		     fetch(value); ++count);
 		return count * sizeof(T);
 	}
 
@@ -486,16 +486,12 @@ class SysctlValue {
 	template <typename T>
 	int get(T * dst, size_t & size) const {
 		lock_guard const lock{this->mtx};
-		std::istringstream stream{this->value};
 		size /= sizeof(T);
 		size_t i = 0;
-		for (; stream.good() && i < size; stream >> dst[i++]);
+		auto fetch = FromChars{this->value};
+		for (; i < size && fetch(dst[i]); ++i);
 		size = i * sizeof(T);
-		if (T value; (stream >> value).good()) {
-			errno = ENOMEM;
-			return -1;
-		}
-		return 0;
+		return errno = fetch * ENOMEM, -fetch;
 	}
 
 	/**
@@ -531,10 +527,10 @@ class SysctlValue {
 	template <typename T>
 	T get() const {
 		lock_guard const lock{this->mtx};
-
-		std::istringstream stream{this->value};
-		T result;
-		stream >> result;
+		T result{};
+		if (!FromChars{this->value}(result)) {
+			errno = EINVAL;
+		}
 		return result;
 	}
 
@@ -577,11 +573,11 @@ class SysctlValue {
 	 */
 	template <typename T>
 	void set(T const * const newp, size_t newlen) {
-		std::ostringstream stream;
+		std::string value;
 		for (size_t i = 0; i < newlen / sizeof(T); ++i) {
-			stream << (i ? " " : "") << newp[i];
+			value += (i ? " " : "") + std::to_string(newp[i]);
 		}
-		this->set(stream.str());
+		set(std::move(value));
 	}
 
 	/**
@@ -830,12 +826,9 @@ class Sysctls {
 			}
 			/* get mib numbers */
 			std::smatch match;
-			auto str = name;
-			for (size_t i = 1;
-			     std::regex_search(str, match, expr); ++i) {
-				std::istringstream{match[1]} >> mib[i];
-				++mib[i]; /* offset, because 0 is the base mib */
-				str = match.suffix();
+			if (std::regex_search(name, match, expr) &&
+			    FromChars{match[1]}(mib[1])) {
+				++mib[1]; /* offset, because 0 is the base mib */
 			}
 			/* map name → mib */
 			this->mibs[name] = mib;
@@ -1206,12 +1199,11 @@ class Emulator {
 				auto levels = sysctls[name]
 				              .get<std::string>();
 				levels = std::regex_replace(levels, "/[-+]?[0-9]*"_r, "");
-				std::istringstream levelstream{levels};
+				auto fetch = FromChars{levels};
 				freqLevels.clear();
 
 				auto msg = debug("emulate core %d clock frequencies:", i);
-				for (unsigned long level; levelstream.good();) {
-					levelstream >> level;
+				for (unsigned long level{0}; fetch(level);) {
 					freqLevels.push_back(level);
 					msg.printf(" %d", level);
 				}
@@ -1478,17 +1470,20 @@ class Main {
 		coreid_t const cores = columns / (CPUSTATES + 1);
 
 		/* check reference frequencies */
-		std::istringstream istream{input};
+		auto fetch = FromChars{input};
 		for (coreid_t i = 0;
 		     features & 1_FREQ_TRACKING && i < cores; ++i) {
-			mhz_t freq;
-			istream >> freq;
-			input = input.substr(input.find(' ') + 1);
+			mhz_t freq{0};
+			if (!fetch(freq)) {
+				fail("unable to parse core frequency from record at: %.8s ...\n", fetch.it);
+				return;
+			}
 			if (freq <= 0) {
 				fail("recorded clock frequencies must be > 0\n");
 				return;
 			}
 		}
+		input = {fetch.it, fetch.end};
 
 		/* initialise kern.cp_times */
 		try {
