@@ -528,12 +528,12 @@ class SysctlValue {
 	T get() const {
 		lock_guard const lock{this->mtx};
 		T result{};
-		if (!FromChars{this->value}(result)) {
-			errno = EINVAL;
+		auto fetch = FromChars{this->value};
+		if (!fetch(result)) {
+			return errno = EINVAL, result;
 		}
-		return result;
+		return errno = fetch * ENOMEM, result;
 	}
-
 
 	/**
 	 * Copy a list of values into the given buffer.
