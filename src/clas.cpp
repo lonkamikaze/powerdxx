@@ -46,44 +46,125 @@ char const * const UnitStr[]{
 
 /**
  * Determine the unit of a string encoded value.
- *
- * @param str
- *	The string to determine the unit of
- * @return
- *	A unit
  */
-Unit unit(std::string const & str) {
-	size_t pos = str[0] == '+' || str[0] == '-' ? 1 : 0;
-	for (; pos < str.length() && ((str[pos] >= '0' && str[pos] <= '9') ||
-	                              str[pos] == '.'); ++pos);
-	auto const unitstr = str.substr(pos);
-	for (size_t i = 0; i < utility::countof(UnitStr); ++i) {
-		if (unitstr == UnitStr[i]) {
-			return static_cast<Unit>(i);
+struct Value {
+	/**
+	 * The magnitude of the value.
+	 */
+	double value;
+
+	/**
+	 * The unit of the value.
+	 */
+	Unit unit;
+
+	/**
+	 * Implicitly cast to the magnitude.
+	 *
+	 * @return
+	 *	The magnitude of the value
+	 */
+	operator double() const { return this->value; }
+
+	/**
+	 * Implicitly cast to the unit.
+	 *
+	 * @return
+	 *	The unit of the value
+	 */
+	operator Unit() const { return this->unit; }
+
+	/**
+	 * Add offset to the magnitude.
+	 *
+	 * @param off
+	 *	The offset value
+	 * @return
+	 *	A self reference
+	 */
+	Value & operator +=(double const off) {
+		return this->value += off, *this;
+	}
+
+	/**
+	 * Subtract offset from the magnitude.
+	 *
+	 * @param off
+	 *	The offset value
+	 * @return
+	 *	A self reference
+	 */
+	Value & operator -=(double const off) {
+		return this->value -= off, *this;
+	}
+
+	/**
+	 * Scale magnitude by the given factor.
+	 *
+	 * @param fact
+	 *	The factor to scale the magnitude by
+	 * @return
+	 *	A self reference
+	 */
+	Value & operator *=(double const fact) {
+		return this->value *= fact, *this;
+	}
+
+	/**
+	 * Divide the magnitude by the given divisor.
+	 *
+	 * @param div
+	 *	The divisor to divide the magnitude by
+	 * @return
+	 *	A self reference
+	 */
+	Value & operator /=(double const div) {
+		return this->value /= div, *this;
+	}
+
+	/**
+	 * Construct value from a null terminated character array.
+	 *
+	 * @param valp
+	 *	A pointer to the value portion of the array
+	 * @param unitp
+	 *	Set by the constructor to point behind the magnitude
+	 */
+	Value(char const * const valp, char * unitp = nullptr) :
+	    value{std::strtod(valp, &unitp)}, unit{Unit::UNKNOWN} {
+		for (size_t unit = 0;
+		     unitp && unit < utility::countof(UnitStr); ++unit) {
+			auto unitstr = UnitStr[unit];
+			for (size_t i = 0;
+			     std::tolower(unitp[i]) == std::tolower(unitstr[i]);
+			     ++i) {
+				if (!unitstr[i]) {
+					this->unit = static_cast<Unit>(unit);
+					return;
+				}
+			}
 		}
 	}
-	return Unit::UNKNOWN;
-}
+
+};
+
 } /* namespace */
 
 types::cptime_t clas::load(char const * const str) {
-	std::string load{str};
-	for (char & ch : load) { ch = std::tolower(ch); }
-
-	if (load == "") {
+	if (!str || !*str) {
 		errors::fail(errors::Exit::ELOAD, 0,
 		             "load target value missing");
 	}
 
-	auto value = strtod(str, nullptr);
-	switch (unit(load)) {
+	auto value = Value{str};
+	switch (value) {
 	case Unit::SCALAR:
 		if (value > 1. || value < 0) {
 			errors::fail(errors::Exit::EOUTOFRANGE, 0,
 			             "load targets must be in the range [0.0, 1.0]: "s + str);
 		}
 		/* convert load to [0, 1024] range */
-		value = 1024 * value;
+		value *= 1024;
 		return value < 1 ? 1 : value;
 	case Unit::PERCENT:
 		if (value > 100. || value < 0) {
@@ -91,7 +172,7 @@ types::cptime_t clas::load(char const * const str) {
 			             "load targets must be in the range [0%, 100%]: "s + str);
 		}
 		/* convert load to [0, 1024] range */
-		value = 1024 * (value / 100.);
+		value *= 10.24;
 		return value < 1 ? 1 : value;
 	default:
 		break;
@@ -100,16 +181,13 @@ types::cptime_t clas::load(char const * const str) {
 }
 
 types::mhz_t clas::freq(char const * const str) {
-	std::string freqstr{str};
-	for (char & ch : freqstr) { ch = std::tolower(ch); }
-
-	if (freqstr == "") {
+	if (!str || !*str) {
 		errors::fail(errors::Exit::EFREQ, 0,
 		             "frequency value missing");
 	}
 
-	auto value = strtod(str, nullptr);
-	switch (unit(freqstr)) {
+	auto value = Value{str};
+	switch (value) {
 	case Unit::HZ:
 		value /= 1000000.;
 		break;
@@ -137,19 +215,16 @@ types::mhz_t clas::freq(char const * const str) {
 }
 
 types::ms clas::ival(char const * const str) {
-	std::string interval{str};
-	for (char & ch : interval) { ch = std::tolower(ch); }
-
-	if (interval == "") {
+	if (!str || !*str) {
 		errors::fail(errors::Exit::EIVAL, 0, "interval value missing");
 	}
 
-	auto value = strtod(str, nullptr);
+	auto value = Value{str};
 	if (value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
 		     "interval must be positive: "s + str);
 	}
-	switch (unit(interval)) {
+	switch (value) {
 	case Unit::SECOND:
 		return types::ms{static_cast<long long>(value * 1000.)};
 	case Unit::SCALAR: /* for powerd compatibility */
@@ -163,39 +238,35 @@ types::ms clas::ival(char const * const str) {
 }
 
 size_t clas::samples(char const * const str) {
-	if (std::string{str} == "") {
+	if (!str || !*str) {
 		errors::fail(errors::Exit::ESAMPLES, 0,
 		             "sample count value missing");
 	}
 
-	if (unit(str) != Unit::SCALAR) {
+	auto value = Value{str};
+	if (value != Unit::SCALAR) {
 		errors::fail(errors::Exit::ESAMPLES, 0,
 		             "sample count must be a scalar integer: "s + str);
 	}
-	auto const cnt = strtol(str, nullptr, 0);
-	auto const cntf = strtod(str, nullptr);
-	if (cntf != cnt) {
+	if (value != static_cast<size_t>(value)) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
 		             "sample count must be an integer: "s + str);
 	}
-	if (cnt < 1 || cnt > 1000) {
+	if (value < 1 || value > 1000) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
 		             "sample count must be in the range [1, 1000]: "s + str);
 	}
-	return size_t(cnt);
+	return value;
 }
 
 types::decikelvin_t clas::temperature(char const * const str) {
-	std::string tempstr{str};
-	for (char & ch : tempstr) { ch = std::toupper(ch); }
-
-	if (tempstr == "") {
+	if (!str || !*str) {
 		errors::fail(errors::Exit::ETEMPERATURE, 0,
 		             "temperature value missing");
 	}
 
-	auto value = strtod(str, nullptr);
-	switch (unit(tempstr)) {
+	auto value = Value{str};
+	switch (value) {
 	case Unit::SCALAR:
 	case Unit::CELSIUS:
 		value += 273.15;
@@ -214,5 +285,5 @@ types::decikelvin_t clas::temperature(char const * const str) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
 		             "temperature must be above absolute zero (-273.15 C): "s + str);
 	}
-	return types::decikelvin_t(value * 10);
+	return value *= 10;
 }
