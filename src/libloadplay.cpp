@@ -763,11 +763,11 @@ class Sysctls {
 		{"hw.model",       {CTL_HW, HW_MODEL}},
 		{"hw.ncpu",        {CTL_HW, HW_NCPU}},
 		{ACLINE,           {1000}},
-		{FREQ,             {1001}},
-		{FREQ_LEVELS,      {1002}},
+		{FREQ,             {1001, -1}},
+		{FREQ_LEVELS,      {1002, -1}},
 		{CP_TIMES,         {1003}},
 		{LOADREC_FEATURES, {1004}},
-		{FREQ_DRIVER,      {1005}}
+		{FREQ_DRIVER,      {1005, -1}}
 	};
 
 	/**
@@ -778,11 +778,11 @@ class Sysctls {
 		{{CTL_HW, HW_MODEL},   {CTLTYPE_STRING, "hw.model"}},
 		{{CTL_HW, HW_NCPU},    {CTLTYPE_INT,    "0"}},
 		{{1000},               {CTLTYPE_INT,    "2"}},
-		{{1001},               {CTLTYPE_INT,    "0"}},
-		{{1002},               {CTLTYPE_STRING, ""}},
+		{{1001, -1},           {CTLTYPE_INT,    "0"}},
+		{{1002, -1},           {CTLTYPE_STRING, ""}},
 		{{1003},               {CTLTYPE_LONG,   ""}},
 		{{1004},               {CTLTYPE_U64,    "0"}},
-		{{1005},               {CTLTYPE_STRING, ""}}
+		{{1005, -1},           {CTLTYPE_STRING, ""}}
 	};
 
 	public:
@@ -828,12 +828,11 @@ class Sysctls {
 			std::smatch match;
 			if (std::regex_search(name, match, expr) &&
 			    FromChars{match[1]}(mib[1])) {
-				++mib[1]; /* offset, because 0 is the base mib */
+				/* map name → mib */
+				this->mibs[name] = mib;
+				/* inherit type from base */
+				this->sysctls[mib] = this->sysctls[this->mibs[baseName]];
 			}
-			/* map name → mib */
-			this->mibs[name] = mib;
-			/* inherit type from base */
-			this->sysctls[mib] = this->sysctls[this->mibs[baseName]];
 		}
 		/* assign value */
 		this->sysctls[mib].set(value);
