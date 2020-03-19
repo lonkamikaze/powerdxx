@@ -55,6 +55,8 @@ using constants::ACLINE;
 using constants::FREQ;
 using constants::FREQ_LEVELS;
 using constants::FREQ_DRIVER;
+using constants::TEMPERATURE;
+using constants::TJMAX_SOURCES;
 
 using utility::sprintf_safe;
 using namespace utility::literals;
@@ -767,7 +769,9 @@ class Sysctls {
 		{FREQ_LEVELS,      {1002, -1}},
 		{CP_TIMES,         {1003}},
 		{LOADREC_FEATURES, {1004}},
-		{FREQ_DRIVER,      {1005, -1}}
+		{FREQ_DRIVER,      {1005, -1}},
+		{TEMPERATURE,      {1006, -1}},
+		{TJMAX_SOURCES[0], {1007, -1}}
 	};
 
 	/**
@@ -782,7 +786,9 @@ class Sysctls {
 		{{1002, -1},           {CTLTYPE_STRING, ""}},
 		{{1003},               {CTLTYPE_LONG,   ""}},
 		{{1004},               {CTLTYPE_U64,    "0"}},
-		{{1005, -1},           {CTLTYPE_STRING, ""}}
+		{{1005, -1},           {CTLTYPE_STRING, ""}},
+		{{1006, -1},           {CTLTYPE_INT,    "-1"}},
+		{{1007, -1},           {CTLTYPE_INT,    "-1"}},
 	};
 
 	public:
