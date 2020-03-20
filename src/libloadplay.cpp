@@ -814,34 +814,30 @@ class Sysctls {
 	 *	The value to store
 	 */
 	void addValue(std::string const & name, std::string const & value) {
-		lock_guard const lock{this->mtx};
-
-		mib_t mib{};
 		try {
-			mib = this->mibs.at(name);
+			lock_guard const lock{this->mtx};
+			this->sysctls[this->mibs.at(name)].set(value);
 		} catch (std::out_of_range &) {
-			/* creating a new entry */
-			auto const expr = "\\.([0-9]*)\\."_r;
-			auto const baseName = std::regex_replace(name, expr, ".%d.");
 			/* get the base mib */
+			mib_t mib{}, baseMib{};
 			try {
-				mib = this->mibs.at(baseName);
+				mib = baseMib = getBaseMib(name.c_str());
 			} catch (std::out_of_range &) {
 				warn("unsupported sysctl: %s\n", name.c_str());
 				return;
 			}
 			/* get mib numbers */
 			std::smatch match;
+			auto const expr = "\\.([0-9]+)\\."_r;
 			if (std::regex_search(name, match, expr) &&
 			    FromChars{match[1]}(mib[1])) {
+				lock_guard const lock{this->mtx};
 				/* map name → mib */
 				this->mibs[name] = mib;
 				/* inherit type from base */
-				this->sysctls[mib] = this->sysctls[this->mibs[baseName]];
+				(this->sysctls[mib] = this->sysctls[baseMib]).set(value);
 			}
 		}
-		/* assign value */
-		this->sysctls[mib].set(value);
 	}
 
 	/**
@@ -855,6 +851,24 @@ class Sysctls {
 	mib_t const & getMib(char const * const name) const {
 		lock_guard const lock{this->mtx};
 		return this->mibs.at(name);
+	}
+
+	/**
+	 * Retrieves the base mib for a given mib name.
+	 *
+	 * E.g. the base mib for "dev.cpu.0.freq" is the mib for
+	 * "dev.cpu.%d.freq".
+	 *
+	 * @param name
+	 *	The MIB name
+	 * @return
+	 *	The MIB of the base name
+	 */
+	mib_t const & getBaseMib(char const * const name) const {
+		lock_guard const lock{this->mtx};
+		auto const expr = "\\.([0-9]+)\\."_r;
+		auto const baseName = std::regex_replace(name, expr, ".%d.");
+		return this->mibs.at(baseName);
 	}
 
 	/**
@@ -1456,7 +1470,6 @@ class Main {
 		} catch (std::out_of_range &) {
 			warn("%s is not set, please check your load record\n", name);
 		}
-
 
 		/* check for hw.ncpu */
 		if (sysctls[{CTL_HW, HW_NCPU}].get<int>() < 1) {
