@@ -316,7 +316,8 @@ struct FromChars {
 
 	/**
 	 * The first character of the same array that may not be read,
-	 * this should usually point to a terminating zero.
+	 * this should usually point to a terminating zero or behind
+	 * a buffer.
 	 */
 	char const * const end;
 
@@ -362,11 +363,11 @@ struct FromChars {
 	 *	Characters remain to be read
 	 */
 	operator bool() const {
-		return this->end != this->it;
+		return this->it && this->end != this->it && *this->it;
 	}
 
 	/**
-	 * Range base constructor.
+	 * Range based constructor.
 	 *
 	 * @param start,end
 	 *	The character array range
