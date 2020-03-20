@@ -1387,7 +1387,7 @@ class Emulator {
  *
  * This is reset when Main initialisation completes.
  */
-bool sysctl_fallback = true;
+bool sysctl_startup = true;
 
 /**
  * Singleton class representing the main execution environment.
@@ -1533,7 +1533,7 @@ class Main {
 		try {
 			this->bgthread =
 			    std::thread{Emulator{fin, fout, this->die}};
-			sysctl_fallback = false;
+			sysctl_startup = false;
 		} catch (std::out_of_range &) {
 			fail("failed to start emulator thread\n");
 			return;
@@ -1601,9 +1601,8 @@ extern "C" {
  *
  * Falls back to the original under the following conditions:
  *
- * - sysctl_fallback is set
- * - kern.usrstack is requested
- * - vm.* is requested
+ * - sysctl_startup is set
+ * - The mib is not known to the simulation
  *
  * The call may fail for 3 reasons:
  *
@@ -1624,7 +1623,7 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 	    (decltype(&sysctl))dlfunc(RTLD_NEXT, "sysctl");
 
 	/* do not access the sysctl store during startup */
-	if (sysctl_fallback) {
+	if (sysctl_startup) {
 		return orig(name, namelen, oldp, oldlenp, newp, newlen);
 	}
 
@@ -1675,7 +1674,7 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) {
 	static auto const orig =
 	    (decltype(&sysctlnametomib)) dlfunc(RTLD_NEXT, "sysctlnametomib");
 	/* do not access the sysctl store during startup */
-	if (sysctl_fallback) {
+	if (sysctl_startup) {
 		return orig(name, mibp, sizep);
 	}
 
