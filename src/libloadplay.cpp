@@ -1486,17 +1486,19 @@ class Main {
 		}
 
 		/* skip frame time */
-		std::string input{inbuf};
-		input = input.substr(input.find(' ') + 1);
+		auto fetch = FromChars{inbuf};
+		if (uint64_t time{1}; !fetch(time) || time != 0) {
+			fail("first frame time must be 0: %.8s\n", inbuf);
+			return;
+		}
 
 		/* determine the number of cores */
-		size_t columns = 1;
-		for (auto ch : input) { columns += ch == ' '; }
-		/* for each core there is a set of CPUSTATES and a freq column */
-		coreid_t const cores = columns / (CPUSTATES + 1);
+		size_t columns = 0;
+		auto seek = fetch;
+		for (cptime_t val{0}; seek(val); ++columns);
+		coreid_t const cores = columns / (CPUSTATES + !!(features & 1_FREQ_TRACKING));
 
 		/* check reference frequencies */
-		auto fetch = FromChars{input};
 		for (coreid_t i = 0;
 		     features & 1_FREQ_TRACKING && i < cores; ++i) {
 			mhz_t freq{0};
@@ -1509,12 +1511,11 @@ class Main {
 				return;
 			}
 		}
-		input = {fetch.it, fetch.end};
 
 		/* initialise kern.cp_times */
 		try {
-			sysctls.addValue(std::string{CP_TIMES}, input);
-			debug("sysctl %s = %s\n", CP_TIMES, input.c_str());
+			sysctls.addValue(std::string{CP_TIMES}, fetch.it);
+			debug("sysctl %s = %s", CP_TIMES, fetch.it);
 		} catch (std::out_of_range &) {
 			fail("kern.cp_times cannot be set, please check your load record\n");
 			return;
