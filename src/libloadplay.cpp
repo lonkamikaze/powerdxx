@@ -606,6 +606,7 @@ class SysctlValue {
 			this->set(static_cast<uint64_t const *>(newp), newlen);
 			break;
 		default:
+			errno=EFAULT;
 			return -1;
 		}
 		return 0;
@@ -1618,45 +1619,46 @@ extern "C" {
  *	The call failed
  */
 int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
-           const void * newp, size_t newlen) try {
+           const void * newp, size_t newlen) {
 	static auto const orig =
 	    (decltype(&sysctl))dlfunc(RTLD_NEXT, "sysctl");
-	if (sysctl_fallback ||
-	    /* hard-coded fallback for kern.usrstack, required by -lpthread */
-	    (namelen == 2 && name[0] == CTL_KERN && name[1] == KERN_USRSTACK) ||
-	    /* hard-coded fallback, stay away from the memory subsystem */
-	    (namelen >= 1 && name[0] == CTL_VM)) {
+
+	/* do not access the sysctl store during startup */
+	if (sysctl_fallback) {
 		return orig(name, namelen, oldp, oldlenp, newp, newlen);
 	}
-	/* must not print the special/fallback cases, because writing
-	 * to a stream in one of them causes a SEGFAULT (even when
-	 * using sprintf() and fwrite() with a stack buffer) */
-	dprintf("sysctl(%d, %d)\n", name[0], name[1]);
 
-	mib_t mib{name, namelen};
+	/* try simulated sysctls */
+	try {
+		mib_t mib{name, namelen};
+		auto & value = sysctls[mib];
+		dprintf("sysctl(%d, %d) [sim]\n", name[0], name[1]);
 
-	if (oldlenp) {
-		if (oldp) {       /* data requested */
-			if (-1 == sysctls[mib].get(oldp, *oldlenp)) {
+		if (oldlenp) {
+			if (oldp) {
+				/* data requested */
+				if (-1 == value.get(oldp, *oldlenp)) {
+					return -1;
+				}
+			} else {
+				/* size requested */
+				*oldlenp = value.size();
+			}
+		}
+
+		if (newp && newlen) {
+			/* update data */
+			if (-1 == value.set(newp, newlen)) {
 				return -1;
 			}
-		} else try {      /* size requested */
-			*oldlenp = sysctls[mib].size();
-		} catch (int e) { /* ….size() may throw */
-			return e;
 		}
-	}
 
-	if (newp && newlen) {     /* update data */
-		if (-1 == sysctls[mib].set(newp, newlen)) {
-			return -1;
-		}
-	}
+		return sys_results;
+	} catch (std::out_of_range &) {}
 
-	return sys_results;
-} catch (std::out_of_range &) {
-	errno = ENOENT;
-	return -1;
+	/* fallback to system sysctl */
+	dprintf("sysctl(%d, %d) [sys]\n", name[0], name[1]);
+	return orig(name, namelen, oldp, oldlenp, newp, newlen);
 }
 
 /**
@@ -1669,58 +1671,37 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
  * @retval -1
  *	The call failed
  */
-int sysctlnametomib(const char * name, int * mibp, size_t * sizep) try {
+int sysctlnametomib(const char * name, int * mibp, size_t * sizep) {
 	static auto const orig =
 	    (decltype(&sysctlnametomib)) dlfunc(RTLD_NEXT, "sysctlnametomib");
+	/* do not access the sysctl store during startup */
 	if (sysctl_fallback) {
 		return orig(name, mibp, sizep);
 	}
-	/* must not print the special/fallback cases, because writing
-	 * to a stream in one of them causes a SEGFAULT (even when
-	 * using sprintf() and fwrite() with a stack buffer) */
-	dprintf("sysctlnametomib(%s)\n", name);
-	auto const & mib = sysctls.getMib(name);
-	for (size_t i = 0; i < *sizep && i < CTL_MAXNAME; ++i) {
-		mibp[i] = mib[i];
-	}
-	return sys_results;
-} catch (std::out_of_range &) {
-	errno = ENOENT;
-	return -1;
-}
 
-/**
- * Intercept calls to sysctlbyname().
- *
- * Falls back on the original sysctlbyname() for the following names:
- *
- * - kern.smp.cpus
- *
- * May fail for the same reasons as sysctl().
- *
- * @param name,oldp,oldlenp,newp,newlen
- *	Please refer to sysctl(3)
- * @retval 0
- *	The call succeeded
- * @retval -1
- *	The call failed
- */
-int sysctlbyname(const char * name, void * oldp, size_t * oldlenp,
-                 const void * newp, size_t newlen) {
-	static auto const orig =
-	    (decltype(&sysctlbyname)) dlfunc(RTLD_NEXT, "sysctlbyname");
-	/* explicit fallback for sysctls used by OS functions */
-	if (/* -lpthread */ strcmp(name, "kern.smp.cpus") == 0) {
-		Hold<bool> hold{sysctl_fallback, true};
-		return orig(name, oldp, oldlenp, newp, newlen);
-	}
-	/* must not print the special/fallback cases, because writing
-	 * to a stream in one of them causes a SEGFAULT (even when
-	 * using sprintf() and fwrite() with a stack buffer) */
-	dprintf("sysctlbyname(%s)\n", name);
-	/* use original function for regular operation, just without
-	 * holding the sysctl_fallback flag */
-	return orig(name, oldp, oldlenp, newp, newlen);
+	/* try simulated sysctls */
+	try {
+		auto const & mib = sysctls.getMib(name);
+		dprintf("sysctlnametomib(%s) [sim]\n", name);
+		for (size_t i = 0; i < *sizep && i < CTL_MAXNAME; ++i) {
+			mibp[i] = mib[i];
+		}
+		return sys_results;
+	} catch (std::out_of_range &) {}
+
+	/* error if the base is known, that means it is a simulation
+	 * variable and since the requested instance does not exist
+	 * within the simulation, it must not be accessible to the
+	 * host process */
+	try {
+		sysctls.getBaseMib(name);
+		dprintf("sysctlnametomib(%s) [sim] -> ENOENT\n", name);
+		return errno=ENOENT, -1;
+	} catch (std::out_of_range &) {}
+
+	/* fallback to system sysctl */
+	dprintf("sysctlnametomib(%s) [sys]\n", name);
+	return orig(name, mibp, sizep);
 }
 
 /**
