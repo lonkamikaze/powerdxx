@@ -726,6 +726,20 @@ inline ofile<io::link> warn(MsgTs &&... msg) {
 int sys_results = 0;
 
 /**
+ * Combine sys_results with a computed result.
+ *
+ * @param result
+ *	A computed result
+ * @retval sys_results
+ *	If sys_results is a non-zero value
+ * @retval result
+ *	If sys_results is set to 0
+ */
+inline int sys_result(int const result) {
+	return !sys_results * result + sys_results;
+}
+
+/**
  * This prints an error message and sets sys_results to make the hijacked
  * process fail.
  *
@@ -1632,7 +1646,7 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 
 	/* do not access the sysctl store during startup */
 	if (sysctl_startup) {
-		return orig(name, namelen, oldp, oldlenp, newp, newlen);
+		return sys_result(orig(name, namelen, oldp, oldlenp, newp, newlen));
 	}
 
 	/* try simulated sysctls */
@@ -1665,7 +1679,7 @@ int sysctl(const int * name, u_int namelen, void * oldp, size_t * oldlenp,
 
 	/* fallback to system sysctl */
 	dprintf("sysctl(%d, %d) [sys]\n", name[0], name[1]);
-	return orig(name, namelen, oldp, oldlenp, newp, newlen);
+	return sys_result(orig(name, namelen, oldp, oldlenp, newp, newlen));
 }
 
 /**
@@ -1683,7 +1697,7 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) {
 	    (decltype(&sysctlnametomib)) dlfunc(RTLD_NEXT, "sysctlnametomib");
 	/* do not access the sysctl store during startup */
 	if (sysctl_startup) {
-		return orig(name, mibp, sizep);
+		return sys_result(orig(name, mibp, sizep));
 	}
 
 	/* try simulated sysctls */
@@ -1708,7 +1722,7 @@ int sysctlnametomib(const char * name, int * mibp, size_t * sizep) {
 
 	/* fallback to system sysctl */
 	dprintf("sysctlnametomib(%s) [sys]\n", name);
-	return orig(name, mibp, sizep);
+	return sys_result(orig(name, mibp, sizep));
 }
 
 /**
