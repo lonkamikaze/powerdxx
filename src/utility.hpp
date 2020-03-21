@@ -383,13 +383,13 @@ struct FromChars {
 	 * @tparam CountV
 	 *	The number of characters
 	 * @param str
-	 *	Tha character array to parse from
+	 *	The character array to parse from
 	 * @param terminator
 	 *	Indicates whether the character array has a terminating
 	 *	null character.
 	 */
 	template <size_t CountV>
-	FromChars(char const (& str)[CountV], bool terminator = true) :
+	FromChars(char const (& str)[CountV], bool const terminator = true) :
 	    FromChars{str, str + CountV - terminator} {}
 
 	/**
