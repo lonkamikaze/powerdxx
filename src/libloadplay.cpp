@@ -1438,11 +1438,18 @@ class Main {
 
 		/* get static sysctls */
 		auto const expr = "([^=]*)=(.*)\n"_r;
-		while (fin.gets(inbuf) &&
-		       std::regex_match(inbuf, match, expr)) {
+		if (!fin.gets(inbuf)) {
+			fail("cannot read from input\n");
+			return;
+		}
+		while (std::regex_match(inbuf, match, expr)) {
 			sysctls.addValue(match[1].str(), match[2].str());
 			debug("sysctl %s = %s\n",
 			      match[1].str().c_str(), match[2].str().c_str());
+			if (!fin.gets(inbuf)) {
+				fail("unexpected end of input behind: %s", inbuf);
+				return;
+			}
 		}
 
 		/* check supported feature flags */
