@@ -15,7 +15,7 @@ CPPS=          ${SRCFILES:M*.cpp}
 TARGETS=       ${BINCPPS:T:.cpp=} ${SOCPPS:T:.cpp=.so}
 CLEAN=         *.o *.pch ${TARGETS}
 
-PKGVERSION=    ${.CURDIR:T:C/.*-//:M[0-9]*.[0-9]*.[0-9]*}
+PKGVERSION=    ${.CURDIR:T:C/[^-]*-//:M[0-9]*.[0-9]*.[0-9]*}
 GITRELEASE.sh= git tag -l --sort=-taggerdate 2>&- | head -n1 || :
 GITCOMMITS.sh= git rev-list --count HEAD "^${GITRELEASE}" 2>&- || echo 0
 GITRELEASE=    ${GITRELEASE.sh:sh}
