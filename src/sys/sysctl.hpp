@@ -540,26 +540,6 @@ class Once {
 template <typename T, size_t MibDepth>
 using SysctlOnce = Once<T, Sysctl<MibDepth>>;
 
-/**
- * This creates a Once instance.
- *
- * This is intended for cases when a Once instance is created as a
- * temporary to retrieve a value, using it's fallback to a default
- * mechanism.
- *
- * @tparam T
- *	The value type
- * @tparam SysctlT
- *	The Sysctl type
- * @param value
- *	The default value to fall back to
- * @param sysctl
- *	The sysctl to try and read from
- */
-template <typename T, class SysctlT>
-constexpr Once<T, SysctlT> make_Once(T const & value, SysctlT const & sysctl)
-noexcept { return {value, sysctl}; }
-
 } /* namespace ctl */
 } /* namespace sys */
 

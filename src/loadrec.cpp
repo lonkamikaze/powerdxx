@@ -53,7 +53,7 @@ using namespace std::literals::string_literals;
 using clas::ival;
 
 using sys::ctl::make_Sysctl;
-using sys::ctl::make_Once;
+using sys::ctl::Once;
 
 namespace io = sys::io;
 
@@ -252,14 +252,14 @@ void print_sysctls() {
 	              make_Sysctl(CTL_HW, HW_MACHINE).get<char>().get(),
 	              make_Sysctl(CTL_HW, HW_MODEL).get<char>().get(),
 	              g.ncpu,
-	              ACLINE, make_Once(1U, hw_acpi_acline));
+	              ACLINE, Once{1U, hw_acpi_acline});
 
 	for (coreid_t i = 0; i < g.ncpu; ++i) {
 		char mibname[40];
 		sprintf_safe(mibname, FREQ, i);
 		try {
 			sys::ctl::Sysctl<> ctl{mibname};
-			g.fout.printf("%s=%d\n", mibname, make_Once(0, ctl));
+			g.fout.printf("%s=%d\n", mibname, Once{0, ctl});
 		} catch (sys::sc_error<sys::ctl::error> e) {
 			verbose("cannot access sysctl: %s\n", mibname);
 			if (i == 0) {

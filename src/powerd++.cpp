@@ -489,10 +489,10 @@ void init() {
 				char name[40];
 				sprintf_safe(name, source, core);
 				try {
-					group.temp_crit =
-					    sys::ctl::make_Once<decikelvin_t>
-					        (group.temp_crit,
-					         sys::ctl::Sysctl<>{name});
+					group.temp_crit = sys::ctl::Once{
+					    static_cast<decikelvin_t>(group.temp_crit),
+					    sys::ctl::Sysctl<>{name}
+					};
 					g.temp_throttling = true;
 					group.temp_high =
 					    group.temp_crit - HITEMP_OFFSET;
@@ -787,7 +787,7 @@ void update_freq(Global::ACSet const & acstate) {
 void update_freq() {
 	/* get AC line status */
 	auto const acline = to_value<AcLineState>(
-	    sys::ctl::make_Once(AcLineState::UNKNOWN, g.acline_ctl));
+	    sys::ctl::Once{AcLineState::UNKNOWN, g.acline_ctl});
 	auto const & acstate = g.acstates[acline];
 
 	assert(acstate.target_load <= 1024 &&
@@ -829,7 +829,7 @@ void init_loads() {
 
 	/* get AC line status */
 	auto const acline = to_value<AcLineState>(
-	    sys::ctl::make_Once(AcLineState::UNKNOWN, g.acline_ctl));
+	    sys::ctl::Once{AcLineState::UNKNOWN, g.acline_ctl});
 	auto const & acstate = g.acstates[acline];
 
 	/* fill the load buffer for each core */
