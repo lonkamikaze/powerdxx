@@ -34,7 +34,7 @@
 namespace {
 
 using nih::Parameter;
-using nih::make_Options;
+using nih::Options;
 
 using types::cptime_t;
 using types::mhz_t;
@@ -1000,7 +1000,7 @@ Parameter<OE> const PARAMETERS[]{
  *	The command line arguments
  */
 void read_args(int const argc, char const * const argv[]) {
-	auto getopt = make_Options(argc, argv, USAGE, PARAMETERS);
+	auto getopt = Options{argc, argv, USAGE, PARAMETERS};
 
 	auto & ac_on = g.acstates[to_value(AcLineState::ONLINE)];
 	auto & ac_batt = g.acstates[to_value(AcLineState::BATTERY)];

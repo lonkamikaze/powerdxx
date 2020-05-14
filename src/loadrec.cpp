@@ -29,7 +29,7 @@
 namespace {
 
 using nih::Parameter;
-using nih::make_Options;
+using nih::Options;
 
 using constants::ACLINE;
 using constants::FREQ;
@@ -174,7 +174,7 @@ void init() {
  *	The command line arguments
  */
 void read_args(int const argc, char const * const argv[]) {
-	auto getopt = make_Options(argc, argv, USAGE, PARAMETERS);
+	auto getopt = Options{argc, argv, USAGE, PARAMETERS};
 
 	try {
 		while (true) switch (getopt()) {

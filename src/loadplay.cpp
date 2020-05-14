@@ -20,7 +20,7 @@
 namespace {
 
 using nih::Parameter;
-using nih::make_Options;
+using nih::Options;
 
 using errors::Exit;
 using errors::Exception;
@@ -147,7 +147,7 @@ void set_library_path(int const argc, char * const argv[]) {
 int main(int argc, char * argv[]) try {
 	auto & env = sys::env::vars;
 
-	auto getopt = make_Options(argc, argv, USAGE, PARAMETERS);
+	auto getopt = Options{argc, argv, USAGE, PARAMETERS};
 
 	try {
 		while (true) switch (getopt()) {

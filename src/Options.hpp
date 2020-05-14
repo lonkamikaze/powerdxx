@@ -65,8 +65,8 @@
  * The usage string and the parameter usage strings are used to assemble
  * the string provided by the nih::Options<>::usage() method.
  *
- * The parameter definitions should be passed to nih::make_Options() to
- * create the functor:
+ * The parameter definitions must be passed to nih::Options constructor
+ * to create the functor:
  *
  * ~~~~{.cpp}
  * #include <iostream>
@@ -77,7 +77,7 @@
  * 	char const * outfile = "-";
  * 	bool verbose = false;
  * 
- * 	auto getopt = nih::make_Options(argc, argv, USAGE, PARAMETERS);
+ * 	auto getopt = nih::Options{argc, argv, USAGE, PARAMETERS};
  * 	while (true) switch (getopt()) { // get new option/argument
  * 	case MyOptions::USAGE:
  * 		std::cerr << getopt.usage(); // show usage
@@ -236,9 +236,6 @@ size_t argCount(Parameter<OptionT> const & def) {
 /**
  * An instance of this class offers operators to retrieve command line
  * options and arguments.
- *
- * Instantiate with make_Options() to infer template parameters
- * automatically.
  *
  * Check the `operator ()` and `operator []` for use.
  *
@@ -710,29 +707,6 @@ class Options {
 		return this->argi;
 	}
 };
-
-/**
- * Wrapper around the Options<> constructor, that uses function template
- * matching to deduce template arguments.
- *
- * @tparam OptionT
- *	An enum for all the available options
- * @tparam DefCount
- *	The number of option definitions
- * @param argc,argv
- *	The command line arguments
- * @param usage
- *	A usage string that is used in the header of the usage output
- * @param defs
- *	An array of parameter definitions
- */
-template <class OptionT, size_t DefCount>
-constexpr Options<OptionT, DefCount>
-make_Options(int const argc, char const * const * const argv,
-             char const * const usage,
-             Parameter<OptionT> const (&defs)[DefCount]) {
-	return Options<OptionT, DefCount>{argc, argv, usage, defs};
-}
 
 } /* namespace nih */
 
