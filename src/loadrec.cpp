@@ -52,8 +52,10 @@ using namespace std::literals::string_literals;
 
 using clas::ival;
 
-using sys::ctl::make_Sysctl;
+using sys::ctl::Sysctl;
 using sys::ctl::Once;
+using sys::ctl::SysctlSync;
+using sys::ctl::SysctlOnce;
 
 namespace io = sys::io;
 
@@ -100,7 +102,7 @@ struct {
 	/**
 	 * The number of CPU cores/threads.
 	 */
-	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{1U, {CTL_HW, HW_NCPU}};
+	SysctlOnce<coreid_t, 2> const ncpu{1U, {CTL_HW, HW_NCPU}};
 } g;
 
 /**
@@ -237,7 +239,7 @@ void read_args(int const argc, char const * const argv[]) {
  * Print the sysctls
  */
 void print_sysctls() {
-	sys::ctl::Sysctl<> hw_acpi_acline;
+	Sysctl hw_acpi_acline;
 	try {
 		hw_acpi_acline = {ACLINE};
 	} catch (sys::sc_error<sys::ctl::error>) {
@@ -249,8 +251,8 @@ void print_sysctls() {
 	              "hw.ncpu=%d\n"
 	              "%s=%d\n",
 	              LOADREC_FEATURES, FEATURES,
-	              make_Sysctl(CTL_HW, HW_MACHINE).get<char>().get(),
-	              make_Sysctl(CTL_HW, HW_MODEL).get<char>().get(),
+	              Sysctl{CTL_HW, HW_MACHINE}.get<char>().get(),
+	              Sysctl{CTL_HW, HW_MODEL}.get<char>().get(),
 	              g.ncpu,
 	              ACLINE, Once{1U, hw_acpi_acline});
 
@@ -258,7 +260,7 @@ void print_sysctls() {
 		char mibname[40];
 		sprintf_safe(mibname, FREQ, i);
 		try {
-			sys::ctl::Sysctl<> ctl{mibname};
+			Sysctl ctl{mibname};
 			g.fout.printf("%s=%d\n", mibname, Once{0, ctl});
 		} catch (sys::sc_error<sys::ctl::error> e) {
 			verbose("cannot access sysctl: %s\n", mibname);
@@ -271,7 +273,7 @@ void print_sysctls() {
 		for (auto const mibbasename : {FREQ_LEVELS, FREQ_DRIVER}) {
 			sprintf_safe(mibname, mibbasename, i);
 			try {
-				sys::ctl::Sysctl<> ctl{mibname};
+				Sysctl ctl{mibname};
 				g.fout.printf("%s=%s\n", mibname, ctl.get<char>().get());
 			} catch (sys::sc_error<sys::ctl::error>) {
 				verbose("cannot access sysctl: %s\n", mibname);
@@ -290,7 +292,7 @@ void run() try {
 	/*
 	 * Setup cptimes buffer for two samples.
 	 */
-	sys::ctl::Sysctl<> const cp_times_ctl = {CP_TIMES};
+	Sysctl const cp_times_ctl{CP_TIMES};
 
 	auto const columns = cp_times_ctl.size() / sizeof(cptime_t);
 	auto cp_times = std::unique_ptr<cptime_t[]>(
@@ -300,14 +302,14 @@ void run() try {
 	 * Setup clock frequency sources for each core.
 	 */
 	coreid_t const cores = columns / CPUSTATES;
-	auto corefreqs = std::unique_ptr<sys::ctl::Sync<mhz_t, sys::ctl::Sysctl<>>[]>(
-	    new sys::ctl::Sync<mhz_t, sys::ctl::Sysctl<>>[cores]{});
+	auto corefreqs = std::unique_ptr<SysctlSync<mhz_t>[]>(
+	    new SysctlSync<mhz_t>[cores]{});
 
 	for (coreid_t i = 0; i < cores; ++i) {
 		char mibname[40];
 		sprintf_safe(mibname, FREQ, i);
 		try {
-			corefreqs[i] = sys::ctl::Sysctl<>{mibname};
+			corefreqs[i] = Sysctl{mibname};
 		} catch (sys::sc_error<sys::ctl::error> e) {
 			if (i == 0) {
 				fail(Exit::ENOFREQ, e,

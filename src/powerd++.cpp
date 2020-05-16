@@ -78,6 +78,11 @@ using constants::ADP;
 using constants::HADP;
 using constants::HITEMP_OFFSET;
 
+using sys::ctl::Sysctl;
+using sys::ctl::Once;
+using sys::ctl::SysctlSync;
+using sys::ctl::SysctlOnce;
+
 namespace io = sys::io;
 
 using namespace std::literals::string_literals;
@@ -100,7 +105,7 @@ struct CoreGroup {
 	/**
 	 * The sysctl dev.cpu.%d.freq.
 	 */
-	sys::ctl::SysctlSync<mhz_t> freq{{}};
+	SysctlSync<mhz_t> freq{{}};
 
 	/**
 	 * The number of the core owning dev.cpu.%d.freq.
@@ -195,7 +200,7 @@ struct Core {
 	/**
 	 * The dev.cpu.%d.temperature sysctl, if present.
 	 */
-	sys::ctl::SysctlSync<decikelvin_t> temp{{}};
+	SysctlSync<decikelvin_t> temp{{}};
 };
 
 /**
@@ -227,7 +232,7 @@ struct Global {
 	/**
 	 * The number of CPU cores or threads.
 	 */
-	sys::ctl::SysctlOnce<coreid_t, 2> const ncpu{1, {CTL_HW, HW_NCPU}};
+	SysctlOnce<coreid_t, 2> const ncpu{1, {CTL_HW, HW_NCPU}};
 
 	/**
 	 * Per AC line state settings.
@@ -274,7 +279,7 @@ struct Global {
 	/**
 	 * The hw.acpi.acline ctl.
 	 */
-	sys::ctl::Sysctl<> acline_ctl;
+	Sysctl<0> acline_ctl;
 
 	/**
 	 * Verbose mode.
@@ -316,7 +321,7 @@ struct Global {
 	/**
 	 * The kern.cp_times sysctl.
 	 */
-	sys::ctl::Sysctl<> cp_times_ctl{};
+	Sysctl<0> cp_times_ctl;
 
 	/**
 	 * The kern.cp_times buffer for all cores.
@@ -409,7 +414,7 @@ void init() {
 		char name[40];
 		sprintf_safe(name, FREQ, core);
 		try {
-			sys::ctl::Sysctl<>{name};
+			Sysctl{name};
 			++g.ngroups;
 		} catch (sys::sc_error<sys::ctl::error> e) {
 		}
@@ -426,7 +431,7 @@ void init() {
 		char name[40];
 		sprintf_safe(name, FREQ, core);
 		try {
-			sys::ctl::Sysctl<> const ctl{name};
+			Sysctl const ctl{name};
 			auto & group = g.groups[++groupi];
 			group.freq = {ctl};
 			group.corei = core;
@@ -489,9 +494,8 @@ void init() {
 				char name[40];
 				sprintf_safe(name, source, core);
 				try {
-					group.temp_crit = sys::ctl::Once{
-					    static_cast<decikelvin_t>(group.temp_crit),
-					    sys::ctl::Sysctl<>{name}
+					group.temp_crit = SysctlOnce<decikelvin_t>{
+					    group.temp_crit, name
 					};
 					g.temp_throttling = true;
 					group.temp_high =
@@ -532,7 +536,7 @@ void init() {
 		/* set per group min/max frequency boundaries */
 		sprintf_safe(name, FREQ_LEVELS, i);
 		try {
-			sys::ctl::Sysctl<> const ctl{name};
+			Sysctl const ctl{name};
 			auto levels = ctl.get<char>();
 			/* the maximum should at least be the minimum
 			 * and vice versa */
@@ -569,7 +573,7 @@ void init() {
 		/* check freq_drivers  */
 		sprintf_safe(name, FREQ_DRIVER, i);
 		try {
-			sys::ctl::Sysctl<> const ctl{name};
+			Sysctl const ctl{name};
 			auto driver = ctl.get<char>();
 			for (auto const prefix : FREQ_DRIVER_BLACKLIST) {
 				if (0 != std::strncmp(driver.get(), prefix,
@@ -787,7 +791,7 @@ void update_freq(Global::ACSet const & acstate) {
 void update_freq() {
 	/* get AC line status */
 	auto const acline = to_value<AcLineState>(
-	    sys::ctl::Once{AcLineState::UNKNOWN, g.acline_ctl});
+	    Once{AcLineState::UNKNOWN, g.acline_ctl});
 	auto const & acstate = g.acstates[acline];
 
 	assert(acstate.target_load <= 1024 &&
@@ -829,7 +833,7 @@ void init_loads() {
 
 	/* get AC line status */
 	auto const acline = to_value<AcLineState>(
-	    sys::ctl::Once{AcLineState::UNKNOWN, g.acline_ctl});
+	    Once{AcLineState::UNKNOWN, g.acline_ctl});
 	auto const & acstate = g.acstates[acline];
 
 	/* fill the load buffer for each core */

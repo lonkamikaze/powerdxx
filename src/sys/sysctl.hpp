@@ -110,20 +110,17 @@ void sysctl_set(mib_t const (& mib)[MibDepth], void const * const newp,
  * `/usr/include/sys/sysctl.h` for predefined MIBs.
  *
  * For all other sysctls, symbolic names must be used. E.g.
- * `Sysctl<>{"dev.cpu.0.freq"}`. Creating a Sysctl from a symbolic
+ * `Sysctl<0>{"dev.cpu.0.freq"}`. Creating a Sysctl from a symbolic
  * name may throw.
  *
- * Fixed address sysctls may be created using the make_Sysctl() function,
- * e.g. `make_Sysctl(CTL_HW, HW_NCPU)`.
- *
- * Instances created from symbolic names must use the Sysctl<0>
- * specialisation, this can be done by omitting the template argument
- * `Sysctl<>`.
+ * Suitable deduction guides usually allow omitting the template arguments,
+ * i.e. Sysctl{CTL_HW, HW_NCPU} and Sysctl{"dev.cpu.0.freq"} implicitly
+ * use the correct template argument.
  *
  * @tparam MibDepth
  *	The MIB level, e.g. "hw.ncpu" is two levels deep
  */
-template <size_t MibDepth = 0>
+template <size_t MibDepth>
 class Sysctl {
 	private:
 	/**
@@ -350,28 +347,30 @@ class Sysctl<0> {
 };
 
 /**
- * Create a Sysctl instances.
- *
- * This is only compatible with creating sysctls from predefined MIBs.
+ * Create a Sysctl from a set of predefined MIBs.
  *
  * @tparam Args
- *	List of argument types, should all be pid_t
- * @param args
- *	List of initialising arguments
- * @return
- *	A Sysctl instance with the depth matching the number of arguments
+ *	List of argument types, should all be mib_t
  */
-template <typename... Args>
-constexpr Sysctl<sizeof...(Args)> make_Sysctl(Args const... args) {
-	return {args...};
-}
+template <typename ... ArgTs>
+Sysctl(mib_t const, ArgTs const ...) -> Sysctl<(1 + sizeof...(ArgTs))>;
+
+/**
+ * Create a Sysctl<0> by name.
+ */
+Sysctl(char const * const) -> Sysctl<0>;
+
+/**
+ * Default construct a Sysctl<0>.
+ */
+Sysctl() -> Sysctl<0>;
 
 /**
  * This is a wrapper around Sysctl that allows semantically transparent
  * use of a sysctl.
  *
  * ~~~ c++
- * Sync<int, Sysctl<>> sndUnit{{"hw.snd.default_unit"}};
+ * Sync<int, Sysctl<0>> sndUnit{{"hw.snd.default_unit"}};
  * if (sndUnit != 3) {    // read from sysctl
  *	sndUnit = 3;      // assign to sysctl
  * }
@@ -442,7 +441,7 @@ class Sync {
  * A convenience alias around Sync.
  *
  * ~~~ c++
- * // Sync<int, Sysctl<>> sndUnit{{"hw.snd.default_unit"}};
+ * // Sync<int, Sysctl<0>> sndUnit{{"hw.snd.default_unit"}};
  * SysctlSync<int> sndUnit{{"hw.snd.default_unit"}};
  * if (sndUnit != 3) {    // read from sysctl
  *	sndUnit = 3;      // assign to sysctl
@@ -537,7 +536,7 @@ class Once {
  * @tparam MibDepth
  *	The maximum allowed MIB depth
  */
-template <typename T, size_t MibDepth>
+template <typename T, size_t MibDepth = 0>
 using SysctlOnce = Once<T, Sysctl<MibDepth>>;
 
 } /* namespace ctl */
