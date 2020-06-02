@@ -1,0 +1,79 @@
+#!/usr/bin/awk -f
+#
+# @see README.md#playdiff
+#
+
+#
+# Print usage in case of missing input files.
+#
+BEGIN {
+	if (ARGC < 3) {
+		print "usage: playdiff file1 file2 ..."
+		exit 1
+	}
+}
+
+#
+# Record the first file data.
+#
+FNR == NR {
+	ORIG_NAME = FILENAME
+	ORIG_TIME = $1
+	i = 0
+	while (i <= NF) {
+		ORIG_DATA[FNR, i] = $i
+		++i
+	}
+}
+
+#
+# Reset the sum of absolute deviations and the sum of deviations
+# in the first line of a new file.
+#
+NR != FNR && FNR == 1 {
+	print "--- " ORIG_NAME
+	print "+++ " FILENAME
+	i = 2
+	while (i <= NF) {
+		SUMABSDEV[i] = 0
+		SUMDEV[i] = 0
+		++i
+	}
+}
+
+#
+# Update the sum of deviations and absolute deviations.
+#
+NR != FNR && FNR > 1 {
+	if ($1 != ORIG_DATA[FNR, 1]) {
+		print "time reference mismatch, skip to next file"
+		nextfile
+	}
+	dt = ORIG_DATA[FNR, 1] - ORIG_DATA[FNR - 1, 1]
+	i = 2
+	while (i <= NF) {
+		$i = dt * ($i - ORIG_DATA[FNR, i])
+		SUMABSDEV[i] += $i < 0 ? -$i : $i
+		SUMDEV[i] += $i
+		++i
+	}
+}
+
+#
+# Output the recorded deviations for each column when the last frame
+# is encountered.
+#
+NR != FNR && $1 == ORIG_TIME {
+	i = 1
+	printf("%-20.20s  %12.12s  %12.12s  %12.12s  %12.12s\n",
+	       "", "ID", "MD", "IAD", "MAD")
+	while (i <= NF) {
+		printf("%-20.20s  %12.1f  %12.1f  %12.1f  %12.1f\n",
+		       ORIG_DATA[1, i],
+		       SUMDEV[i],
+		       SUMDEV[i] / ORIG_TIME,
+		       SUMABSDEV[i],
+		       SUMABSDEV[i] / ORIG_TIME)
+		++i
+	}
+}
