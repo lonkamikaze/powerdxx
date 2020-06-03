@@ -1588,7 +1588,7 @@ class Hold {
 	public:
 
 	/**
-	 * The constructor sets the referenced varibale to the given
+	 * The constructor sets the referenced variable to the given
 	 * value.
 	 *
 	 * @param ref
