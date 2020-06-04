@@ -16,11 +16,10 @@ TARGETS=       ${BINCPPS:T:.cpp=} ${SOCPPS:T:.cpp=.so}
 CLEAN=         *.o *.pch ${TARGETS}
 
 PKGVERSION=    ${.CURDIR:T:C/[^-]*-//:M[0-9]*.[0-9]*.[0-9]*}
-GITRELEASE.sh= git tag -l --sort=-taggerdate 2>&- | head -n1 || :
-GITCOMMITS.sh= git rev-list --count HEAD "^${GITRELEASE}" 2>&- || echo 0
+GITVERSION.sh= git describe 2>&- || :
 GITRELEASE=    ${GITRELEASE.sh:sh}
 GITCOMMITS=    ${GITCOMMITS.sh:sh}
-GITVERSION=    ${GITRELEASE}${GITCOMMITS:C/^/+c/:N+c0}
+GITVERSION=    ${GITVERSION.sh:sh}
 VERSIONLIST=   ${GITVERSION} ${PKGVERSION} unknown
 VERSION=       ${VERSIONLIST:[1]}
 
