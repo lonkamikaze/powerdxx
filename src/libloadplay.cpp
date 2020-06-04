@@ -1316,11 +1316,13 @@ class Emulator {
 					this->fin.scanf("%lu", ticks);
 					sumRecTicks += ticks;
 				}
+				double const recLoadTicks =
+				    sumRecTicks - recTicks[CP_IDLE];
 				/* must be non-zero */
 				sumRecTicks += !sumRecTicks;
 				/* update report with recorded data */
 				frame[i].rec =
-				    {core.recFreq, 1. - static_cast<double>(recTicks[CP_IDLE]) / sumRecTicks};
+				    {core.recFreq, recLoadTicks / sumRecTicks};
 
 				/* get recorded cycles in [kcycles] */
 				cptime_t cycles[CPUSTATES]{};
