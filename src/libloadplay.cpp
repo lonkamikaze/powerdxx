@@ -67,6 +67,7 @@ using types::ms;
 using types::cptime_t;
 using types::mhz_t;
 using types::coreid_t;
+using cycles_t = uint64_t;
 
 using version::LOADREC_FEATURES;
 using version::flag_t;
@@ -1153,21 +1154,21 @@ class Emulator {
 		mhz_t recFreq{0};
 
 		/**
-		 * The load cycles simulated for this frame in [kcycles].
+		 * The load cycles simulated for this frame in [cycles].
 		 *
 		 * This is determined at the beginning of frame and used
 		 * to calculate the reported load at the end of frame.
 		 */
-		cptime_t runLoadCycles{0};
+		cycles_t runLoadCycles{0};
 
 		/**
-		 * The cycles carried over to the next frame in [kcycles].
+		 * The cycles carried over to the next frame in [cycles].
 		 *
 		 * This is determined at the beginning of frame and
 		 * used to calculated the simulation load at the
 		 * beginning of the next frame.
 		 */
-		cptime_t carryCycles[CPUSTATES]{};
+		cycles_t carryCycles[CPUSTATES]{};
 	};
 
 	/**
@@ -1324,21 +1325,21 @@ class Emulator {
 				frame[i].rec =
 				    {core.recFreq, recLoadTicks / sumRecTicks};
 
-				/* get recorded cycles in [kcycles] */
-				cptime_t cycles[CPUSTATES]{};
-				auto const runCycles = duration * core.recFreq;
-				for (cptime_t state = 0; state < CPUSTATES; ++state) {
+				/* get recorded cycles in [cycles] */
+				cycles_t cycles[CPUSTATES]{};
+				cycles_t const runCycles = duration * core.recFreq * 1000;
+				for (size_t state = 0; state < CPUSTATES; ++state) {
 					cycles[state] = runCycles * recTicks[state] / sumRecTicks;
 				}
 
 				/* add the carry to the recorded cycles */
-				for (cptime_t state = 0; state < CPUSTATES; ++state) {
+				for (size_t state = 0; state < CPUSTATES; ++state) {
 					cycles[state] += core.carryCycles[state];
 					core.carryCycles[state] = 0;
 				}
 
 				/* determine simulation cycles at current freq */
-				cptime_t availableCycles = core.runFreq * duration;
+				cycles_t availableCycles = duration * core.runFreq * 1000;
 				core.runLoadCycles = 0;
 				/* assign cycles in order of priority */
 				static_assert(CPUSTATES == 5, "All CPUSTATES must be implemented");
@@ -1358,9 +1359,19 @@ class Emulator {
 				cycles[CP_IDLE] = availableCycles;
 
 				/* set load for this core */
-				for (cptime_t state = 0; state < CPUSTATES; ++state) {
+				for (size_t state = 0; state < CPUSTATES; ++state) {
+					/*
+					 * Use kcycles instead of cycles to
+					 * prevent creating more than one
+					 * wraparound per sample at reasonable
+					 * powerd sample rates.
+					 *
+					 * The formula * for the max powerd
+					 * sampling cycle is:
+					 * `max_cycle = 2^32 / max_clk / 1000`
+					 */
 					this->sum[i * CPUSTATES + state] +=
-					    cycles[state];
+					    (cycles[state] + 500) / 1000;
 				}
 			}
 
@@ -1378,8 +1389,8 @@ class Emulator {
 			for (coreid_t i = 0; i < this->ncpu; ++i) {
 				auto & core = this->cores[i];
 				core.runFreq = core.freqCtl->get<mhz_t>();
-				cptime_t const runCycles =
-				    core.runFreq * duration;
+				cycles_t const runCycles =
+				    duration * core.runFreq * 1000;
 				frame[i].run =
 				    {core.runFreq,
 				     runCycles
