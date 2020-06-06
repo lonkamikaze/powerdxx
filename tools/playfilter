@@ -1,0 +1,348 @@
+#!/bin/sh
+set -f
+
+e=0
+readonly E_READ_CONCAT=$((e += 1))
+readonly E_READ_COLUMNS=$((e += 1))
+readonly E_FILTER_UNKNOWN=$((e += 1))
+readonly E_FILTER_NOMATCH=$((e += 1))
+readonly E_FILTER_MOVINGAVG_RANGE=$((e += 1))
+readonly E_FILTER_HORIZ_UNIT=$((e += 1))
+
+select() {
+	local expr i
+	expr="${1}"
+	shift
+	i=0
+	while [ $((i += 1)) -le $# ]; do
+		eval "case \"\${${i}%\\[*\\]}\" in
+		${expr})
+			echo ${i}
+		;;
+		esac"
+	done
+}
+
+join() {
+	echo "$*"
+}
+
+filter_movingavg() {
+	local head columns
+	read head
+	columns="$(select "${1}" ${head})"
+	if [ -z "${columns}" ]; then
+		echo "error: movingavg: no column match for: ${1}" >&2
+		exit ${E_FILTER_NOMATCH}
+	fi
+	columns="$(printf 'COLUMNS[%d];' ${columns})"
+	echo "${head}"
+	/usr/bin/awk -vPRE="${2}" -vPOST="${3}" "
+	BEGIN {
+		${columns}
+		PRE  += 0
+		POST += 0
+		SIZE = PRE + POST
+		if (!SIZE) {
+			print \"error: movingavg: range must contain at least 1 value\" > \"/dev/stderr\"
+			exit ${E_FILTER_MOVINGAVG_RANGE}
+		}
+	}
+
+	# truncate floating-point value to 6 fraction digits to avoid
+	# rounding artifacts
+	function trunc6(val) {
+		return int(val * 1000000 + .5) / 1000000
+	}
+
+	# fill input buffer
+	# fill output buffer
+	{
+		for (c = 1; c <= NF; ++c) {
+			BUF_IN[NR, c] = \$c
+			BUF_OUT[NR, c] = \$c
+		}
+	}
+
+	# fill up the lookahead buffer
+	NR <= POST {
+		for (c in COLUMNS) {
+			BUF_SUM[c] += trunc6(\$c)
+		}
+	}
+
+	# fill up the lookback buffer, too
+	# start feeding the output buffer
+	NR > POST && NR <= SIZE {
+		for (c in COLUMNS) {
+			BUF_SUM[c] += trunc6(\$c)
+			BUF_OUT[NR - POST, c] = BUF_SUM[c] / NR
+		}
+	}
+
+	# update filter
+	# feed output buffer
+	NR > SIZE {
+		for (c in COLUMNS) {
+			BUF_SUM[c] -= trunc6(BUF_IN[NR - SIZE, c])
+			BUF_SUM[c] += trunc6(\$c)
+			BUF_OUT[NR - POST, c] = trunc6(BUF_SUM[c] / SIZE)
+		}
+	}
+
+	# produce output
+	# eat output buffer
+	# eat input buffer
+	NR > POST {
+		for (c = 1; c <= NF; ++c) {
+			\$c = BUF_OUT[NR - POST, c]
+			delete BUF_OUT[NR - POST, c]
+			delete BUF_IN[NR - SIZE, c]
+		}
+		print
+	}
+
+	END {
+		for (l = NR + 1; l <= NR + POST; ++l) {
+			# update filter, feed output buffer
+			size = SIZE - l + NR
+			for (c in COLUMNS) {
+				BUF_SUM[c] -= trunc6(BUF_IN[l - SIZE, c])
+				BUF_OUT[l - POST, c] = size ? BUF_SUM[c] / size : 0
+			}
+			# produces output, eat buffers
+			for (c = 1; c <= NF; ++c) {
+				\$c = BUF_OUT[l - POST, c]
+				delete BUF_OUT[l - POST, c]
+				delete BUF_IN[l - SIZE, c]
+			}
+			print
+		}
+	}
+	"
+}
+
+filter_subsample() {
+	/usr/bin/awk -vWRAP="${1}" 'NR % (WRAP + 0) == 1'
+}
+
+filter_cut() {
+	local head columns
+	read head
+	columns="$(select "${1}" ${head})"
+	if [ -z "${columns}" ]; then
+		echo "error: cut: no column match for: ${1}" >&2
+		exit ${E_FILTER_NOMATCH}
+	fi
+	columns="$(IFS=, join $(printf ' $%d' ${columns}))"
+	(echo "${head}"; /bin/cat) | /usr/bin/awk "{ print(${columns}) }"
+}
+
+filter_horiz() {
+	local head columns
+	read head
+	columns="$(select "${2}" ${head})"
+	if [ -z "${columns}" ]; then
+		echo "error: h${1}: no column match for: ${2}" >&2
+		exit ${E_FILTER_NOMATCH}
+	fi
+	columns="$(printf 'COLUMNS[%d];' ${columns})"
+	(echo "${head}"; /bin/cat) | /usr/bin/awk -vALGO="${1}" "
+	BEGIN { ${columns} }
+	NR == 1 {
+		NAME = ALGO \"(\"
+		for (c in COLUMNS) {
+			UNIT = substr(\$c, match(\$c, /\\[.*\\]\$/))
+			break
+		}
+		for (c = 1; c <= NF; ++c) {
+			if (!(c in COLUMNS)) {
+				continue
+			}
+			name = \$c
+			sub(/\\[.*\\]\$/, \"\", name)
+			NAME = NAME name \",\"
+			unit = substr(\$c, match(\$c, /\\[.*\\]\$/))
+			if (unit != UNIT) {
+				print \"error: h\" ALGO \" unit mismatch\"  > \"/dev/stderr\"
+				print \"hint:  \" unit \" != \" UNIT        > \"/dev/stderr\"
+				exit ${E_FILTER_HORIZ_UNIT}
+			}
+		}
+		sub(/,\$/, \")\", NAME)
+		\$++NF = NAME UNIT
+	}
+	NR > 1 && ALGO == \"max\" {
+		max = 0
+		for (c in COLUMNS) {
+			max = (max >= \$c ? max : \$c)
+		}
+		\$++NF = max
+	}
+	NR > 1 && ALGO == \"min\" {
+		for (c in COLUMNS) {
+			min = \$c
+			break
+		}
+		for (c in COLUMNS) {
+			min = (min <= \$c ? min : \$c)
+		}
+		\$++NF = min
+	}
+	NR > 1 && ALGO == \"sum\" {
+		sum = 0
+		for (c in COLUMNS) {
+			sum += \$c
+		}
+		\$++NF = sum
+	}
+	NR > 1 && ALGO == \"avg\" {
+		sum = 0
+		cnt = 0
+		for (c in COLUMNS) {
+			++cnt
+			sum += \$c
+		}
+		\$++NF = sum / cnt
+	}
+	1
+	"
+}
+
+filter_hmax() {
+	filter_horiz max "$@"
+}
+
+filter_hmin() {
+	filter_horiz min "$@"
+}
+
+filter_hsum() {
+	filter_horiz sum "$@"
+}
+
+filter_havg() {
+	filter_horiz avg "$@"
+}
+
+filter_patch() {
+	local head columns
+	read head
+	columns="$(select "${1}" ${head})"
+	if [ -z "${columns}" ]; then
+		echo "error: patch: no column match for: ${1}" >&2
+		exit ${E_FILTER_NOMATCH}
+	fi
+	columns="$(printf 'COLUMNS[%d];' ${columns})"
+	echo "${head}"
+	/usr/bin/awk "
+	BEGIN { ${columns} }
+	{
+		for (c in COLUMNS) {
+			if (PREV[c] >= \$c) {
+				ADD[c] += PREV[c]
+			}
+			PREV[c] = \$c
+			\$c += ADD[c]
+		}
+		print
+	}
+	"
+}
+
+filter_clone() {
+	local head columns
+	read head
+	columns="$(select "${1}" ${head})"
+	if [ -z "${columns}" ]; then
+		echo "error: clone: no column match for: ${1}" >&2
+		exit ${E_FILTER_NOMATCH}
+	fi
+	columns="$(printf 'COLUMNS[%d];' ${columns})"
+	(echo "${head}"; /bin/cat) | /usr/bin/awk -vCLONES="${2}" "
+	BEGIN {
+		${columns}
+		CLONES += 0
+	}
+	NR == 1 {
+		COLS = NF
+		for (c = 1; c <= COLS; ++c) {
+			if (!(c in COLUMNS)) {
+				continue
+			}
+			for (clone = 0; clone < CLONES; ++clone) {
+				name = \$c
+				sub(/(\\[.*\\])?\$/, \".\" clone \"&\", name)
+				\$++NF = name
+			}
+		}
+	}
+	NR > 1 {
+		for (c = 1; c <= COLS; ++c) {
+			if (!(c in COLUMNS)) {
+				continue
+			}
+			for (clone = 0; clone < CLONES; ++clone) {
+				\$++NF = \$c
+			}
+		}
+	}
+	1
+	"
+}
+
+runFilter() {
+	local IFS
+	case "${1}" in
+	cut=*|movingavg=*|subsample=*|hmax=*|hmin=*|hsum=*|havg=*|patch=*|clone=*)
+		IFS=,
+		IFS=$' \n\t' filter_${1%%=*} ${1#*=}
+	;;
+	*)
+		echo "error: not a valid filter: ${1}" >&2
+		exit ${E_FILTER_UNKNOWN}
+	;;
+	esac
+}
+
+runFilters() {
+	if [ -n "${1}" -a -z "${1##*=*}" ]; then
+		if [ -n "${2}" -a -z "${2##*=*}" ]; then
+			runFilter "${1}" | (shift; runFilters "$@")
+			return
+		fi
+		runFilter "${1}"
+		return
+	fi
+	/bin/cat
+}
+
+readFiles() {
+	while [ -z "${1##*=*}" ] && shift; do :; done
+	[ "${1}" == "--" ] && shift
+	/usr/bin/awk "
+	NR == 1 { 
+		for (c = 1; c <= NF; ++c) {
+			HEADER[c] = \$c
+		}
+		HEADER_NF = NF
+	}
+	NF != HEADER_NF {
+		print \"error: \" FILENAME \":\" FNR \": mismatching number of columns\" > \"/dev/stderr\"
+		exit ${E_READ_COLUMNS}
+	}
+	FNR != NR && FNR == 1 {
+		for (c in HEADER) {
+			if (\$c != HEADER[c]) {
+				print \"error: \" FILENAME \":\" FNR \": column name mismatch\" > \"/dev/stderr\"
+				print \"hint:  \" \$c \" != \" HEADER[c] > \"/dev/stderr\"
+				exit ${E_READ_CONCAT}
+			}
+		}
+		next
+	}
+	1
+	" "$@"
+}
+
+readFiles "$@" | runFilters "$@"
