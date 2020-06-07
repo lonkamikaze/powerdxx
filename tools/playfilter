@@ -141,9 +141,9 @@ filter_cut() {
 filter_horiz() {
 	local head columns
 	read head
-	select columns "${2}" ${head}
+	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
-	(echo "${head}"; /bin/cat) | /usr/bin/awk -vALGO="${1}" "
+	(echo "${head}"; /bin/cat) | /usr/bin/awk -vALGO="${FILTER#h}" "
 	BEGIN { ${columns} }
 	NR == 1 {
 		NAME = ALGO \"(\"
@@ -160,8 +160,8 @@ filter_horiz() {
 			NAME = NAME name \",\"
 			unit = substr(\$c, match(\$c, /\\[.*\\]\$/))
 			if (unit != UNIT) {
-				print \"error: h\" ALGO \" unit mismatch\"  > \"/dev/stderr\"
-				print \"hint:  \" unit \" != \" UNIT        > \"/dev/stderr\"
+				print \"error: h\" ALGO \" unit mismatch\" > \"/dev/stderr\"
+				print \"hint:  \" unit \" != \" UNIT       > \"/dev/stderr\"
 				exit ${E_FILTER_HORIZ_UNIT}
 			}
 		}
@@ -203,22 +203,6 @@ filter_horiz() {
 	}
 	1
 	"
-}
-
-filter_hmax() {
-	filter_horiz max "$@"
-}
-
-filter_hmin() {
-	filter_horiz min "$@"
-}
-
-filter_hsum() {
-	filter_horiz sum "$@"
-}
-
-filter_havg() {
-	filter_horiz avg "$@"
 }
 
 filter_patch() {
@@ -281,10 +265,13 @@ filter_clone() {
 
 runFilter() {
 	local IFS
+	IFS=,
 	case "${1}" in
-	cut=*|movingavg=*|subsample=*|hmax=*|hmin=*|hsum=*|havg=*|patch=*|clone=*)
-		IFS=,
+	cut=*|movingavg=*|subsample=*|patch=*|clone=*)
 		FILTER="${1%%=*}" IFS=$' \n\t' filter_${1%%=*} ${1#*=}
+	;;
+	hmax=*|hmin=*|hsum=*|havg=*)
+		FILTER="${1%%=*}" IFS=$' \n\t' filter_horiz ${1#*=}
 	;;
 	*)
 		echo "error: not a valid filter: ${1}" >&2
