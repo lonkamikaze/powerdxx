@@ -9,7 +9,7 @@ readonly E_FILTER_NOMATCH=$((e += 1))
 readonly E_FILTER_MOVINGAVG_RANGE=$((e += 1))
 readonly E_FILTER_HORIZ_UNIT=$((e += 1))
 
-select() {
+selectp() {
 	local expr i
 	expr="${1}"
 	shift
@@ -23,18 +23,22 @@ select() {
 	done
 }
 
+select() {
+	setvar "${1}" "$(shift; selectp "$@")"
+	if eval "[ -z \"\${$1}\" ]"; then
+		echo "error: ${FILTER}: no column match for: ${2}" >&2
+		exit ${E_FILTER_NOMATCH}
+	fi
+}
+
 join() {
-	echo "$*"
+	setvar "${1}" "$(shift; echo "$*")"
 }
 
 filter_movingavg() {
 	local head columns
 	read head
-	columns="$(select "${1}" ${head})"
-	if [ -z "${columns}" ]; then
-		echo "error: movingavg: no column match for: ${1}" >&2
-		exit ${E_FILTER_NOMATCH}
-	fi
+	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	echo "${head}"
 	/usr/bin/awk -vPRE="${2}" -vPOST="${3}" "
@@ -129,23 +133,15 @@ filter_subsample() {
 filter_cut() {
 	local head columns
 	read head
-	columns="$(select "${1}" ${head})"
-	if [ -z "${columns}" ]; then
-		echo "error: cut: no column match for: ${1}" >&2
-		exit ${E_FILTER_NOMATCH}
-	fi
-	columns="$(IFS=, join $(printf ' $%d' ${columns}))"
+	select columns "${1}" ${head}
+	IFS=, join columns $(printf '$%d ' ${columns})
 	(echo "${head}"; /bin/cat) | /usr/bin/awk "{ print(${columns}) }"
 }
 
 filter_horiz() {
 	local head columns
 	read head
-	columns="$(select "${2}" ${head})"
-	if [ -z "${columns}" ]; then
-		echo "error: h${1}: no column match for: ${2}" >&2
-		exit ${E_FILTER_NOMATCH}
-	fi
+	select columns "${2}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	(echo "${head}"; /bin/cat) | /usr/bin/awk -vALGO="${1}" "
 	BEGIN { ${columns} }
@@ -228,11 +224,7 @@ filter_havg() {
 filter_patch() {
 	local head columns
 	read head
-	columns="$(select "${1}" ${head})"
-	if [ -z "${columns}" ]; then
-		echo "error: patch: no column match for: ${1}" >&2
-		exit ${E_FILTER_NOMATCH}
-	fi
+	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	echo "${head}"
 	/usr/bin/awk "
@@ -253,11 +245,7 @@ filter_patch() {
 filter_clone() {
 	local head columns
 	read head
-	columns="$(select "${1}" ${head})"
-	if [ -z "${columns}" ]; then
-		echo "error: clone: no column match for: ${1}" >&2
-		exit ${E_FILTER_NOMATCH}
-	fi
+	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	(echo "${head}"; /bin/cat) | /usr/bin/awk -vCLONES="${2}" "
 	BEGIN {
@@ -296,7 +284,7 @@ runFilter() {
 	case "${1}" in
 	cut=*|movingavg=*|subsample=*|hmax=*|hmin=*|hsum=*|havg=*|patch=*|clone=*)
 		IFS=,
-		IFS=$' \n\t' filter_${1%%=*} ${1#*=}
+		FILTER="${1%%=*}" IFS=$' \n\t' filter_${1%%=*} ${1#*=}
 	;;
 	*)
 		echo "error: not a valid filter: ${1}" >&2
