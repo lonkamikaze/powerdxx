@@ -40,7 +40,7 @@ join() {
 
 filter_movingavg() {
 	local head columns
-	read head
+	read -r head
 	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	echo "${head}"
@@ -135,7 +135,7 @@ filter_subsample() {
 
 filter_cut() {
 	local head columns
-	read head
+	read -r head
 	select columns "${1}" ${head}
 	IFS=, join columns $(printf '$%d ' ${columns})
 	(echo "${head}"; /bin/cat) | /usr/bin/awk "{ print(${columns}) }"
@@ -143,7 +143,7 @@ filter_cut() {
 
 filter_horiz() {
 	local head columns
-	read head
+	read -r head
 	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	(echo "${head}"; /bin/cat) | /usr/bin/awk -vALGO="${FILTER#h}" "
@@ -210,7 +210,7 @@ filter_horiz() {
 
 filter_patch() {
 	local head columns
-	read head
+	read -r head
 	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	echo "${head}"
@@ -231,7 +231,7 @@ filter_patch() {
 
 filter_clone() {
 	local head columns
-	read head
+	read -r head
 	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	(echo "${head}"; /bin/cat) | /usr/bin/awk -vCLONES="${2}" "
