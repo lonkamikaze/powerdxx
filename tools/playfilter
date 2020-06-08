@@ -6,9 +6,11 @@ readonly E_USAGE=$((e += 1))
 readonly E_READ_CONCAT=$((e += 1))
 readonly E_READ_COLUMNS=$((e += 1))
 readonly E_FILTER_UNKNOWN=$((e += 1))
+readonly E_FILTER_ORDER=$((e += 1))
 readonly E_FILTER_NOMATCH=$((e += 1))
 readonly E_FILTER_MOVINGAVG_RANGE=$((e += 1))
 readonly E_FILTER_HORIZ_UNIT=$((e += 1))
+readonly E_FILTER_STYLE_UNKNOWN=$((e += 1))
 
 selectp() {
 	local expr i
@@ -285,6 +287,55 @@ filter_precision() {
 	"
 }
 
+filter_style() {
+	case "${1}" in
+	[Cc][Ss][Vv])
+		/usr/bin/awk -vOFS=, '
+		NR == 1 {
+			for (c = 1; c <= NF; ++c) {
+				$c = "\"" $c "\""
+			}
+		}
+		{
+			$1 = $1
+			print
+		}
+		'
+	;;
+	[Mm][Dd])
+		/usr/bin/awk '
+		BEGIN {
+			OFS=""
+			ORS="|\n"
+		}
+		NR == 1 {
+			for (c = 1; c <= NF; ++c) {
+				LEN[c] = length($c)
+			}
+		}
+		{
+			for (c = 1; c <= NF; ++c) {
+				$c = sprintf("| %" LEN[c] "s ", $c)
+			}
+			print
+		}
+		NR == 1 {
+			for (c = 1; c <= NF; ++c) {
+				gsub(/[^|]/, "-", $c)
+				sub(/.$/, ":", $c)
+			}
+			print
+		}
+		'
+	;;
+	*)
+		echo "error: style: unsupported formatting: ${1}" >&2
+		exit ${E_FILTER_STYLE_UNKNOWN}
+	;;
+	esac
+
+}
+
 runFilter() {
 	local IFS
 	IFS=,
@@ -295,6 +346,14 @@ runFilter() {
 	hmax=*|hmin=*|hsum=*|havg=*)
 		FILTER="${1%%=*}" IFS=$' \n\t' filter_horiz ${1#*=}
 	;;
+	style=*)
+		if [ -n "${FINAL}" ]; then
+			FILTER="${1%%=*}" IFS=$' \n\t' filter_${1%%=*} ${1#*=}
+		else
+			echo "error: ${1%%=*}: must be the final filter" >&2
+			exit ${E_FILTER_ORDER}
+		fi
+	;;
 	*)
 		echo "error: not a valid filter: ${1}" >&2
 		exit ${E_FILTER_UNKNOWN}
@@ -304,10 +363,10 @@ runFilter() {
 
 runFilterPipeline() {
 	if [ -n "${2}" -a -z "${2##*=*}" ]; then
-		runFilter "${1}" | (shift; runFilterPipeline "$@")
+		FINAL= runFilter "${1}" | (shift; runFilterPipeline "$@")
 		return
 	fi
-	runFilter "${1}"
+	FINAL=1 runFilter "${1}"
 }
 
 runFilters() {
