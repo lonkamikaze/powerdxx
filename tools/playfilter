@@ -2,6 +2,7 @@
 set -f
 
 e=0
+readonly E_USAGE=$((e += 1))
 readonly E_READ_CONCAT=$((e += 1))
 readonly E_READ_COLUMNS=$((e += 1))
 readonly E_FILTER_UNKNOWN=$((e += 1))
@@ -280,19 +281,28 @@ runFilter() {
 	esac
 }
 
+runFilterPipeline() {
+	if [ -n "${2}" -a -z "${2##*=*}" ]; then
+		runFilter "${1}" | (shift; runFilterPipeline "$@")
+		return
+	fi
+	runFilter "${1}"
+}
+
 runFilters() {
-	if [ -n "${1}" -a -z "${1##*=*}" ]; then
-		if [ -n "${2}" -a -z "${2##*=*}" ]; then
-			runFilter "${1}" | (shift; runFilters "$@")
-			return
-		fi
-		runFilter "${1}"
+	if [ $# -eq 0 ]; then
+		echo "usage: ${0} [ filters... ] [--] [ files... ]"
+		exit ${E_USAGE}
+	fi
+	if [ -z "${1##*=*}" ]; then
+		runFilterPipeline "$@"
 		return
 	fi
 	/bin/cat
 }
 
 readFiles() {
+	[ $# -eq 0 ] && return
 	while [ -z "${1##*=*}" ] && shift; do :; done
 	[ "${1}" == "--" ] && shift
 	/usr/bin/awk "
