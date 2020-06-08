@@ -264,11 +264,32 @@ filter_clone() {
 	"
 }
 
+filter_precision() {
+	local head columns
+	read -r head
+	select columns "${1}" ${head}
+	columns="$(printf 'COLUMNS[%d];' ${columns})"
+	echo "${head}"
+	/usr/bin/awk -vPRECISION="${2}" "
+	BEGIN {
+		PRECISION += 0
+		FMT = \"%.\" PRECISION \"f\"
+		${columns}
+	}
+	{
+		for (c in COLUMNS) {
+			\$c = sprintf(FMT, \$c)
+		}
+	}
+	1
+	"
+}
+
 runFilter() {
 	local IFS
 	IFS=,
 	case "${1}" in
-	cut=*|movingavg=*|subsample=*|patch=*|clone=*)
+	cut=*|movingavg=*|subsample=*|patch=*|clone=*|precision=*)
 		FILTER="${1%%=*}" IFS=$' \n\t' filter_${1%%=*} ${1#*=}
 	;;
 	hmax=*|hmin=*|hsum=*|havg=*)
