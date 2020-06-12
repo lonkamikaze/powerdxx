@@ -42,91 +42,11 @@ filter_movingavg() {
 	local head columns
 	read -r head
 	select columns "${1}" ${head}
-	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	echo "${head}"
-	/usr/bin/awk -vPRE="${2}" -vPOST="${3}" "
-	BEGIN {
-		${columns}
-		PRE  += 0
-		POST += 0
-		SIZE = PRE + POST
-		if (!SIZE) {
-			print \"error: movingavg: range must contain at least 1 value\" > \"/dev/stderr\"
-			exit ${E_FILTER_MOVINGAVG_RANGE}
-		}
-	}
-
-	# truncate floating-point value to 6 fraction digits to avoid
-	# rounding artifacts
-	function trunc6(val) {
-		return int(val * 1000000 + .5) / 1000000
-	}
-
-	# fill input buffer
-	# fill output buffer
-	{
-		for (c = 1; c <= NF; ++c) {
-			BUF_IN[NR, c] = \$c
-			BUF_OUT[NR, c] = \$c
-		}
-	}
-
-	# fill up the lookahead buffer
-	NR <= POST {
-		for (c in COLUMNS) {
-			BUF_SUM[c] += trunc6(\$c)
-		}
-	}
-
-	# fill up the lookback buffer, too
-	# start feeding the output buffer
-	NR > POST && NR <= SIZE {
-		for (c in COLUMNS) {
-			BUF_SUM[c] += trunc6(\$c)
-			BUF_OUT[NR - POST, c] = BUF_SUM[c] / NR
-		}
-	}
-
-	# update filter
-	# feed output buffer
-	NR > SIZE {
-		for (c in COLUMNS) {
-			BUF_SUM[c] -= trunc6(BUF_IN[NR - SIZE, c])
-			BUF_SUM[c] += trunc6(\$c)
-			BUF_OUT[NR - POST, c] = trunc6(BUF_SUM[c] / SIZE)
-		}
-	}
-
-	# produce output
-	# eat output buffer
-	# eat input buffer
-	NR > POST {
-		for (c = 1; c <= NF; ++c) {
-			\$c = BUF_OUT[NR - POST, c]
-			delete BUF_OUT[NR - POST, c]
-			delete BUF_IN[NR - SIZE, c]
-		}
-		print
-	}
-
-	END {
-		for (l = NR + 1; l <= NR + POST; ++l) {
-			# update filter, feed output buffer
-			size = SIZE - l + NR
-			for (c in COLUMNS) {
-				BUF_SUM[c] -= trunc6(BUF_IN[l - SIZE, c])
-				BUF_OUT[l - POST, c] = size ? BUF_SUM[c] / size : 0
-			}
-			# produces output, eat buffers
-			for (c = 1; c <= NF; ++c) {
-				\$c = BUF_OUT[l - POST, c]
-				delete BUF_OUT[l - POST, c]
-				delete BUF_IN[l - SIZE, c]
-			}
-			print
-		}
-	}
-	"
+	if ! /usr/bin/awk -f "${0}.movingavg.awk" \
+	                  -vCOLUMNS="${columns}" -vPRE="${2}" -vPOST="${3}"; then
+		exit ${E_FILTER_MOVINGAVG_RANGE}
+	fi
 }
 
 filter_subsample() {
