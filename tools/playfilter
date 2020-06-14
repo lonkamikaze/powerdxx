@@ -1,6 +1,9 @@
 #!/bin/sh
 set -f
 
+readonly AWK=${AWK:-/usr/bin/awk}
+readonly CAT=${CAT:-/bin/cat}
+
 e=0
 readonly E_USAGE=$((e += 1))
 readonly E_READ_CONCAT=$((e += 1))
@@ -43,14 +46,14 @@ filter_movingavg() {
 	read -r head
 	select columns "${1}" ${head}
 	echo "${head}"
-	if ! /usr/bin/awk -f "${0}.movingavg.awk" \
-	                  -vCOLUMNS="${columns}" -vPRE="${2}" -vPOST="${3}"; then
+	if ! ${AWK} -f "${0}.movingavg.awk" \
+	            -vCOLUMNS="${columns}" -vPRE="${2}" -vPOST="${3}"; then
 		exit ${E_FILTER_MOVINGAVG_RANGE}
 	fi
 }
 
 filter_subsample() {
-	/usr/bin/awk -vWRAP="${1}" 'NR % (WRAP + 0) == 1'
+	${AWK} -vWRAP="${1}" 'NR % int(WRAP) == 1'
 }
 
 filter_cut() {
@@ -58,7 +61,7 @@ filter_cut() {
 	read -r head
 	select columns "${1}" ${head}
 	IFS=, join columns $(printf '$%d ' ${columns})
-	(echo "${head}"; /bin/cat) | /usr/bin/awk "{ print(${columns}) }"
+	(echo "${head}"; ${CAT}) | ${AWK} "{ print(${columns}) }"
 }
 
 filter_horiz() {
@@ -66,8 +69,8 @@ filter_horiz() {
 	read -r head
 	select columns "${1}" ${head}
 	if ! (echo "${head}"; ${CAT}) | \
-	     /usr/bin/awk -f "${0}.horiz.awk" \
-	                  -vALGO="${FILTER#h}" -vCOLUMNS="${columns}"; then
+	     ${AWK} -f "${0}.horiz.awk" \
+	            -vALGO="${FILTER#h}" -vCOLUMNS="${columns}"; then
 		exit ${E_FILTER_HORIZ_UNIT}
 	fi
 }
@@ -78,7 +81,7 @@ filter_patch() {
 	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	echo "${head}"
-	/usr/bin/awk "
+	${AWK} "
 	BEGIN { ${columns} }
 	{
 		for (c in COLUMNS) {
@@ -98,7 +101,7 @@ filter_clone() {
 	read -r head
 	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
-	(echo "${head}"; /bin/cat) | /usr/bin/awk -vCLONES="${2}" "
+	(echo "${head}"; ${CAT}) | ${AWK} -vCLONES="${2}" "
 	BEGIN {
 		${columns}
 		CLONES += 0
@@ -136,7 +139,7 @@ filter_precision() {
 	select columns "${1}" ${head}
 	columns="$(printf 'COLUMNS[%d];' ${columns})"
 	echo "${head}"
-	/usr/bin/awk -vPRECISION="${2}" "
+	${AWK} -vPRECISION="${2}" "
 	BEGIN {
 		PRECISION += 0
 		FMT = \"%.\" PRECISION \"f\"
@@ -154,7 +157,7 @@ filter_precision() {
 filter_style() {
 	case "${1}" in
 	[Cc][Ss][Vv])
-		/usr/bin/awk -vOFS=, '
+		${AWK} -vOFS=, '
 		NR == 1 {
 			for (c = 1; c <= NF; ++c) {
 				$c = "\"" $c "\""
@@ -167,7 +170,7 @@ filter_style() {
 		'
 	;;
 	[Mm][Dd])
-		/usr/bin/awk '
+		${AWK} '
 		BEGIN {
 			OFS=""
 			ORS="|\n"
@@ -242,14 +245,14 @@ runFilters() {
 		runFilterPipeline "$@"
 		return
 	fi
-	/bin/cat
+	${CAT}
 }
 
 readFiles() {
 	[ $# -eq 0 ] && return
 	while [ -z "${1##*=*}" ] && shift; do :; done
 	[ "${1}" == "--" ] && shift
-	/usr/bin/awk "
+	${AWK} "
 	NR == 1 { 
 		for (c = 1; c <= NF; ++c) {
 			HEADER[c] = \$c
