@@ -1,19 +1,28 @@
 #!/bin/sh
 set -f
+set -o pipefail
 
 readonly AWK=${AWK:-/usr/bin/awk}
 readonly CAT=${CAT:-/bin/cat}
 
-e=0
-readonly E_USAGE=$((e += 1))
-readonly E_READ_CONCAT=$((e += 1))
-readonly E_READ_COLUMNS=$((e += 1))
-readonly E_FILTER_UNKNOWN=$((e += 1))
-readonly E_FILTER_ORDER=$((e += 1))
-readonly E_FILTER_NOMATCH=$((e += 1))
-readonly E_FILTER_MOVINGAVG_RANGE=$((e += 1))
-readonly E_FILTER_HORIZ_UNIT=$((e += 1))
-readonly E_FILTER_STYLE_UNKNOWN=$((e += 1))
+
+readonly ERRORS='
+OK
+E_USAGE
+E_READ_CONCAT
+E_READ_COLUMNS
+E_FILTER_UNKNOWN
+E_FILTER_ORDER
+E_FILTER_NOMATCH
+E_FILTER_MOVINGAVG_RANGE
+E_FILTER_HORIZ_UNIT
+E_FILTER_STYLE_UNKNOWN
+'
+
+errno=-1
+for error in ${ERRORS}; do
+	readonly ${error}=$((errno += 1))
+done
 
 selectp() {
 	local expr i
@@ -238,7 +247,13 @@ runFilterPipeline() {
 
 runFilters() {
 	if [ $# -eq 0 ]; then
+		local errno error
 		echo "usage: ${0} [ filters... ] [--] [ files... ]"
+		printf "%8s  %s\n" "Exit no." "Exit symbol"
+		errno=-1
+		for error in ${ERRORS}; do
+			printf " %6d    %s\n" $((errno += 1)) "${error}"
+		done
 		exit ${E_USAGE}
 	fi
 	if [ -z "${1##*=*}" ]; then
