@@ -16,6 +16,7 @@ E_FILTER_ORDER
 E_FILTER_NOMATCH
 E_FILTER_MOVINGAVG_RANGE
 E_FILTER_HORIZ_UNIT
+E_FILTER_CLONE_COLLISION
 E_FILTER_STYLE_UNKNOWN
 '
 
@@ -113,18 +114,27 @@ filter_clone() {
 	(echo "${head}"; ${CAT}) | ${AWK} -vCLONES="${2}" "
 	BEGIN {
 		${columns}
-		CLONES += 0
+		CLONES = int(CLONES)
 	}
 	NR == 1 {
+		for (co = 1; co <= NF; ++co) {
+			ALL[\$co]
+		}
 		COLS = NF
 		for (c = 1; c <= COLS; ++c) {
 			if (!(c in COLUMNS)) {
 				continue
 			}
+			tpl = \$c
+			gsub(/%/, \"%%\", tpl)
+			sub(/(\\[.*\\])?\$/, \".%d&\", tpl)
 			for (clone = 0; clone < CLONES; ++clone) {
-				name = \$c
-				sub(/(\\[.*\\])?\$/, \".\" clone \"&\", name)
-				\$++NF = name
+				name = sprintf(tpl, clone)
+				if (name in ALL) {
+					print \"error: ${FILTER}: column already exists: \" name > \"/dev/stderr\"
+					exit ${E_FILTER_CLONE_COLLISION}
+				}
+				ALL[\$++NF = name]
 			}
 		}
 	}
