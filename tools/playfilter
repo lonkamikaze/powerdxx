@@ -65,67 +65,11 @@ filter_horiz() {
 	local head columns
 	read -r head
 	select columns "${1}" ${head}
-	columns="$(printf 'COLUMNS[%d];' ${columns})"
-	(echo "${head}"; /bin/cat) | /usr/bin/awk -vALGO="${FILTER#h}" "
-	BEGIN { ${columns} }
-	NR == 1 {
-		NAME = ALGO \"(\"
-		for (c in COLUMNS) {
-			UNIT = substr(\$c, match(\$c, /\\[.*\\]\$/))
-			break
-		}
-		for (c = 1; c <= NF; ++c) {
-			if (!(c in COLUMNS)) {
-				continue
-			}
-			name = \$c
-			sub(/\\[.*\\]\$/, \"\", name)
-			NAME = NAME name \",\"
-			unit = substr(\$c, match(\$c, /\\[.*\\]\$/))
-			if (unit != UNIT) {
-				print \"error: h\" ALGO \" unit mismatch\" > \"/dev/stderr\"
-				print \"hint:  \" unit \" != \" UNIT       > \"/dev/stderr\"
-				exit ${E_FILTER_HORIZ_UNIT}
-			}
-		}
-		sub(/,\$/, \")\", NAME)
-		\$++NF = NAME UNIT
-	}
-	NR > 1 && ALGO == \"max\" {
-		max = 0
-		for (c in COLUMNS) {
-			max = (max >= \$c ? max : \$c)
-		}
-		\$++NF = max
-	}
-	NR > 1 && ALGO == \"min\" {
-		for (c in COLUMNS) {
-			min = \$c
-			break
-		}
-		for (c in COLUMNS) {
-			min = (min <= \$c ? min : \$c)
-		}
-		\$++NF = min
-	}
-	NR > 1 && ALGO == \"sum\" {
-		sum = 0
-		for (c in COLUMNS) {
-			sum += \$c
-		}
-		\$++NF = sum
-	}
-	NR > 1 && ALGO == \"avg\" {
-		sum = 0
-		cnt = 0
-		for (c in COLUMNS) {
-			++cnt
-			sum += \$c
-		}
-		\$++NF = sum / cnt
-	}
-	1
-	"
+	if ! (echo "${head}"; ${CAT}) | \
+	     /usr/bin/awk -f "${0}.horiz.awk" \
+	                  -vALGO="${FILTER#h}" -vCOLUMNS="${columns}"; then
+		exit ${E_FILTER_HORIZ_UNIT}
+	fi
 }
 
 filter_patch() {
