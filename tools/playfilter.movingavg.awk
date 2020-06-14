@@ -85,7 +85,7 @@ BEGIN {
 	}
 
 	# use 20 fix-point fraction bits to calculate the buffer sum
-	SUM_TO   = lshift(1, 20)
+	SUM_TO   = 1048576
 	SUM_FROM = 1. / SUM_TO
 }
 
