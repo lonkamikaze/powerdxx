@@ -27,7 +27,7 @@ selectp() {
 }
 
 select() {
-	setvar "${1}" "$(shift; selectp "$@")"
+	join "${1}" $(shift; selectp "$@")
 	if eval "[ -z \"\${$1}\" ]"; then
 		echo "error: ${FILTER}: no column match for: ${2}" >&2
 		exit ${E_FILTER_NOMATCH}
