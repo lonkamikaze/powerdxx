@@ -1,11 +1,25 @@
 #!/bin/sh
+#
+# Provide a set of filters post-process loadplay(1) output.
+#
+# Every filter step is spawned as a process in a pipeline so long
+# filter lists scale well across multiple CPU cores.
+#
+# @see README.md#playfilter
+#
+
 set -f
 set -o pipefail
 
+#
+# Interpreters.
+#
 readonly AWK=${AWK:-/usr/bin/awk}
 readonly CAT=${CAT:-/bin/cat}
 
-
+#
+# Exit/error numbers.
+#
 readonly ERRORS='
 OK
 E_USAGE
@@ -25,6 +39,14 @@ for error in ${ERRORS}; do
 	readonly ${error}=$((errno += 1))
 done
 
+#
+# Output the indices of all matching arguments against a glob pattern.
+#
+# @param 1
+#	The glob pattern to match
+# @param @
+#	The arguments to match against, indices are counted from 1
+#
 selectp() {
 	local expr i
 	expr="${1}"
@@ -39,6 +61,20 @@ selectp() {
 	done
 }
 
+#
+# Return a list of indices for arguments matching a glob pattern.
+#
+# @param &1
+#	The result variable name
+# @param 2
+#	The glob pattern to match
+# @param @
+#	The arguments to match against, indices are counted from 1
+# @param FILTER
+#	The filter to attribute an error to
+# @param E_FILTER_NOMATCH
+#	Exit value if no argument was matched
+#
 select() {
 	join "${1}" $(shift; selectp "$@")
 	if eval "[ -z \"\${$1}\" ]"; then
@@ -47,10 +83,36 @@ select() {
 	fi
 }
 
+#
+# Join the list of arguments with the first character in IFS.
+#
+# @param &1
+#	The result variable name
+# @param @
+#	The list of arguments to join
+# @param IFS
+#	The first character is used to join the arguments
+#
 join() {
 	setvar "${1}" "$(shift; echo "$*")"
 }
 
+#
+# Apply a moving average filter to selected columns.
+#
+# Replace each sample with the mean of a set of buffered samples.
+#
+# @param 1
+#	The glob pattern to select columns
+# @param 2
+#	The number of time slices before the sample point
+# @param 3
+#	The (optional) number of time slices after the sample point
+# @param E_FILTER_MOVINGAVG_RANGE
+#	Exit value if the buffer range is unset or 0
+# @see playfilter.movingavg.awk
+#	For a detailed description of the algorithm
+#
 filter_movingavg() {
 	local head columns
 	read -r head
@@ -62,10 +124,22 @@ filter_movingavg() {
 	fi
 }
 
+#
+# Display only one in a given number of samples.
+#
+# @param 1
+#	The number of samples from which to output the last one
+#
 filter_subsample() {
 	${AWK} -vWRAP="${1}" 'NR % int(WRAP) == 1'
 }
 
+#
+# Output selected columns only.
+#
+# @param 1
+#	The glob pattern to select columns
+#
 filter_cut() {
 	local head columns
 	read -r head
@@ -74,6 +148,18 @@ filter_cut() {
 	(echo "${head}"; ${CAT}) | ${AWK} "{ print(${columns}) }"
 }
 
+#
+# Accumulate a new column from a set of columns.
+#
+# @param 1
+#	The glob pattern to select columns
+# @param FILTER
+#	The accumulation algorithm, a leading `h` is discarded
+# @param E_FILTER_HORIZ_UNIT
+#	Exit value if the selected columns do not have the same unit
+# @see playfilter.horiz.awk
+#	For the set of supported algorithms
+#
 filter_horiz() {
 	local head columns
 	read -r head
@@ -85,6 +171,21 @@ filter_horiz() {
 	fi
 }
 
+#
+# Patch continuous columns of subsequent files and increment columns.
+#
+# E.g. if three input files contain a time column with the value
+# range `(0; 30] s`, the resulting output would contain one column
+# with the concatenated ranges `(0; 30](0; 30](0; 30] s`.
+# Running the time column through this filter results in an output
+# range `(0; 90] s`.
+#
+# The other use case for this filter is to accumulate constant increments,
+# similar to the time column in load recordings (instead of replays).
+#
+# @param 1
+#	The columns to patch
+#
 filter_patch() {
 	local head columns
 	read -r head
@@ -106,6 +207,17 @@ filter_patch() {
 	"
 }
 
+#
+# Create duplicates of columns.
+#
+# @param 1
+#	The columns to duplicate
+# @param 2
+#	The number of clones
+# @param E_FILTER_CLONE_COLLISION
+#	Exit value if a clone would have the same name as an existing
+#	column
+#
 filter_clone() {
 	local head columns
 	read -r head
@@ -152,6 +264,14 @@ filter_clone() {
 	"
 }
 
+#
+# Reformat columns with the given number of fraction decimals.
+#
+# @param 1
+#	The columns to reformat
+# @param 2
+#	The number of fraction decimals
+#
 filter_precision() {
 	local head columns
 	read -r head
@@ -173,6 +293,28 @@ filter_precision() {
 	"
 }
 
+#
+# Format output columns.
+#
+# Supports two output formats:
+#
+# | Style | Format                 |
+# |-------|------------------------|
+# | `csv` | Comma Separated Values |
+# | `md`  | Markdown               |
+#
+# The `csv` formatting style puts headings in double quotes `"` and
+# separates fields by comma `,`.
+#
+# The `md` formatting style produces right aligned fixed with columns,
+# delimited by the pipe character `|`. The heading row is followed by
+# an additional row with dash `-` filled fields.
+#
+# @param 1
+#	The formatting style to output
+# @param E_FILTER_STYLE_UNKNOWN
+#	Exit value if the given formatting style is not supported
+#
 filter_style() {
 	case "${1}" in
 	[Cc][Ss][Vv])
@@ -222,6 +364,22 @@ filter_style() {
 
 }
 
+#
+# Run a single filter.
+#
+# Breaks the filter arguments out of the CLI filter commands and calls
+# the respective filter.
+#
+# @param 1
+#	The CLI filter command `FILTER=ARG,...`
+# @param FINAL
+#	Expected to be a non-empty string for the last filter in
+#	the chain
+# @param E_FILTER_ORDER
+#	Exit value if filter ordering constraints were violated
+# @param E_FILTER_UNKNOWN
+#	Exit value if the given filter is not known
+#
 runFilter() {
 	local IFS
 	IFS=,
@@ -247,6 +405,12 @@ runFilter() {
 	esac
 }
 
+#
+# Recursively pipeline all the filters.
+#
+# @param @
+#	The CLI arguments
+#
 runFilterPipeline() {
 	if [ -n "${2}" -a -z "${2##*=*}" ]; then
 		FINAL= runFilter "${1}" | (shift; runFilterPipeline "$@")
@@ -255,6 +419,17 @@ runFilterPipeline() {
 	FINAL=1 runFilter "${1}"
 }
 
+#
+# Setup the filter pipeline.
+#
+# Print usage if no arguments are given, otherwise run the filter
+# pipeline.
+#
+# @param @
+#	The CLI arguments
+# @param E_USAGE
+#	Exit value if no arguments are given
+#
 runFilters() {
 	if [ $# -eq 0 ]; then
 		local errno error
@@ -273,6 +448,23 @@ runFilters() {
 	${CAT}
 }
 
+#
+# Read input files.
+#
+# Takes all CLI arguments and executes an input filter. Starting from
+# the first argument that does not look like a filter, all arguments
+# are forwarded to an awk based input filter.
+#
+# The filter list can be terminated explicitly using the `--` argument.
+#
+# @param @
+#	All CLI arguments
+# @param E_READ_COLUMNS
+#	Exit value if the number of columns changes
+# @param E_READ_CONCAT
+#	Exit value if a subsequent file has a column heading mismatch
+#	with the first file
+#
 readFiles() {
 	[ $# -eq 0 ] && return
 	while [ -z "${1##*=*}" ] && shift; do :; done
@@ -302,4 +494,5 @@ readFiles() {
 	" "$@"
 }
 
+# execute the filter pipeline
 readFiles "$@" | runFilters "$@"
