@@ -315,6 +315,18 @@ class Options {
 	Parameter<OptionT> const * current;
 
 	/**
+	 * The argument index to show if no argument is supplied
+	 * to show().
+	 *
+	 * This is initially 0 for each new argument and updated
+	 * by use of the subscript operator.
+	 *
+	 * This is for error handling convenience and not considered
+	 * part of the state.
+	 */
+	int mutable showi;
+
+	/**
 	 * Returns a pointer to the file name portion of the given string.
 	 *
 	 * @param file
@@ -418,7 +430,7 @@ class Options {
 	        char const * const usage,
 	        Parameter<OptionT> const (& defs)[DefCount]) :
 	    argc{argc}, argv{argv}, usageStr{usage}, defs{defs},
-	    argi{0}, argp{nullptr}, current{nullptr} {}
+	    argi{0}, argp{nullptr}, current{nullptr}, showi{0} {}
 
 	/**
 	 * Updates the internal state by parsing the next option.
@@ -431,6 +443,9 @@ class Options {
 	 *	A self-reference
 	 */
 	Options & operator ()() {
+		/* reset what to show() */
+		this->showi = 0;
+
 		/*
 		 * point argi and argp to the appropriate places
 		 */
@@ -536,6 +551,9 @@ class Options {
 	 *	The option or one of its arguments
 	 */
 	char const * operator [](int const i) const {
+		/* show() the latest requested argument */
+		this->showi = i;
+
 		/* argument is in the same string as option */
 		if (this->argp && this->argp[0] && this->argp[1] && i > 0) {
 			if (this->argi + i - 1 >= this->argc) {
@@ -692,6 +710,17 @@ class Options {
 			ul += '^';
 		}
 		return cmd + '\n' + ul;
+	}
+
+	/**
+	 * Highlight the last recently accessed argument.
+	 +
+	 * @return
+	 *	A string with the last recently accessed argument underlined
+	 * @see show(int const, int const = 1)
+	 */
+	std::string show() const {
+		return show(this->showi);
 	}
 
 	/**

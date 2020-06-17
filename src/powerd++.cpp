@@ -1090,44 +1090,8 @@ void read_args(int const argc, char const * const argv[]) {
 			return;
 		}
 	} catch (Exception & e) {
-		switch (getopt) {
-		case OE::USAGE:
-			break;
-		case OE::FLAG_VERBOSE:
-		case OE::FLAG_FOREGROUND:
-		case OE::FLAG_NICE:
-			e.msg += "\n\n";
-			e.msg += getopt.show(0);
-			break;
-		case OE::MODE_AC:
-		case OE::MODE_BATT:
-		case OE::MODE_UNKNOWN:
-		case OE::FREQ_MIN:
-		case OE::FREQ_MAX:
-		case OE::FREQ_MIN_AC:
-		case OE::FREQ_MAX_AC:
-		case OE::FREQ_MIN_BATT:
-		case OE::FREQ_MAX_BATT:
-		case OE::FREQ_RANGE:
-		case OE::FREQ_RANGE_AC:
-		case OE::FREQ_RANGE_BATT:
-		case OE::HITEMP_RANGE:
-		case OE::IVAL_POLL:
-		case OE::CNT_SAMPLES:
-		case OE::FILE_PID:
-		case OE::IGNORE:
-			e.msg += "\n\n";
-			e.msg += getopt.show(1);
-			break;
-		case OE::OPT_UNKNOWN:
-		case OE::OPT_NOOPT:
-		case OE::OPT_DASH:
-		case OE::OPT_LDASH:
-		case OE::OPT_DONE:
-			e.msg += "\n\n";
-			e.msg += getopt.show(0);
-			break;
-		}
+		e.msg += "\n\n";
+		e.msg += getopt.show();
 		throw;
 	}
 }
