@@ -67,7 +67,7 @@ using types::ms;
 using types::cptime_t;
 using types::mhz_t;
 using types::coreid_t;
-using cycles_t = uint64_t;
+using cycles_t = uint64_t;  /**< Clock cycle counting type. */
 
 using version::LOADREC_FEATURES;
 using version::flag_t;
