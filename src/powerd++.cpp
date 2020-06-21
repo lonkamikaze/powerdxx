@@ -1110,7 +1110,7 @@ void read_args(int const argc, char const * const argv[]) {
 		case OE::OPT_DASH:
 		case OE::OPT_LDASH:
 			fail(Exit::ECLARG, 0,
-			     "unexpected command line argument: "s + getopt[0]);
+			     "unexpected command line argument");
 		case OE::OPT_DONE:
 			return;
 		}

@@ -161,7 +161,7 @@ types::cptime_t clas::load(char const * const str) {
 	case Unit::SCALAR:
 		if (value > 1. || value < 0) {
 			errors::fail(errors::Exit::EOUTOFRANGE, 0,
-			             "load targets must be in the range [0.0, 1.0]: "s + str);
+			             "load targets must be in the range [0.0, 1.0]");
 		}
 		/* convert load to [0, 1024] range */
 		value *= 1024;
@@ -169,7 +169,7 @@ types::cptime_t clas::load(char const * const str) {
 	case Unit::PERCENT:
 		if (value > 100. || value < 0) {
 			errors::fail(errors::Exit::EOUTOFRANGE, 0,
-			             "load targets must be in the range [0%, 100%]: "s + str);
+			             "load targets must be in the range [0%, 100%]");
 		}
 		/* convert load to [0, 1024] range */
 		value *= 10.24;
@@ -177,7 +177,7 @@ types::cptime_t clas::load(char const * const str) {
 	default:
 		break;
 	}
-	errors::fail(errors::Exit::ELOAD, 0, "load target not recognised: "s + str);
+	errors::fail(errors::Exit::ELOAD, 0, "load target not recognised");
 }
 
 types::mhz_t clas::freq(char const * const str) {
@@ -205,11 +205,11 @@ types::mhz_t clas::freq(char const * const str) {
 		break;
 	default:
 		errors::fail(errors::Exit::EFREQ, 0,
-		             "frequency value not recognised: "s + str);
+		             "frequency value not recognised");
 	}
 	if (value > 1000000. || value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
-		             "target frequency must be in the range [0Hz, 1THz]: "s + str);
+		             "target frequency must be in the range [0Hz, 1THz]");
 	}
 	return types::mhz_t(value);
 }
@@ -222,7 +222,7 @@ types::ms clas::ival(char const * const str) {
 	auto value = Value{str};
 	if (value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
-		     "interval must be positive: "s + str);
+		             "interval must be positive");
 	}
 	switch (value) {
 	case Unit::SECOND:
@@ -234,7 +234,7 @@ types::ms clas::ival(char const * const str) {
 		break;
 	}
 	errors::fail(errors::Exit::EIVAL, 0,
-	             "interval not recognised: "s + str);
+	             "interval not recognised");
 }
 
 size_t clas::samples(char const * const str) {
@@ -246,15 +246,15 @@ size_t clas::samples(char const * const str) {
 	auto value = Value{str};
 	if (value != Unit::SCALAR) {
 		errors::fail(errors::Exit::ESAMPLES, 0,
-		             "sample count must be a scalar integer: "s + str);
+		             "sample count must be a scalar integer");
 	}
 	if (value != static_cast<size_t>(value)) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
-		             "sample count must be an integer: "s + str);
+		             "sample count must be an integer");
 	}
 	if (value < 1 || value > 1000) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
-		             "sample count must be in the range [1, 1000]: "s + str);
+		             "sample count must be in the range [1, 1000]");
 	}
 	return value;
 }
@@ -279,7 +279,7 @@ types::decikelvin_t clas::temperature(char const * const str) {
 		break;
 	default:
 		errors::fail(errors::Exit::ETEMPERATURE, 0,
-		             "temperature value not recognised: "s + str);
+		             "temperature value not recognised");
 	}
 	if (value < 0) {
 		errors::fail(errors::Exit::EOUTOFRANGE, 0,
