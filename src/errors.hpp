@@ -42,6 +42,8 @@ enum class Exit : int {
 	EFILE,        /**< Not a valid file name */
 	EEXEC,        /**< Command execution failed */
 	EDRIVER,      /**< Frequency driver does not allow manual control */
+	ESYSCTLNAME,  /**< User provided sysctl contains invalid characters */
+	EFORMATFIELD, /**< Formatting string contains unexpected field */
 	LENGTH        /**< Enum length */
 };
 
@@ -52,7 +54,7 @@ const char * const ExitStr[]{
 	"OK", "ECLARG", "EOUTOFRANGE", "ELOAD", "EFREQ", "EMODE", "EIVAL",
 	"ESAMPLES", "ESYSCTL", "ENOFREQ", "ECONFLICT", "EPID", "EFORBIDDEN",
 	"EDAEMON", "EWOPEN", "ESIGNAL", "ERANGEFMT", "ETEMPERATURE",
-	"EEXCEPT", "EFILE", "EEXEC", "EDRIVER"
+	"EEXCEPT", "EFILE", "EEXEC", "EDRIVER", "ESYSCTLNAME", "EFORMATFIELD"
 };
 
 static_assert(size_t{utility::to_value(Exit::LENGTH)} == utility::countof(ExitStr),

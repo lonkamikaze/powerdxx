@@ -53,6 +53,8 @@ using clas::samples;
 using clas::temperature;
 using clas::celsius;
 using clas::range;
+using clas::formatfields;
+using clas::sysctlname;
 
 using utility::countof;
 using utility::sprintf_safe;
@@ -324,6 +326,13 @@ struct Global {
 	Sysctl<0> cp_times_ctl;
 
 	/**
+	 * The sysctl name pattern for the temperature sysctl.
+	 *
+	 * May contain a single `%d`.
+	 */
+	char const * tempctl_name{TEMPERATURE};
+
+	/**
 	 * The kern.cp_times buffer for all cores.
 	 */
 	std::unique_ptr<cptime_t[][CPUSTATES]> cp_times;
@@ -511,12 +520,18 @@ void init() {
 		verbose("could not determine critical temperature\n"
 		        "\ttemperature throttling: off\n");
 	} else for (coreid_t i = 0; i < g.ncpu; ++i) {
-		char name[40];
-		sprintf_safe(name, TEMPERATURE, i);
+		char name[80]{};
+		sprintf_safe(name, g.tempctl_name, i);
 		try {
 			g.cores[i].temp = {{name}};
 			assert(g.cores[i].temp >= 0);
 		} catch (sys::sc_error<sys::ctl::error>) {
+			/* user-requested sysctls are mandatory */
+			if (g.tempctl_name != TEMPERATURE) {
+				fail(Exit::ESYSCTLNAME, 0,
+				     "cannot access user-requested sysctl: "s +
+				     name);
+			}
 			verbose("cannot access sysctl: %s\n"
 			        "\ttemperature throttling: off\n",
 			        name);
@@ -950,6 +965,7 @@ enum class OE {
 	FREQ_RANGE_BATT, /**< Set clock frequency range on battery power */
 	HITEMP_RANGE,    /**< Set a high temperature range */
 	MODE_UNKNOWN,    /**< Set unknown power source mode */
+	TEMP_CTL,        /**< Override temperature sysctl */
 	IVAL_POLL,       /**< Set polling interval */
 	FILE_PID,        /**< Set pidfile */
 	FLAG_VERBOSE,    /**< Activate verbose output on stderr */
@@ -990,6 +1006,7 @@ Parameter<OE> const PARAMETERS[]{
 	{OE::FREQ_RANGE_AC,   'A', "freq-range-ac",   "freq:freq", "CPU frequency range on AC power"},
 	{OE::FREQ_RANGE_BATT, 'B', "freq-range-batt", "freq:freq", "CPU frequency range on battery power"},
 	{OE::HITEMP_RANGE,    'H', "hitemp-range",    "temp:temp", "High temperature range (high:critical)"},
+	{OE::TEMP_CTL,        't', "temperature",     "sysctl",    "Override temperature source sysctl"},
 	{OE::IVAL_POLL,       'p', "poll",            "ival",      "The polling interval"},
 	{OE::CNT_SAMPLES,     's', "samples",         "cnt",       "The number of samples to use"},
 	{OE::FILE_PID,        'P', "pid",             "file",      "Alternative PID file"},
@@ -1067,6 +1084,9 @@ void read_args(int const argc, char const * const argv[]) {
 			g.temp_throttling = true;
 			std::tie(g.temp_high, g.temp_crit) =
 			    range(temperature, getopt[1]);
+			break;
+		case OE::TEMP_CTL:
+			g.tempctl_name = formatfields(sysctlname(getopt[1]), 'd');
 			break;
 		case OE::IVAL_POLL:
 			g.interval = ival(getopt[1]);
@@ -1148,7 +1168,8 @@ void show_settings() {
 	}
 	io::ferr.print("Temperature Throttling\n");
 	if (g.temp_throttling) {
-		io::ferr.print("\tactive:                yes\n");
+		io::ferr.printf("\tactive:                yes\n"
+		                "\tsource:                %s\n", g.tempctl_name);
 		for (coreid_t i = 0; i < g.ngroups; ++i) {
 			auto const & group = g.groups[i];
 			io::ferr.printf("\t%3d:                   [%d C, %d C]\n",

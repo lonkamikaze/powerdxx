@@ -58,7 +58,7 @@ CXXFLAGS.libloadplay.so= -lpthread -shared
 CXXFLAGS.powerd++ =      -lutil
 
 ${TARGETS:M*.so}: mk-binary ${.TARGET:.so=.o}
-${TARGETS:N*.so}: mk-binary ${.TARGET}.o clas.o
+${TARGETS:N*.so}: mk-binary ${.TARGET}.o clas.o utility.o
 
 mk-binary: .USE
 	${CXX} ${CXXFLAGS} ${.ALLSRC} -o ${.TARGET}

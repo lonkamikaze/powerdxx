@@ -158,6 +158,66 @@ std::pair<T, T> range(T (& func)(char const * const), char const * const str) {
 	return result;
 }
 
+/**
+ * Verify that the given string only contains characters allowed in
+ * sysctl names.
+ *
+ * The currently permitted characters are: `[0-9A-Za-z%._-]`
+ *
+ * @throws errors::Exit::ESYSCTLNAME
+ *	For empty or invalid strings
+ * @return
+ *	The given string
+ */
+char const * sysctlname(char const * const str);
+
+/**
+ * Sanitise user-provided formatting strings.
+ *
+ * Ensure that the given string contains no more than the given formatting
+ * fields in the given order.
+ *
+ * This only passes plain data format fields, no flags, field width
+ * or precision are allowed.
+ *
+ * @throws errors::Exit::EFORMATFIELD
+ *	For unexpected formatting fields
+ * @param str
+ *	The formatting string to sanitise
+ * @param fields
+ *	A set of characters representing a printf-style formatting
+ * @return
+ *	The given string
+ */
+template <typename ... CharTs>
+char const * formatfields(char const * const fmt, CharTs const ... fields) {
+	using namespace utility::literals;
+	using utility::highlight;
+	using errors::fail;
+	using errors::Exit;
+
+	auto it = fmt;
+	for (char const expect : {fields ..., '%'}) {
+		for (; it && *it; ++it) {
+			if (it[0] == '%' && it[1] == '%') {
+				++it;
+				continue;
+			}
+			if (it[0] == '%' && it[1] == expect) {
+				++it;
+				break;
+			}
+			if (it[0] == '%') {
+				auto const hl = highlight(fmt, it - fmt, 2);
+				fail(Exit::EFORMATFIELD, 0,
+				     "unexpected formatting field: "s +
+				     "\n\t" + hl.text + "\n\t" + hl.line);
+			}
+		}
+	}
+	return fmt;
+}
+
 } /* namespace clas */
 
 #endif /* _POWERDXX_CLAS_HPP_ */

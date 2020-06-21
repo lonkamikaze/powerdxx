@@ -287,3 +287,59 @@ types::decikelvin_t clas::temperature(char const * const str) {
 	}
 	return value *= 10;
 }
+
+char const * clas::sysctlname(char const * const str) {
+	using namespace utility::literals;
+	using utility::highlight;
+	using errors::fail;
+	using errors::Exit;
+
+	if (!str || !*str) {
+		fail(Exit::ESYSCTLNAME, 0, "sysctl name missing");
+	}
+
+	for (auto it = str; it && *it; ++it) {
+		/* pass permitted characters */
+		if ((*it >= '0' && *it <= '9') ||
+		    (*it >= 'A' && *it <= 'Z') ||
+		    (*it >= 'a' && *it <= 'z') ||
+		    *it == '.' ||
+		    *it == '_' ||
+		    *it == '-' ||
+		    *it == '%') {
+			continue;
+		}
+		auto const hl = highlight(str, it - str);
+		/* utf-8 multy-byte fragments */
+		if ((*it & 0xc0) == 0x80) {
+			fail(Exit::ESYSCTLNAME, 0,
+			     "multi-byte (utf-8) character fragment embedded in sysctl name:"s +
+			     "\n\t" + hl.text + "\n\t" + hl.line);
+		}
+		/* utf-8 multi-byte heads */
+		if ((*it & 0xe0) == 0xc0 ||  /* 2-byte */
+		    (*it & 0xf0) == 0xe0 ||  /* 3-byte */
+		    (*it & 0xf8) == 0xf0) {  /* 4-byte */
+			fail(Exit::ESYSCTLNAME, 0,
+			     "multi-byte (utf-8) character embedded in sysctl name:"s +
+			     "\n\t" + hl.text + "\n\t" + hl.line);
+		}
+		/* non-ascii and non-utf-8 code points */
+		if (*it < 0) {
+			fail(Exit::ESYSCTLNAME, 0,
+			     "invalid code point embedded in sysctl name:"s +
+			     "\n\t" + hl.text + "\n\t" + hl.line);
+		}
+		/* ascii control characters */
+		if (*it < ' ' || *it == 0x7f) {
+			fail(Exit::ESYSCTLNAME, 0,
+			     "control character embedded in sysctl name:"s +
+			     "\n\t" + hl.text + "\n\t" + hl.line);
+		}
+		/* regular forbidden character */
+		fail(Exit::ESYSCTLNAME, 0,
+		     "forbidden character in sysctl name:"s +
+		     "\n\t" + hl.text + "\n\t" + hl.line);
+	}
+	return str;
+}
