@@ -983,7 +983,7 @@ enum class OE {
 /**
  * The short usage string.
  */
-char const * const USAGE = "[-hvfN] [-abn mode] [-mM freq] [-FAB freq:freq] [-H temp:temp] [-p ival] [-s cnt] [-P file]";
+char const * const USAGE = "[-hvfN] [-abn mode] [-mM freq] [-FAB freq:freq] [-H temp:temp] [-t sysctl] [-p ival] [-s cnt] [-P file]";
 
 /**
  * Definitions of command line parameters.

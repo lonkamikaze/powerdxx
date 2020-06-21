@@ -18,6 +18,7 @@
 .Op Fl A Ar freq:freq
 .Op Fl B Ar freq:freq
 .Op Fl H Ar temp:temp
+.Op Fl t Ar sysctl
 .Op Fl p Ar ival
 .Op Fl s Ar cnt
 .Op Fl P Ar file
@@ -68,6 +69,19 @@ units are:
 .D1 Li C , Li K , Li F , Li R
 These units stand for deg. Celsius, Kelvin, deg. Fahrenheit and
 deg. Rankine. A value without a unit is treated as deg. Celsius.
+.It Ar sysctl
+The name of a
+.Xr sysctl 3 ,
+may consists of the characters
+.Bq 0-9A-Za-z%._- .
+Characters preceded by
+.Sq %
+are considered formatting fields. Allowed formatting fields are specific
+to a particular sysctl. Unexpected formatting fields are rejected.
+In order to produce a literal
+.Sq % ,
+.Sq %%
+should be used.
 .It Ar ival
 A time interval can be given in seconds or milliseconds.
 .D1 Li s , Li ms
@@ -130,6 +144,10 @@ clock frequency on battery power.
 .It Fl H , -hitemp-range Ar temp:temp
 Set the high to critical temperature range, enables temperature based
 throttling.
+.It Fl t , -temperature Ar sysctl
+Set the temperature source sysctl name. May contain a single
+.Sq %d
+to insert the core ID.
 .It Fl p , -poll Ar ival
 The polling interval that is used to take load samples and update the
 CPU clock (default 0.5s).
