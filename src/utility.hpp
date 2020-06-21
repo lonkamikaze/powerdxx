@@ -406,6 +406,60 @@ struct FromChars {
 	    FromChars{str.data(), str.data() + str.size()} {}
 };
 
+/**
+ * A line of text and an underlining line.
+ *
+ * The text and the line are kept in a separate string to ease indenting
+ * them.
+ */
+struct Underlined {
+	/**
+	 * The text with printf-style escapes.
+	 */
+	std::string text;
+
+	/**
+	 * Aligned underlining characters `^~~~`.
+	 */
+	std::string line;
+
+	/**
+	 * Implicit conversion to std::string.
+	 *
+	 * Convenient if indentation is not required.
+	 */
+	operator std::string() const {
+		return this->text + '\n' + this->line;
+	}
+};
+
+/**
+ * Underline the given number of characters.
+ *
+ * The given length and offset use byte-addressing, the resulting
+ * text is sanitised for printing, which may affect the actual number
+ * of underlining characters:
+ *
+ * - Control characters, multi-byte character fragments and invalid
+ *   code points are substituted by printf-style escapes
+ * - Multi-byte characters are underlined with a single character
+ *
+ * Double width characters are not supported (i.e. the resulting underline
+ * is too short).
+ *
+ * The underlining string is only as long as it needs to be, i.e.
+ * it is not right-padded with white space.
+ *
+ * @param str
+ *	The string to sanitise and underline
+ * @param offs,len
+ *	The byte-offset and length of the underline
+ * @return
+ *	The sanitised text and the underline
+ */
+Underlined highlight(std::string const & str, ptrdiff_t const offs,
+                     ptrdiff_t const len = 1);
+
 } /* namespace utility */
 
 #endif /* _POWERDXX_UTILITY_HPP_ */
