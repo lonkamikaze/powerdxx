@@ -1110,8 +1110,10 @@ void read_args(int const argc, char const * const argv[]) {
 			return;
 		}
 	} catch (Exception & e) {
-		e.msg += "\n\n";
-		e.msg += getopt.show();
+		if (e.msg != "") {
+			e.msg += "\n\n";
+			e.msg += getopt.show();
+		}
 		throw;
 	}
 }
