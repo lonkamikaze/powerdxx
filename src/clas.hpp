@@ -182,7 +182,7 @@ char const * sysctlname(char const * const str);
  *
  * @throws errors::Exit::EFORMATFIELD
  *	For unexpected formatting fields
- * @param str
+ * @param fmt
  *	The formatting string to sanitise
  * @param fields
  *	A set of characters representing a printf-style formatting
