@@ -524,7 +524,12 @@ void init() {
 		sprintf_safe(name, g.tempctl_name, i);
 		try {
 			g.cores[i].temp = {{name}};
-			assert(g.cores[i].temp >= 0);
+			decikelvin_t const val = g.cores[i].temp;
+			if (val < 0 || celsius(val) > 255) {
+				fail(Exit::EOUTOFRANGE, 0,
+				     "core %d temperature %s=%dC must be in range [0 K; 255 C]"_fmt
+				     (i, name, celsius(val)));
+			}
 		} catch (sys::sc_error<sys::ctl::error>) {
 			/* user-requested sysctls are mandatory */
 			if (g.tempctl_name != TEMPERATURE) {

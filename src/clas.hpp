@@ -119,7 +119,8 @@ types::decikelvin_t temperature(char const * const str);
  *	The temperature in °C
  */
 inline int celsius(types::decikelvin_t const val) {
-	return (val - 2731 + 5) / 10;
+	auto const valc = val - 2731;
+	return (valc + (valc >= 0) * 5 - (valc < 0) * 5) / 10;
 }
 
 /**
