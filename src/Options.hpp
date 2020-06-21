@@ -636,80 +636,48 @@ class Options {
 	 * @return
 	 *	A string formatted to highlight the given argument
 	 */
-	std::string show(int const i, int const n = 1) const {
+	utility::Underlined show(int const i, int const n = 1) const {
+		using utility::highlight;
+		using std::string;
+
 		/* select a whole argument */
 		char const * const select = (*this)[i];
 		/* if the current option (i == 0) is requested, pick
 		 * up the pointer to the current short option character */
 		char const * const argp = i == 0 ? this->argp : nullptr;
-		using std::string;
-		string cmd;          /* command and arguments string */
-		string ul;           /* underlining string */
-		int hilight = 0;     /* #args left to underline */
-		bool found = false;  /* whether argument i was found */
-		/* build cmd and ul string */
+		string cmd;             /* command and arguments string */
+		ptrdiff_t offset = -1;  /* the underline byte-offset */
+		ptrdiff_t length = 1;   /* the underline byte-length */
+		int remaining = 0;      /* #args left to underline */
+		/* build cmd string */
 		for (int p = 0; p < this->argc; ++p) {
 			/* build each argument character wise */
-			for (auto it = this->argv[p];; ++it) {
-				/* underlining character */
-				char ulc = hilight ? '~' : ' ';
+			for (auto it = this->argv[p]; *it; ++it) {
 				/* underline short option */
 				if (argp && it == argp) {
-					hilight = n > 0 ? n - 1 : -1;
-					ulc = '^';
-					found = true;
+					remaining = n > 0 ? n : -1;
+					it[1] && --remaining;
+					offset = cmd.size();
 				}
 				/* underline long option / argument */
 				if (!argp && it == select) {
-					hilight = n > 0 ? n : -1;
-					ulc = '^';
-					found = true;
+					remaining = n > 0 ? n : -1;
+					offset = cmd.size();
 				}
-				/* add current character,
-				 * continue to stay in the loop */
-				switch (*it) {
-				case 0:
-					/* end of argument,
-					 * add a space behind the argument */
-					cmd += ' ';
-					/* underline only if it's the first
-					 * character to underline */
-					ul += ulc == '^' ? '^' : ' ';
-					break;
-				case '\t':
-					/* symbolic tab */
-					cmd += "\\t";
-					ul += ulc += ulc;
-					continue;
-				case '\n':
-					/* symbolic newline */
-					cmd += "\\n";
-					ul += ulc += ulc;
-					continue;
-				case ' ':
-				case '\\':
-					/* escape */
-					cmd += '\\';
-					ul += ulc;
-					/*[[fallthrough]];*/
-				default:
-					/* regular character */
-					cmd += *it;
-					ul += ulc;
-					continue;
-				}
-				break;
+				/* regular character */
+				cmd += *it;
 			}
-			hilight > 0 && --hilight;
+			/* update the underline length */
+			remaining && (length = cmd.size() - offset);
+			remaining > 0 && --remaining;
+			/* space separate arguments */
+			cmd += ' ';
 		}
 		/* the selected argument must be behind the last argument,
 		 * e.g. because the last parameter is missing an argument
 		 * or the state is OPT_DONE */
-		if (!found) {
-			cmd += ' ';
-			ul += '^';
-		}
-		return cmd + '\n' + ul;
+		offset >= 0 || i < 0 || (offset = cmd.size());
+		return highlight(cmd, offset, length);
 	}
 
 	/**
