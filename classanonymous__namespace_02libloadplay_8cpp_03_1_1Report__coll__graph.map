@@ -1,10 +1,10 @@
 <map id="anonymous_namespace{libloadplay.cpp}::Report" name="anonymous_namespace{libloadplay.cpp}::Report">
-<area shape="rect" id="node1" title="Provides a mechanism to provide frame wise per core load information." alt="" coords="927,73,1089,114"/>
-<area shape="rect" id="node2" title=" " alt="" coords="713,5,781,32"/>
-<area shape="rect" id="node3" href="$classutility_1_1Sum.html" title=" " alt="" coords="667,56,826,83"/>
-<area shape="rect" id="node4" title=" " alt="" coords="652,107,841,163"/>
-<area shape="rect" id="node5" href="$namespaceanonymous__namespace_02libloadplay_8cpp_03.html#structanonymous__namespace_02libloadplay_8cpp_03_1_1CoreFrameReport" title="The report frame information for a single CPU pipeline." alt="" coords="397,107,584,163"/>
-<area shape="rect" id="node6" href="$namespaceanonymous__namespace_02libloadplay_8cpp_03.html#structanonymous__namespace_02libloadplay_8cpp_03_1_1CoreReport" title="The reported state of a single CPU pipeline." alt="" coords="139,114,327,155"/>
+<area shape="rect" id="node1" title="Provides a mechanism to provide frame wise per core load information." alt="" coords="933,73,1096,114"/>
+<area shape="rect" id="node2" title=" " alt="" coords="719,5,787,32"/>
+<area shape="rect" id="node3" href="$classutility_1_1Sum.html" title=" " alt="" coords="673,56,832,83"/>
+<area shape="rect" id="node4" title=" " alt="" coords="657,107,848,163"/>
+<area shape="rect" id="node5" href="$namespaceanonymous__namespace_02libloadplay_8cpp_03.html#structanonymous__namespace_02libloadplay_8cpp_03_1_1CoreFrameReport" title="The report frame information for a single CPU pipeline." alt="" coords="400,107,589,163"/>
+<area shape="rect" id="node6" href="$namespaceanonymous__namespace_02libloadplay_8cpp_03.html#structanonymous__namespace_02libloadplay_8cpp_03_1_1CoreReport" title="The reported state of a single CPU pipeline." alt="" coords="139,114,329,155"/>
 <area shape="rect" id="node7" title=" " alt="" coords="5,121,64,148"/>
-<area shape="rect" id="node8" href="$namespacesys_1_1io.html#namespacesys_1_1io" title=" " alt="" coords="689,187,805,229"/>
+<area shape="rect" id="node8" href="$namespacesys_1_1io.html#namespacesys_1_1io" title=" " alt="" coords="695,187,811,229"/>
 </map>

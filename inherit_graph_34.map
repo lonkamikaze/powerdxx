@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structsys_1_1io_1_1enable__if.html" title="Similar to std::enable_if, but it also has the value of the expression." alt="" coords="5,5,127,47"/>
+<area shape="rect" id="node1" href="$structsys_1_1io_1_1enable__if.html" title=" " alt="" coords="5,5,147,47"/>
+<area shape="rect" id="node2" href="$structsys_1_1io_1_1contains_3_01set_3_01Set_01_8_8_8_01_4_00_01Value_01_4.html" title="Specialise io::contains to unpack io::set." alt="" coords="195,5,352,47"/>
 </map>

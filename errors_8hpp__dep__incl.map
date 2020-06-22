@@ -3,6 +3,6 @@
 <area shape="rect" id="node2" href="$clas_8hpp.html" title="Provides functions to process command line arguments." alt="" coords="141,80,234,107"/>
 <area shape="rect" id="node4" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="5,155,116,181"/>
 <area shape="rect" id="node5" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="259,155,385,181"/>
-<area shape="rect" id="node6" href="$loadplay_8cpp.html" title="Implements loadplay, a bootstrapping tool for libloadplay." alt="" coords="309,80,425,107"/>
+<area shape="rect" id="node6" href="$loadplay_8cpp.html" title="Implements loadplay, a bootstrapping tool for libloadplay." alt="" coords="309,80,426,107"/>
 <area shape="rect" id="node3" href="$clas_8cpp.html" title="Implements functions to process command line arguments." alt="" coords="141,155,234,181"/>
 </map>

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['literals_485',['literals',['../namespaceutility_1_1literals.html',1,'utility']]],
-  ['utility_486',['utility',['../namespaceutility.html',1,'']]]
+  ['literals_510',['literals',['../namespaceutility_1_1literals.html',1,'utility']]],
+  ['utility_511',['utility',['../namespaceutility.html',1,'']]]
 ];

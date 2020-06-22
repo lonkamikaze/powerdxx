@@ -1,9 +1,11 @@
 <map id="src/Options.hpp" name="src/Options.hpp">
-<area shape="rect" id="node1" title="Provides the nih::Options functor template, a substitute for getopt(3)." alt="" coords="125,5,240,32"/>
-<area shape="rect" id="node2" href="$utility_8hpp.html" title="Implements generally useful functions." alt="" coords="96,80,173,107"/>
+<area shape="rect" id="node1" title="Provides the nih::Options functor template, a substitute for getopt(3)." alt="" coords="185,5,300,32"/>
+<area shape="rect" id="node2" href="$utility_8hpp.html" title="Implements generally useful functions." alt="" coords="155,80,234,107"/>
 <area shape="rect" id="node3" title=" " alt="" coords="5,155,88,181"/>
-<area shape="rect" id="node6" title=" " alt="" coords="198,80,263,107"/>
-<area shape="rect" id="node7" title=" " alt="" coords="287,80,353,107"/>
-<area shape="rect" id="node4" title=" " alt="" coords="113,155,167,181"/>
-<area shape="rect" id="node5" title=" " alt="" coords="191,155,249,181"/>
+<area shape="rect" id="node8" title=" " alt="" coords="258,80,323,107"/>
+<area shape="rect" id="node9" title=" " alt="" coords="347,80,413,107"/>
+<area shape="rect" id="node4" title=" " alt="" coords="112,155,187,181"/>
+<area shape="rect" id="node5" title=" " alt="" coords="211,155,272,181"/>
+<area shape="rect" id="node6" title=" " alt="" coords="297,155,351,181"/>
+<area shape="rect" id="node7" title=" " alt="" coords="375,155,433,181"/>
 </map>

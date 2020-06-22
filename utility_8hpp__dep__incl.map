@@ -1,12 +1,13 @@
 <map id="src/utility.hpp" name="src/utility.hpp">
-<area shape="rect" id="node1" title="Implements generally useful functions." alt="" coords="337,5,436,32"/>
-<area shape="rect" id="node2" href="$errors_8hpp.html" title="Common error handling code." alt="" coords="155,80,258,107"/>
+<area shape="rect" id="node1" title="Implements generally useful functions." alt="" coords="375,5,475,32"/>
+<area shape="rect" id="node2" href="$errors_8hpp.html" title="Common error handling code." alt="" coords="186,80,289,107"/>
 <area shape="rect" id="node3" href="$clas_8hpp.html" title="Provides functions to process command line arguments." alt="" coords="56,155,149,181"/>
-<area shape="rect" id="node5" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="283,229,394,256"/>
+<area shape="rect" id="node5" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="425,229,535,256"/>
 <area shape="rect" id="node6" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="123,229,250,256"/>
-<area shape="rect" id="node7" href="$loadplay_8cpp.html" title="Implements loadplay, a bootstrapping tool for libloadplay." alt="" coords="377,155,493,181"/>
-<area shape="rect" id="node8" href="$libloadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD." alt="" coords="643,155,773,181"/>
-<area shape="rect" id="node9" href="$version_8hpp.html" title="Defines types and constants used for version management." alt="" coords="563,80,674,107"/>
-<area shape="rect" id="node10" href="$Options_8hpp.html" title="Provides the nih::Options functor template, a substitute for getopt(3)." alt="" coords="283,80,397,107"/>
+<area shape="rect" id="node7" href="$loadplay_8cpp.html" title="Implements loadplay, a bootstrapping tool for libloadplay." alt="" coords="275,155,392,181"/>
+<area shape="rect" id="node8" href="$libloadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD." alt="" coords="568,155,699,181"/>
+<area shape="rect" id="node9" href="$version_8hpp.html" title="Defines types and constants used for version management." alt="" coords="507,80,618,107"/>
+<area shape="rect" id="node10" href="$Options_8hpp.html" title="Provides the nih::Options functor template, a substitute for getopt(3)." alt="" coords="368,80,483,107"/>
+<area shape="rect" id="node11" href="$utility_8cpp.html" title="Implements generally useful functions not intended for inlining." alt="" coords="774,80,874,107"/>
 <area shape="rect" id="node4" href="$clas_8cpp.html" title="Implements functions to process command line arguments." alt="" coords="5,229,99,256"/>
 </map>

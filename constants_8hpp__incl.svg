@@ -14,7 +14,7 @@
 <title>Node1</title>
 <g id="a_node1"><a xlink:title="Defines a collection of constants.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-112.5 0,-131.5 95,-131.5 95,-112.5 0,-112.5"/>
-<text text-anchor="middle" x="47.5" y="-119.5" font-family="Helvetica" font-size="10.00">src/constants.hpp</text>
+<text text-anchor="middle" x="47.5" y="-119.5" font-family="Helvetica,sans-Serif" font-size="10.00">src/constants.hpp</text>
 </a>
 </g>
 </g>
@@ -23,7 +23,7 @@
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="types_8hpp.html" target="_top" xlink:title="A collection of type aliases.">
 <polygon fill="white" stroke="black" points="18,-56.5 18,-75.5 77,-75.5 77,-56.5 18,-56.5"/>
-<text text-anchor="middle" x="47.5" y="-63.5" font-family="Helvetica" font-size="10.00">types.hpp</text>
+<text text-anchor="middle" x="47.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">types.hpp</text>
 </a>
 </g>
 </g>
@@ -38,7 +38,7 @@
 <title>Node3</title>
 <g id="a_node3"><a xlink:title=" ">
 <polygon fill="white" stroke="#bfbfbf" points="24.5,-0.5 24.5,-19.5 70.5,-19.5 70.5,-0.5 24.5,-0.5"/>
-<text text-anchor="middle" x="47.5" y="-7.5" font-family="Helvetica" font-size="10.00">chrono</text>
+<text text-anchor="middle" x="47.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">chrono</text>
 </a>
 </g>
 </g>

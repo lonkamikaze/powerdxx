@@ -14,8 +14,8 @@
 <title>Node1</title>
 <g id="a_node1"><a xlink:title="Specialise for FILE object linking file instances.">
 <polygon fill="#bfbfbf" stroke="black" points="7.5,-0.5 7.5,-30.5 99.5,-30.5 99.5,-0.5 7.5,-0.5"/>
-<text text-anchor="start" x="15.5" y="-18.5" font-family="Helvetica" font-size="10.00">sys::io::file&lt; link,</text>
-<text text-anchor="middle" x="53.5" y="-7.5" font-family="Helvetica" font-size="10.00"> Features ... &gt;</text>
+<text text-anchor="start" x="15.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">sys::io::file&lt; link,</text>
+<text text-anchor="middle" x="53.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00"> Features ... &gt;</text>
 </a>
 </g>
 </g>
@@ -24,9 +24,9 @@
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="classsys_1_1io_1_1file__feature.html" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="0,-67.5 0,-108.5 107,-108.5 107,-67.5 0,-67.5"/>
-<text text-anchor="start" x="8" y="-96.5" font-family="Helvetica" font-size="10.00">sys::io::file_feature</text>
-<text text-anchor="start" x="8" y="-85.5" font-family="Helvetica" font-size="10.00">&lt; file&lt; link, Features</text>
-<text text-anchor="middle" x="53.5" y="-74.5" font-family="Helvetica" font-size="10.00"> ... &gt;, Features ... &gt;</text>
+<text text-anchor="start" x="8" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">sys::io::file_feature</text>
+<text text-anchor="start" x="8" y="-85.5" font-family="Helvetica,sans-Serif" font-size="10.00">&lt; file&lt; link, Features</text>
+<text text-anchor="middle" x="53.5" y="-74.5" font-family="Helvetica,sans-Serif" font-size="10.00"> ... &gt;, Features ... &gt;</text>
 </a>
 </g>
 </g>

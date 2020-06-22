@@ -1,7 +1,7 @@
 <map id="src/sys/io.hpp" name="src/sys/io.hpp">
-<area shape="rect" id="node1" title="Implements c++ wrappers for &lt;cstdio&gt; I/O functionality." alt="" coords="233,5,337,32"/>
-<area shape="rect" id="node2" href="$libloadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD." alt="" coords="5,80,135,107"/>
-<area shape="rect" id="node3" href="$loadplay_8cpp.html" title="Implements loadplay, a bootstrapping tool for libloadplay." alt="" coords="159,80,275,107"/>
-<area shape="rect" id="node4" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="299,80,409,107"/>
-<area shape="rect" id="node5" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="433,80,560,107"/>
+<area shape="rect" id="node1" title="Implements c++ wrappers for &lt;cstdio&gt; I/O functionality." alt="" coords="236,5,340,32"/>
+<area shape="rect" id="node2" href="$libloadplay_8cpp.html" title="Implements a library intended to be injected into a clock frequency deamon via LD_PRELOAD." alt="" coords="5,80,136,107"/>
+<area shape="rect" id="node3" href="$loadplay_8cpp.html" title="Implements loadplay, a bootstrapping tool for libloadplay." alt="" coords="160,80,277,107"/>
+<area shape="rect" id="node4" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="302,80,413,107"/>
+<area shape="rect" id="node5" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="437,80,563,107"/>
 </map>

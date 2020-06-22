@@ -14,7 +14,7 @@
 <title>Node1</title>
 <g id="a_node1"><a xlink:title="Provides functions to process command line arguments.">
 <polygon fill="#bfbfbf" stroke="black" points="95,-56.5 95,-75.5 165,-75.5 165,-56.5 95,-56.5"/>
-<text text-anchor="middle" x="130" y="-63.5" font-family="Helvetica" font-size="10.00">src/clas.hpp</text>
+<text text-anchor="middle" x="130" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">src/clas.hpp</text>
 </a>
 </g>
 </g>
@@ -23,7 +23,7 @@
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="clas_8cpp.html" target="_top" xlink:title="Implements functions to process command line arguments.">
 <polygon fill="white" stroke="black" points="0,-0.5 0,-19.5 70,-19.5 70,-0.5 0,-0.5"/>
-<text text-anchor="middle" x="35" y="-7.5" font-family="Helvetica" font-size="10.00">src/clas.cpp</text>
+<text text-anchor="middle" x="35" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">src/clas.cpp</text>
 </a>
 </g>
 </g>
@@ -38,7 +38,7 @@
 <title>Node3</title>
 <g id="a_node3"><a xlink:href="loadrec_8cpp.html" target="_top" xlink:title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings.">
 <polygon fill="white" stroke="black" points="88.5,-0.5 88.5,-19.5 171.5,-19.5 171.5,-0.5 88.5,-0.5"/>
-<text text-anchor="middle" x="130" y="-7.5" font-family="Helvetica" font-size="10.00">src/loadrec.cpp</text>
+<text text-anchor="middle" x="130" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">src/loadrec.cpp</text>
 </a>
 </g>
 </g>
@@ -53,7 +53,7 @@
 <title>Node4</title>
 <g id="a_node4"><a xlink:href="powerd_09_09_8cpp.html" target="_top" xlink:title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd.">
 <polygon fill="white" stroke="black" points="189.5,-0.5 189.5,-19.5 284.5,-19.5 284.5,-0.5 189.5,-0.5"/>
-<text text-anchor="middle" x="237" y="-7.5" font-family="Helvetica" font-size="10.00">src/powerd++.cpp</text>
+<text text-anchor="middle" x="237" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">src/powerd++.cpp</text>
 </a>
 </g>
 </g>

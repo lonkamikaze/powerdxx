@@ -14,7 +14,7 @@
 <title>Node1</title>
 <g id="a_node1"><a xlink:title="A collection of type aliases.">
 <polygon fill="#bfbfbf" stroke="black" points="0,-56.5 0,-75.5 76,-75.5 76,-56.5 0,-56.5"/>
-<text text-anchor="middle" x="38" y="-63.5" font-family="Helvetica" font-size="10.00">src/types.hpp</text>
+<text text-anchor="middle" x="38" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">src/types.hpp</text>
 </a>
 </g>
 </g>
@@ -23,7 +23,7 @@
 <title>Node2</title>
 <g id="a_node2"><a xlink:title=" ">
 <polygon fill="white" stroke="#bfbfbf" points="15,-0.5 15,-19.5 61,-19.5 61,-0.5 15,-0.5"/>
-<text text-anchor="middle" x="38" y="-7.5" font-family="Helvetica" font-size="10.00">chrono</text>
+<text text-anchor="middle" x="38" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">chrono</text>
 </a>
 </g>
 </g>

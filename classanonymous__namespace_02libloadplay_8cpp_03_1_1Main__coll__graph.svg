@@ -14,8 +14,8 @@
 <title>Node1</title>
 <g id="a_node1"><a xlink:title="Singleton class representing the main execution environment.">
 <polygon fill="#bfbfbf" stroke="black" points="28.5,-0.5 28.5,-30.5 150.5,-30.5 150.5,-0.5 28.5,-0.5"/>
-<text text-anchor="start" x="36.5" y="-18.5" font-family="Helvetica" font-size="10.00">anonymous_namespace</text>
-<text text-anchor="middle" x="89.5" y="-7.5" font-family="Helvetica" font-size="10.00">{libloadplay.cpp}::Main</text>
+<text text-anchor="start" x="36.5" y="-18.5" font-family="Helvetica,sans-Serif" font-size="10.00">anonymous_namespace</text>
+<text text-anchor="middle" x="89.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">{libloadplay.cpp}::Main</text>
 </a>
 </g>
 </g>
@@ -24,8 +24,8 @@
 <title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacesys_1_1io.html#namespacesys_1_1io" target="_top" xlink:title=" ">
 <polygon fill="white" stroke="black" points="0,-89.5 0,-119.5 87,-119.5 87,-89.5 0,-89.5"/>
-<text text-anchor="start" x="8" y="-107.5" font-family="Helvetica" font-size="10.00">sys::io::file&lt; io::</text>
-<text text-anchor="middle" x="43.5" y="-96.5" font-family="Helvetica" font-size="10.00">own &gt;</text>
+<text text-anchor="start" x="8" y="-107.5" font-family="Helvetica,sans-Serif" font-size="10.00">sys::io::file&lt; io::</text>
+<text text-anchor="middle" x="43.5" y="-96.5" font-family="Helvetica,sans-Serif" font-size="10.00">own &gt;</text>
 </a>
 </g>
 </g>
@@ -34,15 +34,15 @@
 <title>Node2&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M55.93,-79.99C64.28,-64.21 74.99,-43.94 82.05,-30.6"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="52.68,-78.66 51.1,-89.13 58.86,-81.93 52.68,-78.66"/>
-<text text-anchor="middle" x="81" y="-63" font-family="Helvetica" font-size="10.00"> fin</text>
-<text text-anchor="middle" x="81" y="-52" font-family="Helvetica" font-size="10.00">fout</text>
+<text text-anchor="middle" x="81" y="-63" font-family="Helvetica,sans-Serif" font-size="10.00"> fin</text>
+<text text-anchor="middle" x="81" y="-52" font-family="Helvetica,sans-Serif" font-size="10.00">fout</text>
 </g>
 <!-- Node3 -->
 <g id="node3" class="node">
 <title>Node3</title>
 <g id="a_node3"><a xlink:title="STL class.">
 <polygon fill="white" stroke="#bfbfbf" points="105,-95 105,-114 168,-114 168,-95 105,-95"/>
-<text text-anchor="middle" x="136.5" y="-102" font-family="Helvetica" font-size="10.00">std::thread</text>
+<text text-anchor="middle" x="136.5" y="-102" font-family="Helvetica,sans-Serif" font-size="10.00">std::thread</text>
 </a>
 </g>
 </g>
@@ -51,7 +51,7 @@
 <title>Node3&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M126.94,-85.81C118.13,-69.49 105.22,-45.59 97.09,-30.55"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="123.99,-87.71 131.82,-94.84 130.15,-84.38 123.99,-87.71"/>
-<text text-anchor="middle" x="139" y="-57.5" font-family="Helvetica" font-size="10.00"> bgthread</text>
+<text text-anchor="middle" x="139" y="-57.5" font-family="Helvetica,sans-Serif" font-size="10.00"> bgthread</text>
 </g>
 </g>
 </svg>

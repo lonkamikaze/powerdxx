@@ -1,4 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classsys_1_1io_1_1file__feature.html" title=" " alt="" coords="5,5,148,61"/>
-<area shape="rect" id="node2" href="$classsys_1_1io_1_1file_3_01link_00_01Features_01_8_8_8_01_4.html" title="Specialise for FILE object linking file instances." alt="" coords="196,13,319,54"/>
+<area shape="rect" id="node1" href="$classsys_1_1io_1_1file__feature.html" title=" " alt="" coords="5,71,139,112"/>
+<area shape="rect" id="node2" href="$classsys_1_1io_1_1file__feature_3_01FileT_00_01read_00_01Tail_01_8_8_8_01_4.html" title="Implement read support for file types." alt="" coords="188,5,341,47"/>
+<area shape="rect" id="node3" href="$classsys_1_1io_1_1file__feature_3_01FileT_00_01seek_00_01Tail_01_8_8_8_01_4.html" title="Implement seek support for file types." alt="" coords="187,71,343,112"/>
+<area shape="rect" id="node4" href="$classsys_1_1io_1_1file__feature_3_01FileT_00_01write_00_01Tail_01_8_8_8_01_4.html" title="Implement write support for file types." alt="" coords="187,136,343,177"/>
 </map>

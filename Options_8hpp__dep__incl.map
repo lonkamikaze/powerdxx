@@ -1,6 +1,6 @@
 <map id="src/Options.hpp" name="src/Options.hpp">
-<area shape="rect" id="node1" title="Provides the nih::Options functor template, a substitute for getopt(3)." alt="" coords="143,5,258,32"/>
-<area shape="rect" id="node2" href="$loadplay_8cpp.html" title="Implements loadplay, a bootstrapping tool for libloadplay." alt="" coords="5,80,121,107"/>
-<area shape="rect" id="node3" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="145,80,256,107"/>
-<area shape="rect" id="node4" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="280,80,407,107"/>
+<area shape="rect" id="node1" title="Provides the nih::Options functor template, a substitute for getopt(3)." alt="" coords="145,5,260,32"/>
+<area shape="rect" id="node2" href="$loadplay_8cpp.html" title="Implements loadplay, a bootstrapping tool for libloadplay." alt="" coords="5,80,123,107"/>
+<area shape="rect" id="node3" href="$loadrec_8cpp.html" title="Implements a load recorder, useful for simulating loads to test CPU clock daemons and settings." alt="" coords="147,80,258,107"/>
+<area shape="rect" id="node4" href="$powerd_09_09_8cpp.html" title="Implements powerd++ a drop in replacement for FreeBSD&#39;s powerd." alt="" coords="282,80,409,107"/>
 </map>

@@ -1,16 +1,13 @@
 <map id="anonymous_namespace{powerd++.cpp}::Core" name="anonymous_namespace{powerd++.cpp}::Core">
-<area shape="rect" id="node1" title="Contains the management information for a single CPU core." alt="" coords="884,389,1047,430"/>
-<area shape="rect" id="node2" href="$namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup" title="Contains the management information for a group of cores with a common clock frequency." alt="" coords="607,229,789,270"/>
-<area shape="rect" id="node3" title=" " alt="" coords="21,109,80,136"/>
-<area shape="rect" id="node7" title=" " alt="" coords="187,84,359,111"/>
-<area shape="rect" id="node8" href="$classutility_1_1Min.html" title=" " alt="" coords="202,135,345,161"/>
-<area shape="rect" id="node11" href="$classutility_1_1Max.html" title=" " alt="" coords="200,185,347,212"/>
-<area shape="rect" id="node4" title=" " alt="" coords="239,287,307,313"/>
-<area shape="rect" id="node5" href="$classsys_1_1ctl_1_1Sync.html" title=" " alt="" coords="192,388,355,415"/>
-<area shape="rect" id="node6" title=" " alt="" coords="17,415,84,441"/>
-<area shape="rect" id="node14" href="$classsys_1_1ctl_1_1Sync.html" title=" " alt="" coords="387,435,583,461"/>
-<area shape="rect" id="node9" href="$classutility_1_1Min.html" title=" " alt="" coords="186,337,361,364"/>
-<area shape="rect" id="node10" title=" " alt="" coords="5,293,96,320"/>
-<area shape="rect" id="node12" href="$classutility_1_1Max.html" title=" " alt="" coords="184,236,363,263"/>
-<area shape="rect" id="node13" title=" " alt="" coords="662,460,734,487"/>
+<area shape="rect" id="node1" title="Contains the management information for a single CPU core." alt="" coords="747,194,909,235"/>
+<area shape="rect" id="node2" href="$namespaceanonymous__namespace_02powerd_09_09_8cpp_03.html#structanonymous__namespace_02powerd_09_09_8cpp_03_1_1CoreGroup" title="Contains the management information for a group of cores with a common clock frequency." alt="" coords="468,157,652,198"/>
+<area shape="rect" id="node3" title=" " alt="" coords="21,84,80,111"/>
+<area shape="rect" id="node5" title=" " alt="" coords="183,59,355,85"/>
+<area shape="rect" id="node6" href="$classutility_1_1Min.html" title=" " alt="" coords="198,109,341,136"/>
+<area shape="rect" id="node9" href="$classutility_1_1Max.html" title=" " alt="" coords="196,160,343,187"/>
+<area shape="rect" id="node4" title=" " alt="" coords="235,211,303,237"/>
+<area shape="rect" id="node7" href="$classutility_1_1Min.html" title=" " alt="" coords="182,268,357,295"/>
+<area shape="rect" id="node8" title=" " alt="" coords="5,293,96,320"/>
+<area shape="rect" id="node10" href="$classutility_1_1Max.html" title=" " alt="" coords="180,319,359,345"/>
+<area shape="rect" id="node11" title=" " alt="" coords="524,239,596,265"/>
 </map>

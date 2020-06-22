@@ -1,11 +1,13 @@
 <map id="src/clas.hpp" name="src/clas.hpp">
-<area shape="rect" id="node1" title="Provides functions to process command line arguments." alt="" coords="179,5,273,32"/>
-<area shape="rect" id="node2" href="$types_8hpp.html" title="A collection of type aliases." alt="" coords="5,80,84,107"/>
-<area shape="rect" id="node4" href="$errors_8hpp.html" title="Common error handling code." alt="" coords="109,80,189,107"/>
-<area shape="rect" id="node5" href="$utility_8hpp.html" title="Implements generally useful functions." alt="" coords="158,155,235,181"/>
-<area shape="rect" id="node7" title=" " alt="" coords="249,229,304,256"/>
-<area shape="rect" id="node9" title=" " alt="" coords="314,80,367,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="14,155,75,181"/>
-<area shape="rect" id="node6" title=" " alt="" coords="61,229,143,256"/>
-<area shape="rect" id="node8" title=" " alt="" coords="168,229,225,256"/>
+<area shape="rect" id="node1" title="Provides functions to process command line arguments." alt="" coords="289,5,383,32"/>
+<area shape="rect" id="node2" href="$types_8hpp.html" title="A collection of type aliases." alt="" coords="115,80,194,107"/>
+<area shape="rect" id="node4" href="$errors_8hpp.html" title="Common error handling code." alt="" coords="219,80,299,107"/>
+<area shape="rect" id="node5" href="$utility_8hpp.html" title="Implements generally useful functions." alt="" coords="219,155,298,181"/>
+<area shape="rect" id="node9" title=" " alt="" coords="378,229,433,256"/>
+<area shape="rect" id="node11" title=" " alt="" coords="424,80,477,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="124,155,185,181"/>
+<area shape="rect" id="node6" title=" " alt="" coords="5,229,88,256"/>
+<area shape="rect" id="node7" title=" " alt="" coords="112,229,187,256"/>
+<area shape="rect" id="node8" title=" " alt="" coords="211,229,272,256"/>
+<area shape="rect" id="node10" title=" " alt="" coords="297,229,354,256"/>
 </map>
