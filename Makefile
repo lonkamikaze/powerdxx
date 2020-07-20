@@ -2,7 +2,7 @@ FLAGS=         -std=${STD} -Wall -Werror -pedantic
 STD=           c++17
 DBGFLAGS=      -O0 -g -DEBUG
 PFLAGS=        -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error
-TESTBUILDS=    clang++90 clang++80 clang++70 g++9
+TESTBUILDS=    clang++10 clang++90 clang++80 g++9
 
 PREFIX?=       /usr/local
 DOCSDIR?=      ${PREFIX}/share/doc/powerdxx
