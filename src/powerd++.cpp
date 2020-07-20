@@ -468,11 +468,12 @@ void init() {
 			state.freq_max = line_unknown.freq_max;
 		}
 		/* check user frequency boundaries */
-		if (state.freq_min < state.freq_max) { continue; }
-		fail(Exit::EOUTOFRANGE, 0,
-		     "frequency limits 'min < max' violation:\n"
-		     "\t%s [%d MHz, %d MHz]"_fmt
-		     (state.name, state.freq_min, state.freq_max));
+		if (state.freq_min >= state.freq_max) {
+			fail(Exit::EOUTOFRANGE, 0,
+			     "frequency limits 'min < max' violation:\n"
+			     "\t%s [%d MHz, %d MHz]"_fmt
+			     (state.name, state.freq_min, state.freq_max));
+		}
 	}
 
 	/* setup temperature throttling */
