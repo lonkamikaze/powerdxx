@@ -381,8 +381,7 @@ static_assert(countof(g.acstates) == to_value(AcLineState::LENGTH),
 template <typename... MsgTs>
 inline void verbose(MsgTs &&... msg) {
 	if (g.verbose) {
-		io::ferr.print("powerd++: ");
-		io::ferr.printf(std::forward<MsgTs>(msg)...);
+		io::ferr.print("powerd++: ").printf(std::forward<MsgTs>(msg)...);
 	}
 }
 
