@@ -206,7 +206,7 @@ struct Core {
 };
 
 /**
- * A collection of all the gloabl, mutable states.
+ * A collection of all the global, mutable states.
  *
  * This is mostly for semantic clarity.
  */
