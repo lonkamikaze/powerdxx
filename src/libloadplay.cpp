@@ -326,11 +326,6 @@ class SysctlValue {
 	std::recursive_mutex mutable mtx;
 
 	/**
-	 * Lock guard type, fitting the mutex.
-	 */
-	typedef std::lock_guard<decltype(mtx)> lock_guard;
-
-	/**
 	 * The sysctl type.
 	 */
 	unsigned int type;
@@ -363,7 +358,7 @@ class SysctlValue {
 	 */
 	template <typename T>
 	size_t size() const {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		size_t count = 0;
 		T value;
 		for (auto fetch = FromChars{this->value};
@@ -384,7 +379,7 @@ class SysctlValue {
 	 *	The instance to copy
 	 */
 	SysctlValue(SysctlValue const & copy) {
-		lock_guard const copylock{copy.mtx};
+		std::scoped_lock const copylock{copy.mtx};
 		this->type = copy.type;
 		this->value = copy.value;
 		this->onSet = copy.onSet;
@@ -424,8 +419,7 @@ class SysctlValue {
 	 *	A self reference
 	 */
 	SysctlValue & operator =(SysctlValue const & copy) {
-		lock_guard const copylock{copy.mtx};
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{copy.mtx, this->mtx};
 		this->type = copy.type;
 		this->value = copy.value;
 		this->onSet = copy.onSet;
@@ -441,7 +435,7 @@ class SysctlValue {
 	 *	A self reference
 	 */
 	SysctlValue & operator =(SysctlValue && move) {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		this->type = move.type;
 		this->value = std::move(move.value);
 		this->onSet = std::move(move.onSet);
@@ -457,7 +451,7 @@ class SysctlValue {
 	 *	Throws -1 if the current CTLTYPE is not implemented.
 	 */
 	size_t size() const {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 
 		switch (this->type) {
 		case CTLTYPE_STRING:
@@ -488,7 +482,7 @@ class SysctlValue {
 	 */
 	template <typename T>
 	int get(T * dst, size_t & size) const {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		size /= sizeof(T);
 		size_t i = 0;
 		auto fetch = FromChars{this->value};
@@ -509,7 +503,7 @@ class SysctlValue {
 	 *	also sets errno=ENOMEM
 	 */
 	int get(char * dst, size_t & size) const {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		auto const strsize = this->value.size();
 		size = std::min(strsize, size - 1);
 		for (size_t i = 0; i < size; ++i) { dst[i] = value[i]; }
@@ -529,7 +523,7 @@ class SysctlValue {
 	 */
 	template <typename T>
 	T get() const {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		T result{};
 		auto fetch = FromChars{this->value};
 		if (!fetch(result)) {
@@ -550,7 +544,7 @@ class SysctlValue {
 	 *	also sets errno=ENOMEM
 	 */
 	int get(void * dst, size_t & size) const {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 
 		switch (this->type) {
 		case CTLTYPE_STRING:
@@ -592,7 +586,7 @@ class SysctlValue {
 	 *	The source buffer and size
 	 */
 	int set(void const * const newp, size_t newlen) {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		switch (this->type) {
 		case CTLTYPE_STRING:
 			this->set(std::string{static_cast<char const *>(newp), newlen - 1});
@@ -620,7 +614,7 @@ class SysctlValue {
 	 *	The new value
 	 */
 	void set(std::string && value) {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		this->value = std::move(value);
 		this->onSet(*this);
 	}
@@ -632,7 +626,7 @@ class SysctlValue {
 	 *	The new value
 	 */
 	void set(std::string const & value) {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		this->value = value;
 		this->onSet(*this);
 	}
@@ -657,7 +651,7 @@ class SysctlValue {
 	 *	The function to move to the callback handler
 	 */
 	void registerOnSet(callback_function && callback) {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		this->onSet = std::move(callback);
 	}
 
@@ -668,7 +662,7 @@ class SysctlValue {
 	 *	The function to copy to the callback handler
 	 */
 	void registerOnSet(callback_function const & callback) {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		this->onSet = callback;
 	}
 };
@@ -681,7 +675,7 @@ class SysctlValue {
  */
 template <>
 std::string SysctlValue::get<std::string>() const {
-	lock_guard const lock{this->mtx};
+	std::scoped_lock const lock{this->mtx};
 	return this->value;
 }
 
@@ -769,11 +763,6 @@ class Sysctls {
 	std::mutex mutable mtx;
 
 	/**
-	 * The appropriate lock guard type for mtx.
-	 */
-	typedef std::lock_guard<decltype(mtx)> lock_guard;
-
-	/**
 	 * Maps name → mib.
 	 */
 	std::unordered_map<std::string, mib_t> mibs{
@@ -817,7 +806,7 @@ class Sysctls {
 	 *	The value to store
 	 */
 	void addValue(mib_t const & mib, std::string const & value) {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		this->sysctls[mib].set(value);
 	}
 
@@ -831,7 +820,7 @@ class Sysctls {
 	 */
 	void addValue(std::string const & name, std::string const & value) {
 		try {
-			lock_guard const lock{this->mtx};
+			std::scoped_lock const lock{this->mtx};
 			this->sysctls[this->mibs.at(name)].set(value);
 		} catch (std::out_of_range &) {
 			/* get the base mib */
@@ -847,7 +836,7 @@ class Sysctls {
 			auto const expr = "\\.([0-9]+)\\."_r;
 			if (std::regex_search(name, match, expr) &&
 			    FromChars{match[1]}(mib[1])) {
-				lock_guard const lock{this->mtx};
+				std::scoped_lock const lock{this->mtx};
 				/* map name → mib */
 				this->mibs[name] = mib;
 				/* inherit type from base */
@@ -865,7 +854,7 @@ class Sysctls {
 	 *	The MIB
 	 */
 	mib_t const & getMib(char const * const name) const {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		return this->mibs.at(name);
 	}
 
@@ -881,7 +870,7 @@ class Sysctls {
 	 *	The MIB of the base name
 	 */
 	mib_t const & getBaseMib(char const * const name) const {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		auto const expr = "\\.([0-9]+)\\."_r;
 		auto const baseName = std::regex_replace(name, expr, ".%d.");
 		return this->mibs.at(baseName);
@@ -908,7 +897,7 @@ class Sysctls {
 	 *	A SysctlValue reference
 	 */
 	SysctlValue & operator [](mib_t const & mib) {
-		lock_guard const lock{this->mtx};
+		std::scoped_lock const lock{this->mtx};
 		return this->sysctls.at(mib);
 	}
 } sysctls{}; /**< Sole instance of \ref Sysctls. */
