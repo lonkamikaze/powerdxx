@@ -8,95 +8,120 @@
 
 using namespace utility::literals;
 
-utility::Underlined
-utility::highlight(std::string const & str, ptrdiff_t const offs,
-                   ptrdiff_t const len) {
-	using std::cbegin;
-	using std::cend;
+/**
+ * File local scope.
+ */
+namespace {
 
-	std::string txt;
-	std::string ul;
-	auto const beg = cbegin(str);
+/**
+ * Append a string literal to a sanitised string.
+ *
+ * Updates the meta data along with the string.
+ *
+ * @tparam SizeV
+ *	The string literal size, including the terminator
+ * @param lhs
+ *	The sanitised string to update
+ * @param rhs
+ *	The string literal to append
+ */
+template <std::size_t SizeV>
+constexpr utility::Sanitised &
+operator +=(utility::Sanitised & lhs, char const (& rhs)[SizeV]) {
+	lhs.text += rhs;
+	lhs.width += (SizeV - 1);
+	return lhs;
+}
+
+} /* namespace */
+
+utility::Sanitised  utility::sanitise(std::string_view const & str) {
+	Sanitised result{};
+	auto & text  = result.text;
+	auto & width = result.width;
 	auto const end = cend(str);
-	int merge = 0;
+	for (auto it = cbegin(str); it != end; ++it) {
+		/* utf-8 multi-byte */
+		if (std::size_t bytes = 0;
+		    ((*it & 0xe0) == 0xc0 && (bytes = 2)) ||  /* 2-byte */
+		    ((*it & 0xf0) == 0xe0 && (bytes = 3)) ||  /* 3-byte */
+		    ((*it & 0xf8) == 0xf0 && (bytes = 4))) {  /* 4-byte */
+			text += *it;
+			for (std::size_t i = 1; i < bytes; ++i) {
+				if (it + 1 != end && (it[1] & 0xc0) == 0x80) {
+					text += *(++it);
+				}
+			}
+			++width;
+			continue;
+		}
 
-	/* sanitise and underline the string character wise */
-	for (auto it = begin(str); it != end; ++it) {
-		/* underlining character ' ', '^', '~' or '\0' */
-		char const ulc = (it - beg <  offs)        * ' ' +
-		                 (it - beg == offs)        * '^' +
-		                 (it - beg >  offs)        *
-		                 (it - beg <  offs + len)  * '~';
-		/* string style appends do not, unlike single character
-		 * appends, inject 0 bytes into a string */
-		char const ulcx2[]{ulc, ulc, 0};
-		char const * const ulcx1 = ulcx2 + 1;
-		/* utf-8 multi-byte heads */
-		if (((*it & 0xe0) == 0xc0 && (merge = 1)) ||  /* 2-byte */
-		    ((*it & 0xf0) == 0xe0 && (merge = 2)) ||  /* 3-byte */
-		    ((*it & 0xf8) == 0xf0 && (merge = 3))) {  /* 4-byte */
-			txt += *it;
-			ul += ulcx1;
-			continue;
-		}
-		/* utf-8 multi-byte tail, do not underline, because
-		 * it is merged with a previous character */
-		if (merge && (*it & 0xc0) == 0x80) {
-			--merge;
-			txt += *it;
-			continue;
-		}
-		merge = 0;
 		/* printf control characters */
 		switch (*it) {
 		case '\a':
-			txt += "\\a";
-			ul  += ulcx2;
+			result += "\\a";
 			continue;
 		case '\b':
-			txt += "\\b";
-			ul  += ulcx2;
+			result += "\\b";
 			continue;
 		case '\f':
-			txt += "\\f";
-			ul  += ulcx2;
+			result += "\\f";
 			continue;
 		case '\n':
-			txt += "\\n";
-			ul  += ulcx2;
+			result += "\\n";
 			continue;
 		case '\r':
-			txt += "\\r";
-			ul  += ulcx2;
+			result += "\\r";
 			continue;
 		case '\t':
-			txt += "\\t";
-			ul  += ulcx2;
+			result += "\\t";
 			continue;
 		case '\v':
-			txt += "\\v";
-			ul  += ulcx2;
+			result += "\\v";
 			continue;
 		case '\\':
-			txt += "\\\\";
-			ul  += ulcx2;
+			result += "\\\\";
 			continue;
 		}
 		/* other control characters and invalid code points */
-		if (*it < ' ' || *it >= 0x7f) {
+		if (*it < ' ') {
 			auto const escaped = "\\%o"_fmt(*it & 0xff);
-			for (auto const tch : escaped) {
-				txt += tch;
-				ul  += ulcx1;
-			}
+			text += escaped;
+			width += escaped.size();
 			continue;
 		}
 		/* regular characters */
-		txt += *it;
-		ul  += ulcx1;
+		text += *it;
+		++width;
 	}
-	if (offs >= end - beg) {
-		ul += '^';
+	return result;
+}
+
+utility::Underlined
+utility::highlight(std::string_view const & str, std::size_t const offs,
+                   std::size_t const len) {
+	/*
+	 * Sanitise the string in 3 stages to get a separate count
+	 * of visible characters for each stage.
+	 */
+	/* before the underlining offset */
+	auto [text, width] = sanitise(str.substr(0, offs));
+	Underlined result{std::move(text)};
+	result.line.insert(0, width, ' ');
+
+	/* the underlined section */
+	result.line += '^';
+	if (offs < str.size()) {
+		auto [text, width] = sanitise(str.substr(offs, len));
+		result.text += text;
+		result.line.insert(result.line.size(), width - 1, '~');
 	}
-	return {txt, ul};
+
+	/* behind the underlined section */
+	if (offs + len < str.size()) {
+		auto [text, width] = sanitise(str.substr(offs + len));
+		result.text += text;
+	}
+
+	return result;
 }

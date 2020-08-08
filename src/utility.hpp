@@ -407,6 +407,38 @@ struct FromChars {
 };
 
 /**
+ * Bundles a string with printf-style escapes along with the number
+ * of printable characters.
+ */
+struct Sanitised {
+	/**
+	 * The text with printf-style escapes.
+	 */
+	std::string text;
+
+	/**
+	 * The number of visible characters in the text.
+	 *
+	 * I.e. multi-byte characters count a single characters, escaped
+	 * characters count as the number of characters from their
+	 * visual representation.
+	 */
+	std::size_t width;
+};
+
+/**
+ * Produces a sanitised string that is safe to display.
+ *
+ * Escapes control and invalid characters with printf(3) style escapes.
+ *
+ * @param str
+ *	The string to escape
+ * @return
+ *	The sanitised string with meta information
+ */
+Sanitised sanitise(std::string_view const & str);
+
+/**
  * A line of text and an underlining line.
  *
  * The text and the line are kept in a separate string to ease indenting
@@ -457,8 +489,8 @@ struct Underlined {
  * @return
  *	The sanitised text and the underline
  */
-Underlined highlight(std::string const & str, ptrdiff_t const offs,
-                     ptrdiff_t const len = 1);
+Underlined highlight(std::string_view const & str, std::size_t const offs,
+                     std::size_t const len = 1);
 
 } /* namespace utility */
 
