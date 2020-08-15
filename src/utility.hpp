@@ -424,6 +424,13 @@ struct Sanitised {
 	 * visual representation.
 	 */
 	std::size_t width;
+
+	/**
+	 * Implicit conversion to std::string.
+	 */
+	operator std::string const &() const {
+		return text;
+	}
 };
 
 /**

@@ -62,6 +62,7 @@ using utility::to_value;
 using namespace utility::literals;
 using utility::Min;
 using utility::Max;
+using utility::sanitise;
 
 using constants::CP_TIMES;
 using constants::ACLINE;
@@ -1277,7 +1278,7 @@ void run_daemon() try {
 		pidfile.write();
 	} catch (sys::sc_error<sys::pid::error> e) {
 		fail(Exit::EPID, e,
-		     "cannot write to pidfile: "s + g.pidfilename);
+		     "cannot write to pidfile: "s += sanitise(g.pidfilename));
 	}
 
 	/* the main loop */
