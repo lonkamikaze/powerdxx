@@ -532,6 +532,11 @@ void init() {
 				     (i, name, celsius(val)));
 			}
 		} catch (sys::sc_error<sys::ctl::error>) {
+			if (0 < i) {
+				verbose("cannot access sysctl: %s\n", name);
+				g.cores[i].temp = g.cores[i - 1].temp;
+				continue;
+			}
 			/* user-requested sysctls are mandatory */
 			if (g.tempctl_name != TEMPERATURE) {
 				fail(Exit::ESYSCTLNAME, 0,
