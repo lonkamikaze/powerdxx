@@ -581,14 +581,7 @@ void init() {
 			group->min = min;
 			group->max = max;
 		} catch (sys::sc_error<sys::ctl::error>) {
-			if (g.temp_throttling) {
-				verbose("cannot access sysctl: %s\n"
-				        "\ttemperature throttling: off\n",
-				        name);
-				g.temp_throttling = false;
-			} else {
-				verbose("cannot access sysctl: %s\n", name);
-			}
+			verbose("cannot access sysctl: %s\n", name);
 		}
 
 		/* check freq_drivers  */
