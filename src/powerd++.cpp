@@ -1144,12 +1144,10 @@ void show_settings() {
 	                "\tCPU cores:             %d\n"
 	                "Core Groups\n", g.ncpu);
 	assert(g.groups && g.ngroups);
-	auto * group = &g.groups[0];
-	for (coreid_t b = 0, e = 1; e <= g.ncpu; ++e) {
-		if (e == g.ncpu || group != g.cores[e].group) {
-			io::ferr.printf("\t%3d:                   [%d, %d]\n", b, b, e - 1);
+	for (coreid_t gid = 0, b = 0, e = 1; e <= g.ncpu; ++e) {
+		if (e == g.ncpu || g.cores[b].group != g.cores[e].group) {
+			io::ferr.printf("\t%3d:                   [%d, %d]\n", gid++, b, e - 1);
 			b = e;
-			group = g.cores[e].group;
 		}
 	}
 	io::ferr.print("Core Group Frequency Limits\n");
