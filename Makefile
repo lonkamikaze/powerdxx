@@ -3,6 +3,7 @@ STD=           c++17
 DBGFLAGS=      -O0 -g -DEBUG
 PFLAGS=        -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error \
                -fsanitize=address
+PROFILEFLAGS=  -pg
 TESTBUILDS=    clang++13 clang++12 clang++11 g++11 g++10
 
 PREFIX?=       /usr/local
@@ -75,8 +76,11 @@ CXXFLAGS+= ${FLAGS}
 .ifmake(paranoid)
 CXXFLAGS+= ${PFLAGS}
 .endif
+.ifmake(profile)
+CXXFLAGS+= ${PROFILEFLAGS}
+.endif
 
-debug paranoid: ${.TARGETS:Ndebug:Nparanoid:S/^$/all/W}
+debug paranoid profile: ${.TARGETS:Ndebug:Nparanoid:Nprofile:S/^$/all/W}
 
 # Final addition to CXXFLAGS, target specific flags
 CXXFLAGS+= ${CXXFLAGS.${.TARGET}}
