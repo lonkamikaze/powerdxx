@@ -3,7 +3,7 @@ STD=           c++17
 DBGFLAGS=      -O0 -g -DEBUG
 PFLAGS=        -fstack-protector -fsanitize=undefined -fsanitize-undefined-trap-on-error \
                -fsanitize=address
-TESTBUILDS=    clang++10 clang++90 clang++80 g++9
+TESTBUILDS=    clang++13 clang++12 clang++11 g++11 g++10
 
 PREFIX?=       /usr/local
 DOCSDIR?=      ${PREFIX}/share/doc/powerdxx
